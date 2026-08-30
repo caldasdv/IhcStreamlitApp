@@ -105,7 +105,7 @@ Como estudante quero criar, visualizar e escolher meu período acadêmico atual 
 - Critérios de aceitação: nome e intervalo válidos; nome único por usuário; primeiro período torna-se atual; somente período ativo e pertencente ao usuário pode ser selecionado; arquivamento preserva histórico e não remove o período atual; estados vazio, erro e sucesso tratados.
 - Dependências: identidade OIDC, repositories e MongoDB Atlas.
 - Complexidade: M
-- Status: REVIEW (implementada na PR #21; integração à `main` pendente).
+- Status: DONE (integrada à `main` pela PR #21).
 
 ### US-017
 
