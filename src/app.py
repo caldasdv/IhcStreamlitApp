@@ -10,8 +10,8 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
 
-APP_DIR = Path(__file__).parent
-load_dotenv(APP_DIR / ".env")
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+load_dotenv(PROJECT_DIR / ".env")
 
 
 @st.cache_resource

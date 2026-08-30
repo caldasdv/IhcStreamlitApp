@@ -15,7 +15,7 @@ Protótipo de um planejador de estudos feito com Streamlit e MongoDB Atlas. O ba
 
 ```bash
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 ## Variáveis de ambiente
@@ -31,3 +31,5 @@ Depois substitua `<db_password>` pela senha do usuário criado no MongoDB Atlas.
 ## Rodar em uma VPS ou no Community Cloud
 
 Configure `MONGODB_URI` nas variáveis de ambiente da VPS ou nos Secrets do Community Cloud. O app não depende mais de SQLite ou Google Drive.
+
+No Community Cloud, use `src/app.py` como arquivo principal da aplicação.
