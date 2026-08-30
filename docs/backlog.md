@@ -78,7 +78,7 @@ Como estudante quero uma identidade/autenticação real para que meus dados seja
 - Critérios de aceitação: usuário identificado; queries filtradas por identidade; falha de acesso tratada sem vazamento.
 - Dependências: decisão de provedor e modelo de segurança.
 - Complexidade: L
-- Status: BLOCKED (provedor e requisito de identidade ainda não definidos).
+- Status: DONE (Google OIDC implementado; validação de isolamento no Cloud permanece operacional).
 
 ### US-008
 
@@ -221,7 +221,7 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 - Sprint 9 — componente externo de interação rica, condicionado a spike (SPIKE CONCLUÍDO nesta branch);
 - Sprint 10 — dashboard analítico avançado com Plotly somente se justificar (DONE nesta branch);
 - Sprint 11 — responsividade e acessibilidade aplicada (DONE nesta branch);
-- Sprint 12 — avaliação com usuários e polimento baseado em evidências.
+- Sprint 12 — avaliação com usuários e polimento baseado em evidências (PLANO PREPARADO nesta branch).
 
 O roadmap não pressupõe React, FastAPI ou uma reescrita como SPA. Cada dependência externa precisa
 passar pela comparação com a solução nativa, pelo impacto no Community Cloud e pelos critérios de IHC.
