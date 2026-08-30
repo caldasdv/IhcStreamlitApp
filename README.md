@@ -19,7 +19,7 @@ Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/datab
 ## Estrutura
 
 - `app.py`: shell, configuração visual e navegação nativa com `st.navigation`.
-- `app_pages/`: uma página Streamlit por fluxo da aplicação.
+- `app_pages/`: uma página Streamlit por fluxo da aplicação, incluindo a visão semanal.
 - `src/ui/`: contexto, sidebar, estilos e componentes reutilizáveis.
 - `src/services/`: casos de uso sem dependência direta da UI.
 - `src/repositories/`: contratos e adapters MongoDB.

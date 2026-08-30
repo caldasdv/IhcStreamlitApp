@@ -58,7 +58,7 @@ Como estudante quero editar e reagendar sessões para corrigir meu plano sem rec
 - Critérios de aceitação: edição valida os mesmos campos; reagendamento revalida conflitos; cancelamento não altera outras sessões.
 - Dependências: US-002 e repositories.
 - Complexidade: M
-- Status: BACKLOG.
+- Status: DONE.
 
 ### US-006
 
@@ -68,7 +68,7 @@ Como estudante quero uma visão semanal com ações rápidas para revisar minha 
 - Critérios de aceitação: sete dias visíveis; sessões agrupadas por dia; ação de concluir disponível com feedback.
 - Dependências: US-001, US-003.
 - Complexidade: M
-- Status: BACKLOG.
+- Status: DONE.
 
 ### US-007
 

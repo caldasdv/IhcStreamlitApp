@@ -54,5 +54,41 @@ class SessionService:
     def complete(self, session_id: Any, user_id: Any) -> None:
         self.repository.mark_completed(session_id, user_id)
 
+    def update(
+        self,
+        *,
+        session_id: Any,
+        user_id: Any,
+        subject_id: Any,
+        topic: str,
+        goal: str,
+        study_date: date,
+        study_time: time,
+        duration: int,
+        priority: str,
+    ) -> None:
+        """Edita uma sessão e revalida conflito, ignorando a própria sessão."""
+        validate_new_session(topic=topic, study_date=study_date, duration=duration)
+        existing = [
+            item
+            for item in self.repository.list_pending_by_date(user_id, study_date)
+            if item.get("_id") != session_id
+        ]
+        if sessions_conflict(study_time, duration, existing):
+            raise ValueError("Esse horário conflita com outra sessão pendente.")
+        self.repository.update(
+            session_id,
+            user_id,
+            {
+                "subject_id": subject_id,
+                "topic": topic.strip(),
+                "study_date": study_date.isoformat(),
+                "study_time": study_time.strftime("%H:%M"),
+                "duration": duration,
+                "priority": priority,
+                "goal": goal.strip(),
+            },
+        )
+
     def delete(self, session_id: Any, user_id: Any) -> None:
         self.repository.delete(session_id, user_id)
