@@ -16,12 +16,26 @@ load_dotenv(PROJECT_DIR / ".env")
 
 @st.cache_resource
 def get_database():
-    uri = os.getenv("MONGODB_URI")
+    uri = get_mongodb_uri()
     if not uri:
-        raise RuntimeError("MONGODB_URI não foi encontrada no arquivo .env.")
+        raise RuntimeError("MONGODB_URI não foi configurada nos Secrets ou no ambiente.")
     client = MongoClient(uri, server_api=ServerApi("1"), serverSelectionTimeoutMS=5000)
     client.admin.command("ping")
-    return client["plano_estudos"]
+    db = client["plano_estudos"]
+    db.users.create_index("email", unique=True)
+    db.subjects.create_index([("user_id", 1), ("name", 1)])
+    db.study_sessions.create_index([("user_id", 1), ("study_date", 1), ("study_time", 1)])
+    return db
+
+
+def get_mongodb_uri() -> str | None:
+    try:
+        if "MONGODB_URI" in st.secrets:
+            return st.secrets["MONGODB_URI"]
+    except Exception:
+        # Localmente, st.secrets pode não existir; nesse caso usamos .env.
+        pass
+    return os.getenv("MONGODB_URI")
 
 
 def seed_database(db) -> None:
@@ -119,7 +133,7 @@ try:
     seed_database(db)
 except Exception as error:
     st.error("Não foi possível conectar ao MongoDB Atlas.")
-    st.code(str(error))
+    st.caption(f"Detalhe técnico: {type(error).__name__}")
     st.stop()
 
 user = db.users.find_one({})
