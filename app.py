@@ -120,7 +120,7 @@ subjects = query("SELECT * FROM subjects WHERE user_id = ? ORDER BY name", (user
 with st.sidebar:
     st.markdown("### Plano")
     st.caption("Planejador de estudos")
-    page = st.radio("Navegação", ["Visão geral", "Nova sessão", "Disciplinas"], label_visibility="collapsed")
+    page = st.selectbox("Navegação", ["Visão geral", "Nova sessão", "Disciplinas"], label_visibility="collapsed")
     st.divider()
     st.caption("Usuário de teste")
     st.write(user["name"])
@@ -186,7 +186,7 @@ elif page == "Nova sessão":
         study_date = col1.date_input("Data", value=date.today(), format="DD/MM/YYYY")
         study_time = col2.time_input("Horário", value=time(14, 0), step=900)
         duration = col3.selectbox("Duração", [25, 45, 60, 90, 120], index=2, format_func=lambda x: f"{x} minutos")
-        priority = st.radio("Prioridade", ["Baixa", "Média", "Alta"], horizontal=True, index=1)
+        priority = st.selectbox("Prioridade", ["Baixa", "Média", "Alta"], index=1)
         submitted = st.form_submit_button("Adicionar sessão", type="primary", use_container_width=True)
     if submitted:
         if not topic.strip():
