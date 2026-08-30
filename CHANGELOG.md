@@ -8,6 +8,7 @@
 - Template seguro de configuração do MongoDB Atlas para Streamlit Community Cloud.
 - Primeiras regras de domínio de sessões extraídas e testes unitários preparados.
 - Conexão, seed, repositories e services separados da UI; testes com fakes adicionados.
+- Telas separadas em `app_pages/` com navegação nativa e carregamento com feedback visível.
 
 ### Changed
 
