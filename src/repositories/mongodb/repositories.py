@@ -46,6 +46,9 @@ class MongoStudySessionRepository:
     def create(self, data: dict[str, Any]) -> Any:
         return self.collection.insert_one(data).inserted_id
 
+    def update(self, session_id: Any, user_id: Any, data: dict[str, Any]) -> None:
+        self.collection.update_one({"_id": session_id, "user_id": user_id}, {"$set": data})
+
     def mark_completed(self, session_id: Any, user_id: Any) -> None:
         self.collection.update_one({"_id": session_id, "user_id": user_id}, {"$set": {"status": "Concluída"}})
 

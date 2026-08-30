@@ -10,6 +10,7 @@ class FakeSessionRepository:
     def __init__(self, pending=None):
         self.pending = pending or []
         self.created = []
+        self.updated = []
         self.completed = []
         self.deleted = []
 
@@ -25,6 +26,9 @@ class FakeSessionRepository:
 
     def mark_completed(self, session_id, user_id):
         self.completed.append((session_id, user_id))
+
+    def update(self, session_id, user_id, data):
+        self.updated.append((session_id, user_id, data))
 
     def delete(self, session_id, user_id):
         self.deleted.append((session_id, user_id))
@@ -68,6 +72,26 @@ def test_session_service_rejects_conflicting_session():
         )
 
     assert repository.created == []
+
+
+def test_session_service_updates_own_session_without_self_conflict():
+    repository = FakeSessionRepository([{"_id": "session-id", "study_time": "14:00", "duration": 60}])
+    service = SessionService(repository)
+
+    service.update(
+        session_id="session-id",
+        user_id="user-id",
+        subject_id="subject-id",
+        topic="Revisão",
+        goal="",
+        study_date=date(2026, 8, 30),
+        study_time=time(14, 30),
+        duration=30,
+        priority="Média",
+    )
+
+    assert repository.updated[0][0:2] == ("session-id", "user-id")
+    assert repository.updated[0][2]["topic"] == "Revisão"
 
 
 def test_subject_service_rejects_blank_name():

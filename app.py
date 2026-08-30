@@ -17,6 +17,7 @@ page = st.navigation(
     [
         st.Page("app_pages/overview.py", title="Visão geral", icon=":material/home:"),
         st.Page("app_pages/new_session.py", title="Nova sessão", icon=":material/add_circle:"),
+        st.Page("app_pages/weekly.py", title="Visão semanal", icon=":material/calendar_view_week:"),
         st.Page("app_pages/progress.py", title="Progresso", icon=":material/analytics:"),
         st.Page("app_pages/subjects.py", title="Disciplinas", icon=":material/menu_book:"),
     ],

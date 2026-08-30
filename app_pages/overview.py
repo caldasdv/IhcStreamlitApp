@@ -1,6 +1,6 @@
 """Tela de visão geral."""
 
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 
 import streamlit as st
 
@@ -55,5 +55,44 @@ if day_sessions:
         services.sessions.complete(chosen["_id"], user["_id"])
         st.rerun()
     if action_col2.button("Excluir sessão", width="stretch"):
-        services.sessions.delete(chosen["_id"], user["_id"])
+        st.session_state["confirm_delete_session_id"] = chosen["_id"]
         st.rerun()
+
+    if st.session_state.get("confirm_delete_session_id") == chosen["_id"]:
+        with st.container(border=True):
+            st.warning(f"Excluir a sessão **{chosen['topic']}**? Essa ação não pode ser desfeita.")
+            confirm_col, cancel_col = st.columns(2)
+            if confirm_col.button("Confirmar exclusão", type="primary", width="stretch"):
+                services.sessions.delete(chosen["_id"], user["_id"])
+                st.session_state["confirm_delete_session_id"] = None
+                st.rerun()
+            if cancel_col.button("Cancelar", width="stretch"):
+                st.session_state["confirm_delete_session_id"] = None
+                st.rerun()
+
+    with st.expander("Editar ou reagendar sessão"):
+        with st.form("edit_session"):
+            subject_names = [s["name"] for s in subjects]
+            current_subject = next((s["name"] for s in subjects if s["_id"] == chosen["subject_id"]), subject_names[0])
+            edit_subject_name = st.selectbox("Disciplina", subject_names, index=subject_names.index(current_subject))
+            edit_topic = st.text_input("Assunto", value=chosen["topic"])
+            edit_goal = st.text_area("Objetivo", value=chosen.get("goal", ""))
+            edit_col1, edit_col2, edit_col3 = st.columns(3)
+            edit_date = edit_col1.date_input("Data", value=date.fromisoformat(chosen["study_date"]), format="DD/MM/YYYY")
+            edit_time = edit_col2.time_input("Horário", value=time.fromisoformat(chosen["study_time"]), step=900)
+            edit_duration = edit_col3.selectbox("Duração", [25, 45, 60, 90, 120], index=[25, 45, 60, 90, 120].index(chosen["duration"]), format_func=lambda x: f"{x} minutos")
+            edit_priority = st.selectbox("Prioridade", ["Baixa", "Média", "Alta"], index=["Baixa", "Média", "Alta"].index(chosen["priority"]))
+            edit_submitted = st.form_submit_button("Salvar alterações", type="primary", width="stretch")
+        if edit_submitted:
+            try:
+                edit_subject_id = next(s["_id"] for s in subjects if s["name"] == edit_subject_name)
+                services.sessions.update(
+                    session_id=chosen["_id"], user_id=user["_id"], subject_id=edit_subject_id,
+                    topic=edit_topic, goal=edit_goal, study_date=edit_date, study_time=edit_time,
+                    duration=edit_duration, priority=edit_priority,
+                )
+            except (ValueError, StopIteration) as error:
+                st.error(str(error) if isinstance(error, ValueError) else "Selecione uma disciplina válida.")
+            else:
+                st.success("Sessão atualizada.")
+                st.rerun()
