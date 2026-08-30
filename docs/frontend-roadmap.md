@@ -159,3 +159,14 @@ etapa porque a tarefa ainda era consistência visual, não interação que exigi
 
 **Limitação:** a revisão responsiva foi estática/smoke test. A avaliação com estudantes permanece
 planejada para a Sprint 12.
+
+## Execução da Sprint 9
+
+**Status:** SPIKE CONCLUÍDO
+
+Foi implementada uma agenda semanal visual com Custom Component v2. Ela agrupa sessões por dia,
+permite selecionar uma sessão, usa tokens de tema e possui fallback para a lista nativa. A decisão
+e os limites estão registrados em `docs/decisions/ADR-004-custom-component-v2.md`.
+
+**Limitação:** ainda é necessário validar a interação no Community Cloud e com estudantes antes de
+considerá-la uma substituição definitiva da visão semanal.

@@ -23,3 +23,4 @@
 - Confirmações de ações passaram a sobreviver ao rerun e são consumidas uma única vez.
 - Roadmap das Sprints 8–12 de frontend, componentes externos e avaliação de IHC documentado.
 - Fundação visual da Sprint 8 aplicada com componentes reutilizáveis, tokens CSS e ajustes responsivos.
+- Spike da Sprint 9 adicionado com agenda visual em Custom Component v2 e fallback textual.
