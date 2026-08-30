@@ -150,6 +150,23 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 
 **Definition of Done:** checklist de deploy aprovado, testes relevantes passam e documentação operacional atualizada.
 
+### Sprint 4 — Revisão de IHC/UX e hardening (execução atual)
+
+**Objetivo:** reduzir rupturas de interação e tornar falhas de leitura, consulta e gravação recuperáveis.
+
+**Tarefas concluídas:** consistência do filtro temporal no dashboard; tabela alternativa aos gráficos;
+tratamento de erros em consultas e ações; estados vazios; contraste e foco; revisão documentada em
+`docs/ihc-review.md`.
+
+**Tarefas pendentes:** definir autenticação e isolamento de dados (US-007); validar os fluxos com usuários;
+revisar a dependência de seletores CSS internos após o deploy.
+
+**Riscos:** os achados de interação ainda são inspeção estática; o comportamento real no Community Cloud
+depende de configuração de Secrets, rede e latência do Atlas.
+
+**Definition of Done:** correções testadas, falhas sem vazamento de detalhes técnicos, documentação atualizada
+e limitações de avaliação registradas.
+
 ## Definition of Ready
 
 Objetivo, entrada, saída, critérios de aceitação, dependências e impacto arquitetural conhecidos.

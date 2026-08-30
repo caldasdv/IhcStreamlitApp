@@ -6,7 +6,8 @@ import streamlit as st
 
 from src.domain.session_rules import effective_status
 from src.ui.components.session_card import render_session_card
-from src.ui.context import load_page_context
+from src.ui.context import load_page_context, load_page_sessions
+from src.ui.feedback import show_action_error
 from src.ui.sidebar import render_account_sidebar
 
 
@@ -16,7 +17,7 @@ render_account_sidebar(services, user)
 st.caption("SEMANA DE ESTUDOS")
 st.title(f"Olá, {user['name'].split()[0]}")
 st.write("Aqui está o que você planejou para os próximos dias.")
-all_sessions = services.sessions.list_for_user(user["_id"], subjects)
+all_sessions = load_page_sessions(services, user, subjects)
 pending = [s for s in all_sessions if effective_status(s) in ("Pendente", "Atrasada")]
 completed = [s for s in all_sessions if effective_status(s) == "Concluída"]
 week_start = date.today() - timedelta(days=date.today().weekday())
@@ -52,8 +53,13 @@ if day_sessions:
     chosen = next(item for item in day_sessions if item["_id"] == chosen_id)
     action_col1, action_col2 = st.columns([1, 1])
     if effective_status(chosen) != "Concluída" and action_col1.button("Marcar como concluída", width="stretch"):
-        services.sessions.complete(chosen["_id"], user["_id"])
-        st.rerun()
+        try:
+            services.sessions.complete(chosen["_id"], user["_id"])
+        except Exception as error:
+            show_action_error("concluir a sessão", error)
+        else:
+            st.success("Sessão concluída.")
+            st.rerun()
     if action_col2.button("Excluir sessão", width="stretch"):
         st.session_state["confirm_delete_session_id"] = chosen["_id"]
         st.rerun()
@@ -63,9 +69,14 @@ if day_sessions:
             st.warning(f"Excluir a sessão **{chosen['topic']}**? Essa ação não pode ser desfeita.")
             confirm_col, cancel_col = st.columns(2)
             if confirm_col.button("Confirmar exclusão", type="primary", width="stretch"):
-                services.sessions.delete(chosen["_id"], user["_id"])
-                st.session_state["confirm_delete_session_id"] = None
-                st.rerun()
+                try:
+                    services.sessions.delete(chosen["_id"], user["_id"])
+                except Exception as error:
+                    show_action_error("excluir a sessão", error)
+                else:
+                    st.session_state["confirm_delete_session_id"] = None
+                    st.success("Sessão excluída.")
+                    st.rerun()
             if cancel_col.button("Cancelar", width="stretch"):
                 st.session_state["confirm_delete_session_id"] = None
                 st.rerun()
@@ -93,6 +104,8 @@ if day_sessions:
                 )
             except (ValueError, StopIteration) as error:
                 st.error(str(error) if isinstance(error, ValueError) else "Selecione uma disciplina válida.")
+            except Exception as error:
+                show_action_error("salvar as alterações", error)
             else:
                 st.success("Sessão atualizada.")
                 st.rerun()

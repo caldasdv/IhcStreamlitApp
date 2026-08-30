@@ -11,8 +11,10 @@
 - Telas separadas em `app_pages/` com navegação nativa e carregamento com feedback visível.
 - Edição/reagendamento, confirmação de exclusão e visão semanal adicionados.
 - Dashboard de progresso com métricas semanais e gráficos nativos adicionado.
+- Revisão de IHC/UX aplicada ao dashboard e aos fluxos de gravação, com estados de erro, tabela alternativa e foco visível.
 
 ### Changed
 
 - README atualizado com instalação, configuração, testes e deploy.
 - `.gitignore` reforçado para secrets, ambientes virtuais e caches de teste.
+- Relatório de inspeção heurística registrado em `docs/ihc-review.md`.
