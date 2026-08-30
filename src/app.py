@@ -1,92 +1,19 @@
 from __future__ import annotations
 
-import os
 from datetime import date, time, timedelta
 from pathlib import Path
 
 import streamlit as st
 from dotenv import load_dotenv
-from pymongo import MongoClient
-from pymongo.server_api import ServerApi
 
 from src.domain.session_rules import (
     effective_status,
-    minutes_at,
-    sessions_conflict,
-    validate_new_session,
 )
+from src.services.container import get_application_services
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_DIR / ".env")
-
-
-@st.cache_resource
-def get_database():
-    uri = get_mongodb_uri()
-    if not uri:
-        raise RuntimeError("MONGODB_URI não foi configurada nos Secrets ou no ambiente.")
-    client = MongoClient(uri, server_api=ServerApi("1"), serverSelectionTimeoutMS=5000)
-    client.admin.command("ping")
-    db = client[get_database_name()]
-    db.users.create_index("email", unique=True)
-    db.subjects.create_index([("user_id", 1), ("name", 1)])
-    db.study_sessions.create_index([("user_id", 1), ("study_date", 1), ("study_time", 1)])
-    return db
-
-
-def get_mongodb_uri() -> str | None:
-    try:
-        if "mongodb" in st.secrets and "uri" in st.secrets["mongodb"]:
-            return st.secrets["mongodb"]["uri"]
-        if "MONGODB_URI" in st.secrets:
-            return st.secrets["MONGODB_URI"]
-    except Exception:
-        # Localmente, st.secrets pode não existir; nesse caso usamos .env.
-        pass
-    return os.getenv("MONGODB_URI")
-
-
-def get_database_name() -> str:
-    try:
-        if "mongodb" in st.secrets and st.secrets["mongodb"].get("database"):
-            return st.secrets["mongodb"]["database"]
-    except Exception:
-        pass
-    return os.getenv("MONGODB_DATABASE", "plano_estudos")
-
-
-def seed_database(db) -> None:
-    if db.users.find_one({}):
-        return
-    user_id = db.users.insert_one({"name": "Marina Oliveira", "email": "marina.teste@exemplo.com", "weekly_goal_minutes": 300}).inserted_id
-    subjects = [
-        {"user_id": user_id, "name": "Interação Humano-Computador", "color": "#5E6AD2"},
-        {"user_id": user_id, "name": "Banco de Dados", "color": "#2E8B72"},
-        {"user_id": user_id, "name": "Programação Web", "color": "#C47F17"},
-    ]
-    subject_ids = [db.subjects.insert_one(subject).inserted_id for subject in subjects]
-    today = date.today()
-    db.study_sessions.insert_many([
-        {"user_id": user_id, "subject_id": subject_ids[0], "topic": "Heurísticas de Nielsen", "study_date": today.isoformat(), "study_time": "14:00", "duration": 60, "priority": "Alta", "status": "Pendente", "goal": "Revisar as 10 heurísticas e fazer anotações."},
-        {"user_id": user_id, "subject_id": subject_ids[1], "topic": "Relacionamentos e chaves", "study_date": (today + timedelta(days=1)).isoformat(), "study_time": "16:30", "duration": 45, "priority": "Média", "status": "Pendente", "goal": "Resolver cinco exercícios do material."},
-        {"user_id": user_id, "subject_id": subject_ids[2], "topic": "Revisão de formulários", "study_date": (today - timedelta(days=1)).isoformat(), "study_time": "19:00", "duration": 50, "priority": "Baixa", "status": "Concluída", "goal": "Praticar validação de campos."},
-    ])
-
-
-def has_conflict(db, user_id, study_date: date, study_time: time, duration: int) -> bool:
-    existing = db.study_sessions.find({"user_id": user_id, "study_date": study_date.isoformat(), "status": "Pendente"}, {"study_time": 1, "duration": 1})
-    return sessions_conflict(study_time, duration, list(existing))
-
-
-def load_sessions(db, user_id) -> list[dict]:
-    subjects_by_id = {subject["_id"]: subject for subject in db.subjects.find({"user_id": user_id})}
-    sessions = list(db.study_sessions.find({"user_id": user_id}).sort([("study_date", 1), ("study_time", 1)]))
-    for session in sessions:
-        subject = subjects_by_id.get(session["subject_id"], {"name": "Sem disciplina", "color": "#787774"})
-        session["subject_name"] = subject["name"]
-        session["subject_color"] = subject["color"]
-    return sessions
 
 
 def session_card(row: dict) -> None:
@@ -130,15 +57,13 @@ st.markdown(
 )
 
 try:
-    db = get_database()
-    seed_database(db)
+    services = get_application_services()
+    user = services.users.get_active_user()
+    subjects = services.subjects.list_for_user(user["_id"])
 except Exception as error:
     st.error("Não foi possível conectar ao MongoDB Atlas.")
     st.caption(f"Detalhe técnico: {type(error).__name__}")
     st.stop()
-
-user = db.users.find_one({})
-subjects = list(db.subjects.find({"user_id": user["_id"]}).sort("name", 1))
 
 with st.sidebar:
     st.markdown("## Plano")
@@ -154,7 +79,7 @@ with st.sidebar:
     st.caption("Meta semanal")
     goal_hours = st.number_input("Horas", min_value=1.0, max_value=80.0, value=user.get("weekly_goal_minutes", 300) / 60, step=0.5, label_visibility="collapsed")
     if st.button("Salvar meta", use_container_width=True):
-        db.users.update_one({"_id": user["_id"]}, {"$set": {"weekly_goal_minutes": round(goal_hours * 60)}})
+        services.users.update_weekly_goal(user["_id"], goal_hours)
         st.success("Meta atualizada.")
         st.rerun()
 
@@ -162,7 +87,7 @@ if page == "Visão geral":
     st.caption("SEMANA DE ESTUDOS")
     st.title(f"Olá, {user['name'].split()[0]}")
     st.write("Aqui está o que você planejou para os próximos dias.")
-    all_sessions = load_sessions(db, user["_id"])
+    all_sessions = services.sessions.list_for_user(user["_id"], subjects)
     pending = [s for s in all_sessions if effective_status(s) in ("Pendente", "Atrasada")]
     completed = [s for s in all_sessions if effective_status(s) == "Concluída"]
     week_start = date.today() - timedelta(days=date.today().weekday())
@@ -198,10 +123,10 @@ if page == "Visão geral":
         chosen = next(item for item in day_sessions if item["_id"] == chosen_id)
         action_col1, action_col2 = st.columns([1, 1])
         if effective_status(chosen) != "Concluída" and action_col1.button("Marcar como concluída", use_container_width=True):
-            db.study_sessions.update_one({"_id": chosen["_id"]}, {"$set": {"status": "Concluída"}})
+            services.sessions.complete(chosen["_id"], user["_id"])
             st.rerun()
         if action_col2.button("Excluir sessão", use_container_width=True):
-            db.study_sessions.delete_one({"_id": chosen["_id"]})
+            services.sessions.delete(chosen["_id"], user["_id"])
             st.rerun()
 
 elif page == "Nova sessão":
@@ -221,22 +146,18 @@ elif page == "Nova sessão":
         submitted = st.form_submit_button("Adicionar sessão", type="primary", use_container_width=True)
     if submitted:
         try:
-            validate_new_session(topic=topic, study_date=study_date, duration=duration)
+            subject_id = next(s["_id"] for s in subjects if s["name"] == subject_name)
+            services.sessions.create(user_id=user["_id"], subject_id=subject_id, topic=topic, goal=goal, study_date=study_date, study_time=study_time, duration=duration, priority=priority)
         except ValueError as error:
             st.error(str(error))
         else:
-            if has_conflict(db, user["_id"], study_date, study_time, duration):
-                st.error("Esse horário conflita com outra sessão pendente.")
-            else:
-                subject_id = next(s["_id"] for s in subjects if s["name"] == subject_name)
-                db.study_sessions.insert_one({"user_id": user["_id"], "subject_id": subject_id, "topic": topic.strip(), "study_date": study_date.isoformat(), "study_time": study_time.strftime("%H:%M"), "duration": duration, "priority": priority, "status": "Pendente", "goal": goal.strip()})
-                st.success("Sessão adicionada ao seu plano.")
+            st.success("Sessão adicionada ao seu plano.")
 
 elif page == "Progresso":
     st.caption("ACOMPANHAMENTO")
     st.title("Seu progresso")
     st.write("Acompanhe o que foi planejado e concluído em cada disciplina.")
-    progress_sessions = load_sessions(db, user["_id"])
+    progress_sessions = services.sessions.list_for_user(user["_id"], subjects)
     if not progress_sessions:
         st.info("Adicione uma sessão para começar a acompanhar seu progresso.")
     for subject in subjects:
@@ -259,8 +180,9 @@ else:
         subject_name = st.text_input("Nome da nova disciplina")
         color = st.color_picker("Cor", "#5E6AD2")
         if st.form_submit_button("Adicionar disciplina", type="primary"):
-            if subject_name.strip():
-                db.subjects.insert_one({"user_id": user["_id"], "name": subject_name.strip(), "color": color})
+            try:
+                services.subjects.create(user["_id"], subject_name, color)
                 st.success("Disciplina adicionada.")
                 st.rerun()
-            st.error("Informe o nome da disciplina.")
+            except ValueError as error:
+                st.error(str(error))

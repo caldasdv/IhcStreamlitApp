@@ -1,0 +1,1 @@
+"""Interfaces dos repositories."""
