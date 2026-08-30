@@ -184,7 +184,15 @@ if page == "Visão geral":
         session_card(row)
     if day_sessions:
         st.subheader("Atualizar sessão")
-        chosen = st.selectbox("Escolha uma sessão", day_sessions, format_func=lambda item: f"{item['study_time']} — {item['topic']}")
+        # Use apenas strings no selectbox. sqlite3.Row não pode ser serializado
+        # pelo estado do Streamlit entre os reruns do aplicativo.
+        session_labels = {
+            f"{item['study_time']} — {item['topic']}": item["id"]
+            for item in day_sessions
+        }
+        chosen_label = st.selectbox("Escolha uma sessão", list(session_labels))
+        chosen_id = session_labels[chosen_label]
+        chosen = next(item for item in day_sessions if item["id"] == chosen_id)
         action_col1, action_col2 = st.columns([1, 1])
         if chosen["status"] == "Pendente" and action_col1.button("Marcar como concluída", use_container_width=True):
             execute("UPDATE study_sessions SET status = 'Concluída' WHERE id = ?", (chosen["id"],))
