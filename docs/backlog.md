@@ -219,7 +219,7 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 
 - Sprint 8 — fundação visual e design system leve (DONE nesta branch);
 - Sprint 9 — componente externo de interação rica, condicionado a spike (SPIKE CONCLUÍDO nesta branch);
-- Sprint 10 — dashboard analítico avançado com Plotly somente se justificar;
+- Sprint 10 — dashboard analítico avançado com Plotly somente se justificar (DONE nesta branch);
 - Sprint 11 — responsividade e acessibilidade aplicada;
 - Sprint 12 — avaliação com usuários e polimento baseado em evidências.
 

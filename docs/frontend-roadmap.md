@@ -84,7 +84,7 @@ introduzir frontend paralelo.
 
 **Tarefas:** protótipo comparativo (Streamlit nativo versus componente); contrato de entrada/saída; fallback; segurança de HTML/JS; teste no Community Cloud.
 
-### Sprint 10 — Dashboard analítico avançado
+### Sprint 10 — Dashboard analítico avançado (DONE nesta branch)
 
 **Objetivo:** melhorar decisões de planejamento com visualizações interativas justificadas.
 
@@ -97,6 +97,10 @@ introduzir frontend paralelo.
 - Status: BACKLOG
 
 **Tarefas:** avaliar gráficos nativos versus Plotly; adicionar somente gráficos que ganhem interação real; testar séries vazias e muitos dados; documentar dependência.
+
+**Execução:** o dashboard passou a usar Plotly para comparação por disciplina e evolução diária,
+com filtro temporal e de disciplina aplicado antes das agregações, tooltips em minutos e tabela
+alternativa. A dependência foi adicionada como `plotly>=5.0`.
 
 ### Sprint 11 — Responsividade e acessibilidade aplicada
 

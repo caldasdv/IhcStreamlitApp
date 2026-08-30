@@ -8,7 +8,7 @@ Este repositório está na Sprint 0: a aplicação existente é um protótipo fu
 
 ## Stack
 
-Python, Streamlit, Authlib, PyMongo, MongoDB Atlas e pytest. Pandas/Plotly só serão adicionados quando uma necessidade real justificar o impacto no deploy.
+Python, Streamlit, Authlib, PyMongo, Plotly, MongoDB Atlas e pytest. Pandas só será adicionada quando uma necessidade real justificar o impacto no deploy.
 
 ## Arquitetura
 

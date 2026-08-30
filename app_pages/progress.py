@@ -6,6 +6,7 @@ import streamlit as st
 
 from src.services.report_service import build_subject_summary, build_week_summary
 from src.ui.components.page_header import render_page_header
+from src.ui.components.progress_charts import subject_progress_figure, weekly_progress_figure
 from src.ui.context import load_page_context, load_page_sessions
 from src.ui.sidebar import render_account_sidebar
 
@@ -25,12 +26,24 @@ week_start = selected_week_day - timedelta(days=selected_week_day.weekday())
 week_end = week_start + timedelta(days=6)
 if selected_week_day != week_start:
     st.caption(f"A semana exibida começa na segunda-feira, {week_start:%d/%m/%Y}.")
-week_summary = build_week_summary(progress_sessions, week_start)
 week_sessions = [
     session for session in progress_sessions
     if week_start.isoformat() <= session["study_date"] <= week_end.isoformat()
 ]
-subject_summary = build_subject_summary(week_sessions, subjects)
+subject_options = {"Todas as disciplinas": None}
+subject_options.update({subject["name"]: subject["_id"] for subject in subjects})
+selected_subject_name = st.selectbox("Disciplina", list(subject_options), key="progress_subject")
+selected_subject_id = subject_options[selected_subject_name]
+filtered_week_sessions = [
+    session for session in week_sessions
+    if selected_subject_id is None or session["subject_id"] == selected_subject_id
+]
+filtered_subjects = [
+    subject for subject in subjects
+    if selected_subject_id is None or subject["_id"] == selected_subject_id
+]
+week_summary = build_week_summary(filtered_week_sessions, week_start)
+subject_summary = build_subject_summary(filtered_week_sessions, filtered_subjects)
 planned_minutes = sum(row["planejados"] for row in week_summary)
 completed_minutes = sum(row["concluídos"] for row in week_summary)
 pending_count = sum(row["pendentes"] for row in week_summary)
@@ -49,13 +62,21 @@ else:
     with chart_col:
         with st.container(border=True):
             st.subheader("Carga por disciplina")
-            st.caption("Minutos planejados e concluídos na semana selecionada.")
-            st.bar_chart(subject_summary, x="disciplina", y=["planejados", "concluídos"], horizontal=True)
+            st.caption("Minutos planejados e concluídos. Passe o cursor para ver os valores.")
+            st.plotly_chart(
+                subject_progress_figure(subject_summary),
+                width="stretch",
+                config={"displayModeBar": False},
+            )
     with table_col:
         with st.container(border=True):
             st.subheader("Ritmo ao longo da semana")
             st.caption("Compare a carga planejada com o que foi concluído em cada dia.")
-            st.line_chart(week_summary, x="dia", y=["planejados", "concluídos"])
+            st.plotly_chart(
+                weekly_progress_figure(week_summary),
+                width="stretch",
+                config={"displayModeBar": False},
+            )
 
     with st.expander("Ver dados da semana em tabela"):
         st.dataframe(
