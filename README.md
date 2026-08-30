@@ -32,4 +32,4 @@ Depois substitua `<db_password>` pela senha do usuário criado no MongoDB Atlas.
 
 Configure `MONGODB_URI` nas variáveis de ambiente da VPS ou nos Secrets do Community Cloud. O app não depende mais de SQLite ou Google Drive.
 
-No Community Cloud, use `src/app.py` como arquivo principal da aplicação.
+O entrypoint da raiz (`app.py`) encaminha para `src/app.py`, então a aplicação funciona tanto com a configuração padrão do Community Cloud quanto apontando diretamente para `src/app.py`.
