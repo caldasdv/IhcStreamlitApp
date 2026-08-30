@@ -55,7 +55,13 @@ MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER/
 
 No Streamlit Community Cloud, configure o Secret `MONGODB_URI` ou use o formato documentado em [.streamlit/secrets.toml.example](.streamlit/secrets.toml.example). Nunca commite `.env` ou `.streamlit/secrets.toml`.
 
-O banco padrão do protótipo é `plano_estudos`; a configuração de nome de banco será consolidada junto com a conexão na Sprint 1.
+Para autenticação local, crie um cliente OIDC no Google Cloud e registre
+`http://localhost:8501/oauth2callback` como redirect URI. No Community Cloud, troque o redirect
+URI pela URL publicada terminada em `/oauth2callback` e cole o bloco `[auth]` nos Secrets. O
+usuário é associado ao `sub` estável do Google; o e-mail não é usado como chave de isolamento.
+
+O banco padrão é `plano_estudos`, mas o nome pode ser definido no Secret `[mongodb].database` ou
+em `MONGODB_DATABASE` no ambiente local.
 
 ## Execução e testes
 

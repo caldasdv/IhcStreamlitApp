@@ -45,11 +45,12 @@ Presentation pode depender de Services e modelos de saída. Services podem depen
 - MongoDB Atlas como persistência externa.
 - Streamlit como presentation e Community Cloud como alvo de deploy.
 - Segredos fora do Git; `st.secrets` no Cloud e ambiente local para desenvolvimento.
+- O shell exige autenticação OIDC antes da navegação; o service resolve o usuário por `identity.provider` e `identity.subject`, e os repositories continuam filtrando por `user_id`.
 
 ## Riscos
 
 - `src/app.py` ainda concentra responsabilidades e dificulta testes isolados.
-- O usuário de teste e o seed automático não são autenticação nem estratégia de produção.
-- A conexão MongoDB atual e o banco usado ainda precisam ser alinhados ao schema de Secrets (`mongodb.uri`/`mongodb.database`).
+- Documentos legados sem identidade não são associados automaticamente a uma conta autenticada; o seed demonstrativo não é executado pelo container da aplicação.
+- A configuração aceita o schema de Secrets (`mongodb.uri`/`mongodb.database`) e mantém fallback local por ambiente.
 - Falhas de rede, limites do plano do Atlas e reruns podem causar latência ou operações repetidas.
 - Não há cobertura automatizada nem validação de acessibilidade neste momento.

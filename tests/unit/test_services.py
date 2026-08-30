@@ -4,6 +4,7 @@ import pytest
 
 from src.services.session_service import SessionService
 from src.services.subject_service import SubjectService
+from src.services.user_service import UserService
 
 
 class FakeSessionRepository:
@@ -32,6 +33,27 @@ class FakeSessionRepository:
 
     def delete(self, session_id, user_id):
         self.deleted.append((session_id, user_id))
+
+
+class FakeUserRepository:
+    def __init__(self):
+        self.users = {}
+
+    def find_or_create_by_identity(self, identity):
+        key = (identity["provider"], identity["subject"])
+        return self.users.setdefault(
+            key,
+            {
+                "_id": key,
+                "identity": {"provider": identity["provider"], "subject": identity["subject"]},
+                "name": identity["name"],
+                "email": identity["email"],
+                "weekly_goal_minutes": 300,
+            },
+        )
+
+    def update_weekly_goal(self, user_id, minutes):
+        self.goal = (user_id, minutes)
 
 
 def test_session_service_creates_normalized_session():
@@ -101,3 +123,20 @@ def test_subject_service_rejects_blank_name():
 
     with pytest.raises(ValueError, match="nome"):
         SubjectService(FakeSubjectRepository()).create("user-id", "  ", "#5E6AD2")
+
+
+def test_user_service_resolves_user_by_provider_subject():
+    repository = FakeUserRepository()
+    service = UserService(repository)
+    identity = {
+        "provider": "google",
+        "subject": "google-subject",
+        "name": "Ana",
+        "email": "ana@example.com",
+    }
+
+    first = service.get_or_create_authenticated_user(identity)
+    second = service.get_or_create_authenticated_user(identity)
+
+    assert first == second
+    assert first["identity"] == {"provider": "google", "subject": "google-subject"}

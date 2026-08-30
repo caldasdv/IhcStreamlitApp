@@ -9,11 +9,9 @@ class UserService:
     def __init__(self, repository) -> None:
         self.repository = repository
 
-    def get_active_user(self) -> dict[str, Any]:
-        user = self.repository.find_first()
-        if not user:
-            raise RuntimeError("Nenhum usuário configurado para a aplicação.")
-        return user
+    def get_or_create_authenticated_user(self, identity: dict[str, str]) -> dict[str, Any]:
+        """Resolve o usuário pelo identificador estável do provedor OIDC."""
+        return self.repository.find_or_create_by_identity(identity)
 
     def update_weekly_goal(self, user_id: Any, hours: float) -> None:
         self.repository.update_weekly_goal(user_id, round(hours * 60))

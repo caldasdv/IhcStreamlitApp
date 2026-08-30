@@ -14,6 +14,8 @@ def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
     st.sidebar.divider()
     st.sidebar.write(user["name"])
     st.sidebar.caption(user["email"])
+    if st.sidebar.button("Sair", width="stretch"):
+        st.logout()
     st.sidebar.divider()
     st.sidebar.caption("Meta semanal")
     goal_hours = st.sidebar.number_input(

@@ -8,6 +8,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from src.ui.styles import apply_styles
+from src.ui.auth import require_login
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
@@ -18,6 +19,7 @@ def run_app() -> None:
     load_dotenv(PROJECT_DIR / ".env")
     st.set_page_config(page_title="Plano", page_icon="◷", layout="wide")
     apply_styles()
+    require_login()
     page = st.navigation(
         [
             st.Page("app_pages/overview.py", title="Visão geral", icon=":material/home:"),

@@ -7,7 +7,6 @@ from dataclasses import dataclass
 import streamlit as st
 
 from src.database.connection import get_database
-from src.database.seed import seed_database
 from src.repositories.mongodb.repositories import (
     MongoStudySessionRepository,
     MongoSubjectRepository,
@@ -28,7 +27,6 @@ class ApplicationServices:
 @st.cache_resource
 def get_application_services() -> ApplicationServices:
     database = get_database()
-    seed_database(database)
     return ApplicationServices(
         users=UserService(MongoUserRepository(database)),
         subjects=SubjectService(MongoSubjectRepository(database)),

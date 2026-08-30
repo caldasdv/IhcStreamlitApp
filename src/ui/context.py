@@ -5,6 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from src.services.container import ApplicationServices, get_application_services
+from src.ui.auth import get_current_identity
 from src.ui.feedback import logger
 from src.ui.feedback import show_action_error
 
@@ -14,7 +15,7 @@ def load_page_context() -> tuple[ApplicationServices, dict, list[dict]]:
     try:
         with st.spinner("Conectando ao seu plano de estudos..."):
             services = get_application_services()
-            user = services.users.get_active_user()
+            user = services.users.get_or_create_authenticated_user(get_current_identity())
             subjects = services.subjects.list_for_user(user["_id"])
     except Exception:
         logger.exception("Falha ao carregar o contexto da página")

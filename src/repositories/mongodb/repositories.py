@@ -5,13 +5,33 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 
+from pymongo import ReturnDocument
+
 
 class MongoUserRepository:
     def __init__(self, database) -> None:
         self.collection = database.users
 
-    def find_first(self) -> dict[str, Any] | None:
-        return self.collection.find_one({})
+    def find_or_create_by_identity(self, identity: dict[str, str]) -> dict[str, Any]:
+        return self.collection.find_one_and_update(
+            {
+                "identity.provider": identity["provider"],
+                "identity.subject": identity["subject"],
+            },
+            {
+                "$setOnInsert": {
+                    "identity": {
+                        "provider": identity["provider"],
+                        "subject": identity["subject"],
+                    },
+                    "name": identity["name"],
+                    "email": identity["email"],
+                    "weekly_goal_minutes": 300,
+                }
+            },
+            upsert=True,
+            return_document=ReturnDocument.AFTER,
+        )
 
     def update_weekly_goal(self, user_id: Any, minutes: int) -> None:
         self.collection.update_one({"_id": user_id}, {"$set": {"weekly_goal_minutes": minutes}})

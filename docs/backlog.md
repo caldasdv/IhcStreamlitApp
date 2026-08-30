@@ -185,6 +185,20 @@ e limitações de avaliação registradas.
 
 **Definition of Done:** entrypoints convergentes, documentação atualizada, testes e smoke test passando, sem credenciais versionadas.
 
+### Sprint 6 — Identidade e isolamento
+
+**Objetivo:** substituir o usuário demo por identidade Google OIDC e manter os dados isolados por usuário.
+
+**História:** US-007.
+
+**Tarefas:** login/logout nativos; resolução por `provider + subject`; índice parcial único; remoção do seed automático;
+configuração de callback local/Cloud; testes do service e validação sem credenciais no Git.
+
+**Riscos:** redirect URI incorreto, Secrets ausentes e documentos antigos sem `identity`.
+
+**Definition of Done:** usuário anônimo não acessa páginas; usuário autenticado é criado/recuperado por identidade;
+queries usam o `user_id` resolvido; logout funciona; teste no ambiente Cloud é executado.
+
 ## Definition of Ready
 
 Objetivo, entrada, saída, critérios de aceitação, dependências e impacto arquitetural conhecidos.
