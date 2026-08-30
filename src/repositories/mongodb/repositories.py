@@ -6,6 +6,9 @@ from datetime import date
 from typing import Any
 
 from pymongo import ReturnDocument
+from pymongo.errors import DuplicateKeyError
+
+from src.domain.exceptions import DuplicateSubjectError, EntityNotFoundError
 
 
 class MongoUserRepository:
@@ -44,16 +47,44 @@ class MongoSubjectRepository:
     def list_by_user(self, user_id: Any) -> list[dict[str, Any]]:
         return list(self.collection.find({"user_id": user_id}).sort("name", 1))
 
-    def create(self, user_id: Any, name: str, color: str) -> Any:
-        return self.collection.insert_one({"user_id": user_id, "name": name, "color": color}).inserted_id
+    def belongs_to_user(self, user_id: Any, subject_id: Any) -> bool:
+        return self.collection.find_one({"_id": subject_id, "user_id": user_id}, {"_id": 1}) is not None
+
+    def exists_by_normalized_name(self, user_id: Any, normalized_name: str) -> bool:
+        return self.collection.find_one(
+            {"user_id": user_id, "name_normalized": normalized_name}, {"_id": 1}
+        ) is not None
+
+    def create(self, user_id: Any, name: str, normalized_name: str, color: str) -> Any:
+        try:
+            return self.collection.insert_one(
+                {
+                    "user_id": user_id,
+                    "name": name,
+                    "name_normalized": normalized_name,
+                    "color": color,
+                }
+            ).inserted_id
+        except DuplicateKeyError as error:
+            raise DuplicateSubjectError("Você já possui uma disciplina com esse nome.") from error
 
 
 class MongoStudySessionRepository:
     def __init__(self, database) -> None:
         self.collection = database.study_sessions
 
-    def list_by_user(self, user_id: Any) -> list[dict[str, Any]]:
-        return list(self.collection.find({"user_id": user_id}).sort([("study_date", 1), ("study_time", 1)]))
+    def list_by_user(
+        self, user_id: Any, start_date: date | None = None, end_date: date | None = None
+    ) -> list[dict[str, Any]]:
+        query: dict[str, Any] = {"user_id": user_id}
+        if start_date is not None or end_date is not None:
+            date_range: dict[str, str] = {}
+            if start_date is not None:
+                date_range["$gte"] = start_date.isoformat()
+            if end_date is not None:
+                date_range["$lte"] = end_date.isoformat()
+            query["study_date"] = date_range
+        return list(self.collection.find(query).sort([("study_date", 1), ("study_time", 1)]))
 
     def list_pending_by_date(self, user_id: Any, study_date: date) -> list[dict[str, Any]]:
         return list(
@@ -67,10 +98,18 @@ class MongoStudySessionRepository:
         return self.collection.insert_one(data).inserted_id
 
     def update(self, session_id: Any, user_id: Any, data: dict[str, Any]) -> None:
-        self.collection.update_one({"_id": session_id, "user_id": user_id}, {"$set": data})
+        result = self.collection.update_one({"_id": session_id, "user_id": user_id}, {"$set": data})
+        if result.matched_count == 0:
+            raise EntityNotFoundError("A sessão não foi encontrada ou não está mais disponível.")
 
     def mark_completed(self, session_id: Any, user_id: Any) -> None:
-        self.collection.update_one({"_id": session_id, "user_id": user_id}, {"$set": {"status": "Concluída"}})
+        result = self.collection.update_one(
+            {"_id": session_id, "user_id": user_id}, {"$set": {"status": "Concluída"}}
+        )
+        if result.matched_count == 0:
+            raise EntityNotFoundError("A sessão não foi encontrada ou não está mais disponível.")
 
     def delete(self, session_id: Any, user_id: Any) -> None:
-        self.collection.delete_one({"_id": session_id, "user_id": user_id})
+        result = self.collection.delete_one({"_id": session_id, "user_id": user_id})
+        if result.deleted_count == 0:
+            raise EntityNotFoundError("A sessão não foi encontrada ou não está mais disponível.")

@@ -8,6 +8,8 @@ from typing import Any
 
 import streamlit as st
 
+from src.domain.session_rules import effective_status
+
 
 _AGENDA = st.components.v2.component(
     "study_agenda",
@@ -79,7 +81,7 @@ def render_study_agenda(
                 "time": str(session["study_time"]),
                 "topic": str(session["topic"]),
                 "duration": str(session["duration"]),
-                "status": str(session.get("status", "Pendente")),
+                "status": effective_status(session),
             }
         )
     weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]

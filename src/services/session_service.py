@@ -9,12 +9,19 @@ from src.domain.session_rules import sessions_conflict, validate_new_session
 
 
 class SessionService:
-    def __init__(self, repository) -> None:
+    def __init__(self, repository, subject_repository) -> None:
         self.repository = repository
+        self.subject_repository = subject_repository
 
-    def list_for_user(self, user_id: Any, subjects: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def list_for_user(
+        self,
+        user_id: Any,
+        subjects: list[dict[str, Any]],
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> list[dict[str, Any]]:
         subjects_by_id = {subject["_id"]: subject for subject in subjects}
-        sessions = self.repository.list_by_user(user_id)
+        sessions = self.repository.list_by_user(user_id, start_date, end_date)
         for session in sessions:
             subject = subjects_by_id.get(session["subject_id"], {"name": "Sem disciplina", "color": "#787774"})
             session["subject_name"] = subject["name"]
@@ -34,6 +41,7 @@ class SessionService:
         priority: str,
     ) -> Any:
         validate_new_session(topic=topic, study_date=study_date, duration=duration)
+        self._validate_subject_ownership(user_id, subject_id)
         existing = self.repository.list_pending_by_date(user_id, study_date)
         if sessions_conflict(study_time, duration, existing):
             raise ValueError("Esse horário conflita com outra sessão pendente.")
@@ -69,6 +77,7 @@ class SessionService:
     ) -> None:
         """Edita uma sessão e revalida conflito, ignorando a própria sessão."""
         validate_new_session(topic=topic, study_date=study_date, duration=duration)
+        self._validate_subject_ownership(user_id, subject_id)
         existing = [
             item
             for item in self.repository.list_pending_by_date(user_id, study_date)
@@ -92,3 +101,7 @@ class SessionService:
 
     def delete(self, session_id: Any, user_id: Any) -> None:
         self.repository.delete(session_id, user_id)
+
+    def _validate_subject_ownership(self, user_id: Any, subject_id: Any) -> None:
+        if not self.subject_repository.belongs_to_user(user_id, subject_id):
+            raise ValueError("Selecione uma disciplina válida do seu plano.")

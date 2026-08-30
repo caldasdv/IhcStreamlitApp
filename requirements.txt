@@ -1,5 +1,5 @@
-streamlit[auth]>=1.57
-plotly>=5.0
-python-dotenv>=1.0
-pymongo>=4.9
-dnspython>=2.6
+streamlit[auth]>=1.57,<2
+plotly>=5.0,<8
+python-dotenv>=1.0,<2
+pymongo>=4.9,<5
+dnspython>=2.6,<3

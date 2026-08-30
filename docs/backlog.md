@@ -18,7 +18,7 @@ Como estudante quero visualizar minhas sessões e pendências para saber o que e
 - Critérios de aceitação: agenda por dia; pendentes, concluídas e atrasadas distinguíveis; estado vazio informado.
 - Dependências: acesso ao usuário e repository de sessões.
 - Complexidade: M
-- Status: DONE (protótipo; precisa de testes e separação arquitetural).
+- Status: DONE.
 
 ### US-002
 
@@ -28,7 +28,7 @@ Como estudante quero criar uma sessão com disciplina, assunto, objetivo, data, 
 - Critérios de aceitação: campos válidos; datas passadas rejeitadas; conflito de pendentes rejeitado; persistência confirmada.
 - Dependências: subjects e validações de domínio.
 - Complexidade: M
-- Status: DONE (protótipo; precisa de testes e service).
+- Status: DONE.
 
 ### US-003
 
@@ -38,7 +38,7 @@ Como estudante quero concluir ou excluir uma sessão para manter meu plano atual
 - Critérios de aceitação: conclusão atualiza somente a sessão selecionada; exclusão remove somente a sessão selecionada; feedback claro.
 - Dependências: repository e autorização do usuário.
 - Complexidade: S
-- Status: DONE (protótipo; exclusão ainda sem confirmação).
+- Status: DONE.
 
 ### US-004
 
@@ -48,7 +48,7 @@ Como estudante quero acompanhar minutos concluídos por disciplina e semana para
 - Critérios de aceitação: minutos planejados/concluídos; meta semanal; resumo por disciplina; dados sem sessões tratados.
 - Dependências: consultas e transformação de dados.
 - Complexidade: M
-- Status: DONE (protótipo; precisa de testes).
+- Status: DONE.
 
 ### US-005
 
@@ -150,7 +150,7 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 
 **Definition of Done:** checklist de deploy aprovado, testes relevantes passam e documentação operacional atualizada.
 
-### Sprint 4 — Revisão de IHC/UX e hardening (execução atual)
+### Sprint 4b — Revisão de IHC/UX e hardening
 
 **Objetivo:** reduzir rupturas de interação e tornar falhas de leitura, consulta e gravação recuperáveis.
 
@@ -158,8 +158,7 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 tratamento de erros em consultas e ações; estados vazios; contraste e foco; revisão documentada em
 `docs/ihc-review.md`.
 
-**Tarefas pendentes:** definir autenticação e isolamento de dados (US-007); validar os fluxos com usuários;
-revisar a dependência de seletores CSS internos após o deploy.
+**Tarefas pendentes:** validar os fluxos com usuários e revisar a dependência de seletores CSS internos após o deploy.
 
 **Riscos:** os achados de interação ainda são inspeção estática; o comportamento real no Community Cloud
 depende de configuração de Secrets, rede e latência do Atlas.
@@ -222,6 +221,16 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 - Sprint 10 — dashboard analítico avançado com Plotly somente se justificar (DONE nesta branch);
 - Sprint 11 — responsividade e acessibilidade aplicada (DONE nesta branch);
 - Sprint 12 — avaliação com usuários e polimento baseado em evidências (PLANO PREPARADO nesta branch).
+
+### Sprint 13 — Hardening pós-revisão
+
+**Objetivo:** corrigir inconsistências de dados, escopo temporal, feedback de persistência e reprodutibilidade de testes antes de ampliar o domínio.
+
+**Tarefas:** unicidade de disciplinas por usuário; validação de posse de disciplina; consultas por intervalo; status atrasado consistente; confirmação real de update/delete; empty state por filtro; dependências limitadas; configuração pytest e documentação atualizada.
+
+**Riscos:** documentos legados sem campos normalizados e permissões de gerenciamento de índices no Atlas.
+
+**Definition of Done:** testes unitários passam pelos comandos documentados; smoke test inicia; índices e consultas estão documentados; nenhuma credencial é versionada.
 
 O roadmap não pressupõe React, FastAPI ou uma reescrita como SPA. Cada dependência externa precisa
 passar pela comparação com a solução nativa, pelo impacto no Community Cloud e pelos critérios de IHC.

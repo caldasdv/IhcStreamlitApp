@@ -10,6 +10,7 @@ from src.ui.components.page_header import render_page_header
 from src.ui.components.study_agenda import render_study_agenda
 from src.ui.feedback import show_action_error
 from src.ui.feedback import set_success_flash
+from src.ui.feedback import logger
 from src.ui.sidebar import render_account_sidebar
 
 
@@ -18,8 +19,16 @@ render_account_sidebar(services, user)
 
 render_page_header("PLANEJAMENTO", "Visão semanal", "Revise sua carga de estudos e conclua sessões rapidamente.")
 
-sessions = load_page_sessions(services, user, subjects)
 week_start = date.today() - timedelta(days=date.today().weekday())
+week_end = week_start + timedelta(days=6)
+sessions = load_page_sessions(
+    services,
+    user,
+    subjects,
+    start_date=week_start,
+    end_date=week_end,
+    retry_key="retry_weekly_sessions",
+)
 weekdays = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"]
 
 st.subheader("Agenda visual")
@@ -27,6 +36,7 @@ st.caption("Selecione uma sessão para consultar seus detalhes. A lista por dia 
 try:
     selected_id = render_study_agenda(sessions, week_start, key="weekly_study_agenda")
 except Exception:
+    logger.exception("Falha ao renderizar a agenda visual")
     st.warning("A agenda visual está indisponível; use a lista por dia abaixo.")
     selected_id = None
 if selected_id:

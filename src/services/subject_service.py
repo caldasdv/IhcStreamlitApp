@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
+
+from src.domain.exceptions import DuplicateSubjectError
+from src.domain.subject_rules import normalize_subject_name
 
 
 class SubjectService:
@@ -13,7 +17,16 @@ class SubjectService:
         return self.repository.list_by_user(user_id)
 
     def create(self, user_id: Any, name: str, color: str) -> Any:
-        cleaned_name = name.strip()
+        cleaned_name = " ".join(name.split())
         if not cleaned_name:
             raise ValueError("Informe o nome da disciplina.")
-        return self.repository.create(user_id, cleaned_name, color)
+        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
+            raise ValueError("Selecione uma cor válida para a disciplina.")
+        normalized_name = normalize_subject_name(cleaned_name)
+        legacy_duplicate = any(
+            normalize_subject_name(str(subject.get("name", ""))) == normalized_name
+            for subject in self.repository.list_by_user(user_id)
+        )
+        if legacy_duplicate or self.repository.exists_by_normalized_name(user_id, normalized_name):
+            raise DuplicateSubjectError("Você já possui uma disciplina com esse nome.")
+        return self.repository.create(user_id, cleaned_name, normalized_name, color)

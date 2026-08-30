@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-O Plano é um planejador de estudos web para estudantes. O estado atual é um protótipo Streamlit funcional com usuário de teste, disciplinas, sessões, meta semanal e visão de progresso. A direção arquitetural é um monólito modular, adequado ao tamanho atual e ao deploy no Streamlit Community Cloud.
+O Plano é um planejador de estudos web para estudantes. O MVP Streamlit possui autenticação Google OIDC, disciplinas, sessões, meta semanal, agenda e visão de progresso, com isolamento por usuário. A arquitetura é um monólito modular adequado ao tamanho atual e ao deploy no Streamlit Community Cloud.
 
 ## Componentes
 
@@ -25,7 +25,7 @@ Database connection / MongoDB Atlas
 - **Domain:** modelos de usuário, disciplina e sessão; status, prioridades, validações e conflitos de horário.
 - **Infrastructure:** configuração (`st.secrets`/ambiente), conexão cacheada, índices, repositories e logging.
 
-Na Sprint 1, as regras puras de sessão foram extraídas para `src/domain/session_rules.py`, a UI passou a depender de services e as telas foram separadas em `app_pages/` usando `st.navigation`. O shell compartilhado em `src/ui/app_shell.py` garante o mesmo comportamento quando o Community Cloud ou uma configuração local usa `app.py` ou `src/app.py`. Conexão, índices e seed estão em `src/database`; adapters MongoDB estão em `src/repositories`. O carregamento de cada tela mostra spinner e erro visível, sem bloquear a navegação antes de selecionar uma página.
+As regras puras ficam em `src/domain`, a UI depende de services e as telas são scripts em `app_pages/` usando `st.navigation`. O shell compartilhado em `src/ui/app_shell.py` garante o mesmo comportamento quando o Community Cloud ou uma configuração local usa `app.py` ou `src/app.py`. Conexão e índices estão em `src/database`; adapters MongoDB ficam em `src/repositories`. Consultas de agenda/progresso recebem intervalos de data, e services validam posse das disciplinas antes de persistir sessões.
 
 ## Responsabilidades e dependências
 
@@ -49,8 +49,8 @@ Presentation pode depender de Services e modelos de saída. Services podem depen
 
 ## Riscos
 
-- `src/app.py` ainda concentra responsabilidades e dificulta testes isolados.
 - Documentos legados sem identidade não são associados automaticamente a uma conta autenticada; o seed demonstrativo não é executado pelo container da aplicação.
+- Documentos legados de disciplina ainda podem não possuir `name_normalized`; o service cobre duplicidade, mas uma migração controlada continua pendente.
 - A configuração aceita o schema de Secrets (`mongodb.uri`/`mongodb.database`) e mantém fallback local por ambiente.
 - Falhas de rede, limites do plano do Atlas e reruns podem causar latência ou operações repetidas.
-- Não há cobertura automatizada nem validação de acessibilidade neste momento.
+- Há testes unitários, mas ainda faltam testes automatizados de UI, integração Atlas e validação de acessibilidade em navegador real.
