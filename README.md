@@ -70,4 +70,4 @@ As primeiras regras de domínio já possuem testes em `tests/unit`; execute pyte
 
 Configure `MONGODB_URI` nas variáveis de ambiente ou nos Secrets do Community Cloud. O app não depende de SQLite, Google Drive ou armazenamento local persistente.
 
-O entrypoint da raiz (`app.py`) encaminha para `src/app.py`, portanto é o entrypoint recomendado no Community Cloud. Selecione o arquivo `app.py` na raiz e confirme que `requirements.txt` está sendo lido.
+O entrypoint recomendado no Community Cloud é `app.py` na raiz. `src/app.py` mantém compatibilidade com configurações antigas e usa o mesmo shell de navegação; ambos carregam `requirements.txt` e não armazenam dados localmente.

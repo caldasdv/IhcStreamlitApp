@@ -167,6 +167,24 @@ depende de configuração de Secrets, rede e latência do Atlas.
 **Definition of Done:** correções testadas, falhas sem vazamento de detalhes técnicos, documentação atualizada
 e limitações de avaliação registradas.
 
+### Sprint 5 — Prontidão de deploy
+
+**Objetivo:** garantir que os entrypoints local e Community Cloud executem exatamente a mesma aplicação.
+
+**História:** US-009 — Como mantenedor quero um entrypoint único de aplicação para evitar divergência de comportamento no deploy.
+
+- Prioridade: P0
+- Critérios de aceitação: `app.py` e `src/app.py` usam o mesmo shell; navegação nativa é configurada uma única vez; não há caminho absoluto nem persistência local; smoke test do servidor inicia.
+- Dependências: Streamlit, requirements e configuração externa de Secrets.
+- Complexidade: S
+- Status: DONE
+
+**Tarefas pendentes da sprint:** checklist executado no workspace do Cloud; confirmar Secrets e rede do Atlas; definir provedor de autenticação para desbloquear US-007.
+
+**Riscos:** a execução do Cloud pode divergir por Secrets ausentes, permissões de rede ou branch configurada.
+
+**Definition of Done:** entrypoints convergentes, documentação atualizada, testes e smoke test passando, sem credenciais versionadas.
+
 ## Definition of Ready
 
 Objetivo, entrada, saída, critérios de aceitação, dependências e impacto arquitetural conhecidos.

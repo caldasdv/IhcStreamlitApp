@@ -20,12 +20,12 @@ Repositories
 Database connection / MongoDB Atlas
 ```
 
-- **Presentation:** `app.py`, `app_pages/` e `src/ui/` contêm páginas, formulários, navegação, tabelas, gráficos, estados vazios e mensagens.
+- **Presentation:** `app.py`, `src/ui/app_shell.py`, `app_pages/` e os demais módulos de `src/ui/` contêm shell, páginas, formulários, navegação, tabelas, gráficos, estados vazios e mensagens.
 - **Application/Services:** coordenação de criação, atualização, conclusão, reagendamento e consultas de progresso.
 - **Domain:** modelos de usuário, disciplina e sessão; status, prioridades, validações e conflitos de horário.
 - **Infrastructure:** configuração (`st.secrets`/ambiente), conexão cacheada, índices, repositories e logging.
 
-Na Sprint 1, as regras puras de sessão foram extraídas para `src/domain/session_rules.py`, a UI passou a depender de services e as quatro telas foram separadas em `app_pages/` usando `st.navigation`. Conexão, índices e seed estão em `src/database`; adapters MongoDB estão em `src/repositories`. O carregamento de cada tela mostra spinner e erro visível, sem bloquear a navegação antes de selecionar uma página.
+Na Sprint 1, as regras puras de sessão foram extraídas para `src/domain/session_rules.py`, a UI passou a depender de services e as telas foram separadas em `app_pages/` usando `st.navigation`. O shell compartilhado em `src/ui/app_shell.py` garante o mesmo comportamento quando o Community Cloud ou uma configuração local usa `app.py` ou `src/app.py`. Conexão, índices e seed estão em `src/database`; adapters MongoDB estão em `src/repositories`. O carregamento de cada tela mostra spinner e erro visível, sem bloquear a navegação antes de selecionar uma página.
 
 ## Responsabilidades e dependências
 
