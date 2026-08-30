@@ -98,52 +98,21 @@ def execute(sql: str, params: tuple = ()) -> None:
 
 
 def session_card(row: sqlite3.Row) -> None:
-    status = row["status"]
-    status_class = "done" if status == "Concluída" else "pending"
-    st.markdown(
-        f"""
-        <div class="session-card">
-            <div class="session-time">{row['study_time']} · {row['duration']} min</div>
-            <div class="session-main">
-                <div>
-                    <div class="subject-label">{row['subject_name']}</div>
-                    <div class="session-title">{row['topic']}</div>
-                    <div class="session-goal">{row['goal']}</div>
-                </div>
-                <span class="status {status_class}">{status}</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    with st.container(border=True):
+        info_col, status_col = st.columns([5, 1])
+        info_col.caption(f"{row['study_time']} · {row['duration']} minutos")
+        info_col.write(f"**{row['subject_name']}**")
+        info_col.subheader(row["topic"])
+        if row["goal"]:
+            info_col.write(row["goal"])
+        if row["status"] == "Concluída":
+            status_col.success("Concluída")
+        else:
+            status_col.warning("Pendente")
 
 
 st.set_page_config(page_title="Plano", page_icon="◷", layout="wide")
 setup_database()
-
-st.markdown(
-    """
-    <style>
-    :root { --ink: #202124; --muted: #777b84; --line: #e4e5e8; --blue: #5e6ad2; }
-    .block-container { max-width: 1180px; padding-top: 2.5rem; }
-    h1, h2, h3 { color: var(--ink); letter-spacing: -0.025em; }
-    h1 { font-size: 2.15rem; margin-bottom: .2rem; }
-    [data-testid="stSidebar"] { border-right: 1px solid var(--line); }
-    [data-testid="stSidebar"] section { padding-top: 2rem; }
-    .eyebrow { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
-    .session-card { border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; margin: .55rem 0; background: #fff; }
-    .session-time { color: var(--muted); font-size: .82rem; margin-bottom: .5rem; }
-    .session-main { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-    .subject-label { color: var(--blue); font-size: .82rem; font-weight: 600; }
-    .session-title { color: var(--ink); font-size: 1.05rem; font-weight: 600; margin: .18rem 0; }
-    .session-goal { color: var(--muted); font-size: .88rem; }
-    .status { border-radius: 5px; padding: .28rem .5rem; font-size: .76rem; white-space: nowrap; }
-    .status.pending { color: #805d12; background: #fff5d9; }
-    .status.done { color: #24634f; background: #e5f4ed; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 user = query("SELECT * FROM users LIMIT 1")[0]
 subjects = query("SELECT * FROM subjects WHERE user_id = ? ORDER BY name", (user["id"],))
@@ -160,7 +129,7 @@ with st.sidebar:
     st.caption(f"Banco: `{DB_PATH.name}`")
 
 if page == "Visão geral":
-    st.markdown('<div class="eyebrow">Semana de estudos</div>', unsafe_allow_html=True)
+    st.caption("SEMANA DE ESTUDOS")
     st.title(f"Olá, {user['name'].split()[0]}")
     st.write("Aqui está o que você planejou para os próximos dias.")
     all_sessions = query(
@@ -171,9 +140,12 @@ if page == "Visão geral":
     pending = [s for s in all_sessions if s["status"] == "Pendente"]
     completed = [s for s in all_sessions if s["status"] == "Concluída"]
     col1, col2, col3 = st.columns(3)
-    col1.metric("Sessões pendentes", len(pending))
-    col2.metric("Horas planejadas", f"{sum(s['duration'] for s in pending) / 60:.1f}h")
-    col3.metric("Concluídas", len(completed))
+    col1.write("**Sessões pendentes**")
+    col1.title(len(pending))
+    col2.write("**Horas planejadas**")
+    col2.title(f"{sum(s['duration'] for s in pending) / 60:.1f}h")
+    col3.write("**Concluídas**")
+    col3.title(len(completed))
     st.divider()
     selected_date = st.date_input("Ver dia", value=date.today(), format="DD/MM/YYYY")
     day_sessions = [s for s in all_sessions if s["study_date"] == str(selected_date)]
@@ -202,7 +174,7 @@ if page == "Visão geral":
             st.rerun()
 
 elif page == "Nova sessão":
-    st.markdown('<div class="eyebrow">Planejamento</div>', unsafe_allow_html=True)
+    st.caption("PLANEJAMENTO")
     st.title("Nova sessão")
     st.write("Defina uma sessão pequena e objetiva para facilitar o início do estudo.")
     with st.form("new_session"):
@@ -230,7 +202,7 @@ elif page == "Nova sessão":
             st.success("Sessão adicionada ao seu plano.")
 
 else:
-    st.markdown('<div class="eyebrow">Organização</div>', unsafe_allow_html=True)
+    st.caption("ORGANIZAÇÃO")
     st.title("Disciplinas")
     st.write("Use poucas disciplinas e dê uma cor para reconhecer cada uma rapidamente.")
     for subject in subjects:
