@@ -35,3 +35,7 @@
 - Sprint 11 aplicada com filtros visíveis, datas completas, retry de carregamento e ajustes responsivos/acessíveis.
 - Hardening de consultas temporais, disciplinas duplicadas, status atrasado, empty states, feedback de persistência e configuração reproduzível de testes aplicado.
 - Navegação e composição de services atualizadas para o contexto de períodos acadêmicos da Sprint 14.
+
+### Fixed
+
+- Cache removido do contêiner de services para impedir instâncias antigas após hot reload/deploy; a conexão MongoDB continua em `st.cache_resource`.
