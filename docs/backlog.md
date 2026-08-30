@@ -115,7 +115,7 @@ Como estudante quero associar minhas disciplinas ao período acadêmico atual pa
 - Critérios de aceitação: novas disciplinas são associadas a um período ativo pertencente ao usuário; listagens permitem considerar o período atual; documentos legados sem período recebem tratamento explícito, sem associação automática incorreta; toda leitura e escrita valida `user_id` e `period_id`; sessões existentes permanecem legíveis.
 - Dependências: US-016 integrada à `main`; definição da estratégia para documentos legados.
 - Complexidade: M
-- Status: IN PROGRESS.
+- Status: REVIEW (implementada na PR #22; integração à `main` pendente).
 
 ## Sprints
 
@@ -277,7 +277,7 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 
 ### Sprint 15 — Disciplinas por período acadêmico
 
-**Status:** IN PROGRESS.
+**Status:** REVIEW (PR #22 aberta).
 
 **Objetivo:** relacionar disciplinas ao contexto acadêmico atual sem corromper ou ocultar dados legados.
 

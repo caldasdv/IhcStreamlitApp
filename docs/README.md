@@ -7,7 +7,7 @@ Este diretório concentra as fontes de verdade do Plano. Documentos históricos 
 - MVP operacional: autenticação Google OIDC, isolamento por usuário, disciplinas, sessões de estudo, agenda semanal, progresso e meta semanal.
 - Sprint 13: hardening concluído e incorporado à `main` pelo PR #20.
 - Sprint 14: períodos acadêmicos integrados à `main` pelo PR #21.
-- Sprint 15: associação de disciplinas ao período atual em desenvolvimento.
+- Sprint 15: associação de disciplinas ao período atual em revisão na PR #22.
 - Sprint 12: protocolo de avaliação preparado, ainda pendente de participantes e evidência real.
 - Próxima decisão de produto: oferecer associação manual para disciplinas legadas sem inferir o semestre automaticamente.
 
