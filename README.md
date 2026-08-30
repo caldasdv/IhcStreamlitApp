@@ -23,7 +23,7 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 ## Estrutura
 
 - `app.py`: shell, configuração visual e navegação nativa com `st.navigation`.
-- `app_pages/`: uma página Streamlit por fluxo da aplicação, incluindo a visão semanal.
+- `app_pages/`: uma página Streamlit por fluxo da aplicação, incluindo visão semanal e períodos acadêmicos.
 - `src/ui/`: contexto, sidebar, estilos e componentes reutilizáveis.
 - `src/services/`: casos de uso sem dependência direta da UI.
 - `src/repositories/`: contratos e adapters MongoDB.
@@ -39,6 +39,7 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 - a visão geral acompanha a meta semanal em horas;
 - a página de progresso resume o tempo concluído por disciplina;
 - a conexão usa `MONGODB_URI` e o banco `plano_estudos` no Atlas.
+- o primeiro período acadêmico criado vira o atual; períodos não atuais podem ser arquivados sem apagar o histórico.
 
 ## Rodar localmente
 

@@ -29,6 +29,11 @@ def run_app() -> None:
             st.Page("app_pages/weekly.py", title="Visão semanal", icon=":material/calendar_view_week:"),
             st.Page("app_pages/progress.py", title="Progresso", icon=":material/analytics:"),
             st.Page("app_pages/subjects.py", title="Disciplinas", icon=":material/menu_book:"),
+            st.Page(
+                "app_pages/academic_periods.py",
+                title="Períodos acadêmicos",
+                icon=":material/date_range:",
+            ),
         ],
         position="sidebar",
     )

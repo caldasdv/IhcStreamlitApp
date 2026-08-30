@@ -90,6 +90,16 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 - Complexidade: M
 - Status: DONE.
 
+### US-016
+
+Como estudante quero criar, visualizar e escolher meu período acadêmico atual para organizar meu planejamento no contexto correto.
+
+- Prioridade: P0
+- Critérios de aceitação: nome e intervalo válidos; nome único por usuário; primeiro período torna-se atual; somente período ativo e pertencente ao usuário pode ser selecionado; arquivamento preserva histórico e não remove o período atual; estados vazio, erro e sucesso tratados.
+- Dependências: identidade OIDC, repositories e MongoDB Atlas.
+- Complexidade: M
+- Status: DONE na Sprint 14.
+
 ## Sprints
 
 ### Sprint 0 — Arquitetura e setup
@@ -231,6 +241,18 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 **Riscos:** documentos legados sem campos normalizados e permissões de gerenciamento de índices no Atlas.
 
 **Definition of Done:** testes unitários passam pelos comandos documentados; smoke test inicia; índices e consultas estão documentados; nenhuma credencial é versionada.
+
+### Sprint 14 — Períodos acadêmicos
+
+**Objetivo:** adicionar o contexto temporal acadêmico que antecede a organização de disciplinas.
+
+**História:** US-016.
+
+**Tarefas:** regras puras de nome/intervalo; collection e índices; repository e service isolados por usuário; primeiro período como atual; seleção de período ativo; arquivamento protegido; página Streamlit com feedback e recuperação; testes e documentação.
+
+**Riscos:** disciplinas e sessões legadas ainda não possuem referência de período; a associação será uma história separada para evitar migração automática incorreta.
+
+**Definition of Done:** critérios da US-016 atendidos; testes passam sem Atlas; página acessível pela navegação; nenhum acesso MongoDB na UI; documentação consistente; smoke test iniciado.
 
 O roadmap não pressupõe React, FastAPI ou uma reescrita como SPA. Cada dependência externa precisa
 passar pela comparação com a solução nativa, pelo impacto no Community Cloud e pelos critérios de IHC.

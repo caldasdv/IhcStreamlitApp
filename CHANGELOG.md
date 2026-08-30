@@ -14,6 +14,7 @@
 - Revisão de IHC/UX aplicada ao dashboard e aos fluxos de gravação, com estados de erro, tabela alternativa e foco visível.
 - Skill repo-local de auditoria de segurança adicionada, com checklist por stack, regras de evidência e geração de relatório PDF/Markdown para issues.
 - Testes de normalização, autorização de disciplina e confirmação de escritas MongoDB adicionados.
+- Períodos acadêmicos adicionados com seleção do período atual, arquivamento protegido e testes de domínio/service.
 
 ### Changed
 
@@ -29,3 +30,4 @@
 - Dashboard da Sprint 10 atualizado com Plotly, filtro por disciplina e tooltips com unidades.
 - Sprint 11 aplicada com filtros visíveis, datas completas, retry de carregamento e ajustes responsivos/acessíveis.
 - Hardening de consultas temporais, disciplinas duplicadas, status atrasado, empty states, feedback de persistência e configuração reproduzível de testes aplicado.
+- Navegação e composição de services atualizadas para o contexto de períodos acadêmicos da Sprint 14.

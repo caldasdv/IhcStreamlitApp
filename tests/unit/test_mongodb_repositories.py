@@ -4,7 +4,10 @@ from types import SimpleNamespace
 import pytest
 
 from src.domain.exceptions import EntityNotFoundError
-from src.repositories.mongodb.repositories import MongoStudySessionRepository
+from src.repositories.mongodb.repositories import (
+    MongoAcademicPeriodRepository,
+    MongoStudySessionRepository,
+)
 
 
 class FakeCollection:
@@ -62,3 +65,13 @@ def test_list_by_user_applies_user_and_date_range() -> None:
         "user_id": "user-id",
         "study_date": {"$gte": "2026-08-24", "$lte": "2026-08-30"},
     }
+
+
+def test_archive_period_rejects_missing_or_foreign_period() -> None:
+    collection = FakeCollection(matched_count=0)
+    repository = MongoAcademicPeriodRepository(
+        SimpleNamespace(academic_periods=collection)
+    )
+
+    with pytest.raises(EntityNotFoundError):
+        repository.archive("user-id", "period-id")

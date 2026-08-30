@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime
 from typing import Any
 
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
-from src.domain.exceptions import DuplicateSubjectError, EntityNotFoundError
+from src.domain.exceptions import (
+    DuplicateAcademicPeriodError,
+    DuplicateSubjectError,
+    EntityNotFoundError,
+)
 
 
 class MongoUserRepository:
@@ -38,6 +42,70 @@ class MongoUserRepository:
 
     def update_weekly_goal(self, user_id: Any, minutes: int) -> None:
         self.collection.update_one({"_id": user_id}, {"$set": {"weekly_goal_minutes": minutes}})
+
+    def update_current_academic_period(self, user_id: Any, period_id: Any) -> None:
+        result = self.collection.update_one(
+            {"_id": user_id}, {"$set": {"current_academic_period_id": period_id}}
+        )
+        if result.matched_count == 0:
+            raise EntityNotFoundError("O usuário autenticado não foi encontrado.")
+
+
+class MongoAcademicPeriodRepository:
+    def __init__(self, database) -> None:
+        self.collection = database.academic_periods
+
+    def list_by_user(self, user_id: Any) -> list[dict[str, Any]]:
+        return list(
+            self.collection.find({"user_id": user_id}).sort(
+                [("start_date", -1), ("name", 1)]
+            )
+        )
+
+    def exists_by_normalized_name(self, user_id: Any, normalized_name: str) -> bool:
+        return self.collection.find_one(
+            {"user_id": user_id, "name_normalized": normalized_name}, {"_id": 1}
+        ) is not None
+
+    def create(
+        self,
+        user_id: Any,
+        name: str,
+        normalized_name: str,
+        start_date: date,
+        end_date: date,
+    ) -> Any:
+        now = datetime.now(UTC)
+        try:
+            return self.collection.insert_one(
+                {
+                    "user_id": user_id,
+                    "name": name,
+                    "name_normalized": normalized_name,
+                    "start_date": start_date.isoformat(),
+                    "end_date": end_date.isoformat(),
+                    "status": "ACTIVE",
+                    "created_at": now,
+                    "updated_at": now,
+                }
+            ).inserted_id
+        except DuplicateKeyError as error:
+            raise DuplicateAcademicPeriodError(
+                "Você já possui um período acadêmico com esse nome."
+            ) from error
+
+    def is_active_owned_by(self, user_id: Any, period_id: Any) -> bool:
+        return self.collection.find_one(
+            {"_id": period_id, "user_id": user_id, "status": "ACTIVE"}, {"_id": 1}
+        ) is not None
+
+    def archive(self, user_id: Any, period_id: Any) -> None:
+        result = self.collection.update_one(
+            {"_id": period_id, "user_id": user_id, "status": "ACTIVE"},
+            {"$set": {"status": "ARCHIVED", "updated_at": datetime.now(UTC)}},
+        )
+        if result.matched_count == 0:
+            raise EntityNotFoundError("O período não foi encontrado ou já está arquivado.")
 
 
 class MongoSubjectRepository:

@@ -11,6 +11,27 @@ class UserRepository(Protocol):
 
     def update_weekly_goal(self, user_id: Any, minutes: int) -> None: ...
 
+    def update_current_academic_period(self, user_id: Any, period_id: Any) -> None: ...
+
+
+class AcademicPeriodRepository(Protocol):
+    def list_by_user(self, user_id: Any) -> list[dict[str, Any]]: ...
+
+    def exists_by_normalized_name(self, user_id: Any, normalized_name: str) -> bool: ...
+
+    def create(
+        self,
+        user_id: Any,
+        name: str,
+        normalized_name: str,
+        start_date: date,
+        end_date: date,
+    ) -> Any: ...
+
+    def is_active_owned_by(self, user_id: Any, period_id: Any) -> bool: ...
+
+    def archive(self, user_id: Any, period_id: Any) -> None: ...
+
 
 class SubjectRepository(Protocol):
     def list_by_user(self, user_id: Any) -> list[dict[str, Any]]: ...
