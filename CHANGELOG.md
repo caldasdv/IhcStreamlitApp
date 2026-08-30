@@ -19,6 +19,7 @@
 - Disciplinas e novas sessões associadas ao período acadêmico atual, com isolamento por usuário/período e tratamento explícito dos registros legados.
 - Grade semanal de aulas adicionada com validação de referências, conflitos de horário, remoção protegida e estados Streamlit recuperáveis.
 - Associação manual de disciplinas legadas adicionada com confirmação, validação de período, proteção contra duplicidade e update atômico.
+- README revisado com estado atual, setup reproduzível e configuração separada de OAuth, Atlas e Community Cloud.
 
 ### Changed
 

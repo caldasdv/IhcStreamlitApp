@@ -135,7 +135,7 @@ Como estudante quero associar uma disciplina antiga a um período para organizar
 - Critérios de aceitação: somente disciplina sem período e pertencente ao usuário pode ser associada; destino deve ser período ativo do usuário; confirmação explícita; conflito de nome rejeitado; update atômico; sessões existentes preservadas; feedback de erro e sucesso após rerun.
 - Dependências: US-017 integrada à `main`.
 - Complexidade: S
-- Status: REVIEW (implementada na PR #24; integração à `main` pendente).
+- Status: DONE (integrada à `main` pela PR #24).
 
 ## Sprints
 
@@ -332,7 +332,7 @@ período; página possui estados recuperáveis; documentação e smoke test atua
 
 ### Sprint 17 — Associação manual de disciplinas legadas
 
-**Status:** REVIEW (PR #24 aberta).
+**Status:** DONE (integrada à `main` pela PR #24).
 
 **Objetivo:** permitir que o usuário atribua conscientemente disciplinas antigas sem período a um período ativo.
 
