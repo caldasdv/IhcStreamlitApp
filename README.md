@@ -1,18 +1,53 @@
 # Plano — planejador de estudos
 
-## Objetivo
+Aplicação web para estudantes organizarem períodos acadêmicos, disciplinas, grade de aulas e sessões de estudo, acompanhando o progresso semanal com dados persistidos no MongoDB Atlas.
 
-Permitir que estudantes planejem, executem e acompanhem sessões de estudo com clareza e baixo atrito.
+Aplicação publicada: [planejadordeestudos.streamlit.app](https://planejadordeestudos.streamlit.app/)
 
-O MVP funcional já passou pelas Sprints 0–11; a Sprint 12 possui plano de avaliação com usuários e o hardening técnico atual reforça consistência, isolamento e operação no Community Cloud.
+## Estado atual
+
+O MVP está operacional e as entregas funcionais até a Sprint 17 foram integradas. A avaliação de usabilidade da Sprint 12 possui protocolo pronto, mas ainda depende de participantes e não deve ser considerada concluída.
+
+Principais fluxos:
+
+- login com Google OIDC;
+- isolamento dos dados por usuário autenticado;
+- criação, seleção e arquivamento de períodos acadêmicos;
+- disciplinas vinculadas ao período atual;
+- associação manual de disciplinas legadas a períodos ativos;
+- grade semanal de aulas com detecção de conflitos;
+- criação, edição, conclusão e exclusão de sessões de estudo;
+- agenda semanal, meta de horas e dashboard de progresso;
+- feedback persistente após reruns e estados de erro recuperáveis.
 
 ## Stack
 
-Python, Streamlit, Authlib, PyMongo, Plotly, MongoDB Atlas e pytest. Pandas só será adicionada quando uma necessidade real justificar o impacto no deploy.
+- Python 3.11–3.14;
+- Streamlit com suporte a autenticação OIDC;
+- MongoDB Atlas e PyMongo;
+- Plotly para visualizações analíticas justificadas;
+- pytest para testes automatizados;
+- Streamlit Community Cloud para deploy.
+
+Pandas não é dependência atual e só deve ser adicionada quando houver necessidade concreta.
 
 ## Arquitetura
 
-O projeto usa um monólito modular: Presentation (Streamlit) → Services → Domain → Repositories → MongoDB Atlas. A primeira extração foi concluída na Sprint 1; a UI agora usa services, a conexão/seed ficam em `src/database` e os adapters MongoDB em `src/repositories`.
+O projeto usa um monólito modular:
+
+```text
+Streamlit UI / Pages
+        ↓
+Application Services
+        ↓
+Domain + Repository contracts
+        ↓
+MongoDB repositories
+        ↓
+MongoDB Atlas
+```
+
+As páginas não acessam MongoDB diretamente. Regras de negócio ficam fora do Streamlit e podem ser testadas sem iniciar a aplicação. O `MongoClient` e os services são recursos compartilhados com `st.cache_resource`.
 
 Comece pelo [índice da documentação](docs/README.md). As fontes principais são [arquitetura](docs/architecture.md), [domínio](docs/domain.md), [banco](docs/database.md) e [backlog](docs/backlog.md).
 
@@ -22,14 +57,16 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 
 ## Estrutura
 
-- `app.py`: shell, configuração visual e navegação nativa com `st.navigation`.
-- `app_pages/`: uma página Streamlit por fluxo da aplicação, incluindo visão semanal e períodos acadêmicos.
+- `app.py`: entrypoint fino usado pelo Community Cloud.
+- `app_pages/`: scripts das páginas registradas por `st.navigation`, incluindo períodos e grade de aulas.
 - `src/ui/`: contexto, sidebar, estilos e componentes reutilizáveis.
 - `src/services/`: casos de uso sem dependência direta da UI.
 - `src/repositories/`: contratos e adapters MongoDB.
 - `src/domain/`: regras testáveis sem Streamlit.
-- `tests/`: testes unitários de domínio e services.
+- `tests/`: testes unitários de domínio, services e repositories sem Atlas.
 - A tela `Progresso` inclui métricas semanais e visualizações Plotly por disciplina e por dia, com tabela textual equivalente.
+
+O shell real está em `src/ui/app_shell.py`. Tanto `app.py` quanto o entrypoint de compatibilidade `src/app.py` executam esse mesmo shell.
 
 ## Regras atuais
 
@@ -44,44 +81,118 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 - disciplinas antigas podem ser associadas manualmente a um período ativo, sem alterar suas sessões existentes.
 - a grade semanal registra aulas recorrentes por disciplina e rejeita sobreposição de horários.
 
-## Rodar localmente
+## Preparar o ambiente local
+
+Na raiz do repositório:
 
 ```bash
-python -m pip install -r requirements.txt
-python -m streamlit run app.py
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt -r requirements-dev.txt
 ```
 
-Para desenvolvimento e testes, instale também `requirements-dev.txt`.
+No Windows PowerShell, a ativação equivalente é:
 
-## Configuração local e Secrets
+```powershell
+.venv\Scripts\Activate.ps1
+```
 
-As credenciais locais ficam em `.env`, que não é versionado, com:
+## MongoDB Atlas
+
+Crie um cluster, um usuário de banco com privilégios mínimos necessários e uma regra de rede compatível com o ambiente de execução. Nunca use a conta administrativa do Atlas na aplicação.
+
+Para desenvolvimento local, crie `.env` na raiz:
 
 ```dotenv
-MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER/
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER/?retryWrites=true&w=majority
+MONGODB_DATABASE=plano_estudos
 ```
 
-No Streamlit Community Cloud, configure o Secret `MONGODB_URI` ou use o formato documentado em [.streamlit/secrets.toml.example](.streamlit/secrets.toml.example). Nunca commite `.env` ou `.streamlit/secrets.toml`.
+O `.env` é ignorado pelo Git. Não coloque credenciais no código, README, issues, commits ou logs.
 
-Para autenticação local, crie um cliente OIDC no Google Cloud e registre
-`http://localhost:8501/oauth2callback` como redirect URI. No Community Cloud, troque o redirect
-URI pela URL publicada terminada em `/oauth2callback` e cole o bloco `[auth]` nos Secrets. O
-usuário é associado ao `sub` estável do Google; o e-mail não é usado como chave de isolamento.
+## Login Google local
 
-O banco padrão é `plano_estudos`, mas o nome pode ser definido no Secret `[mongodb].database` ou
-em `MONGODB_DATABASE` no ambiente local.
+1. No Google Cloud Console, configure a tela de consentimento OAuth.
+2. Crie um cliente OAuth 2.0 do tipo aplicação web.
+3. Registre exatamente `http://localhost:8501/oauth2callback` em **URIs de redirecionamento autorizados**.
+4. Copie `.streamlit/secrets.toml.example` para `.streamlit/secrets.toml`.
+5. Preencha o bloco `[auth]` com os dados do cliente local e gere um `cookie_secret` longo e aleatório.
 
-## Execução e testes
+Exemplo local completo:
+
+```toml
+[mongodb]
+uri = "mongodb+srv://USERNAME:PASSWORD@CLUSTER/?retryWrites=true&w=majority"
+database = "plano_estudos"
+
+[auth]
+redirect_uri = "http://localhost:8501/oauth2callback"
+cookie_secret = "GENERATE_A_LONG_RANDOM_SECRET"
+client_id = "GOOGLE_CLIENT_ID"
+client_secret = "GOOGLE_CLIENT_SECRET"
+server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
+```
+
+O arquivo `.streamlit/secrets.toml` é ignorado e nunca deve ser commitado. A identidade interna usa `provider + sub` do Google; e-mail é somente atributo de perfil.
+
+## Executar e testar
+
+Com o ambiente ativado:
 
 ```bash
 python -m streamlit run app.py
-python -m pytest -q
 ```
 
-As regras de domínio, services, transformações, gráficos e resultados de escrita dos repositories possuem testes em `tests/unit`; execute pytest após instalar `requirements-dev.txt`. O projeto suporta Python 3.11 a 3.14, conforme `pyproject.toml`.
+A aplicação local usa normalmente `http://localhost:8501`.
 
-## Rodar em uma VPS ou no Community Cloud
+Validação completa:
 
-Configure `MONGODB_URI` nas variáveis de ambiente ou nos Secrets do Community Cloud. O app não depende de SQLite, Google Drive ou armazenamento local persistente.
+```bash
+python -m pytest -q
+python -m compileall -q app.py app_pages src tests
+python -m pip check
+```
 
-O entrypoint recomendado no Community Cloud é `app.py` na raiz. `src/app.py` mantém compatibilidade com configurações antigas e usa o mesmo shell de navegação; ambos carregam `requirements.txt` e não armazenam dados localmente.
+Os testes unitários não exigem conexão com Atlas nem credenciais. O smoke test manual exige a configuração de autenticação correspondente ao endereço usado.
+
+## Deploy no Streamlit Community Cloud
+
+1. Publique a branch desejada no GitHub.
+2. No Community Cloud, selecione o repositório, a branch e `app.py` como entrypoint.
+3. Em **App settings → Secrets**, informe um TOML completo; não cole no formato `.env`.
+4. No cliente OAuth do Google, registre exatamente a URL pública terminada em `/oauth2callback`.
+5. Garanta que o MongoDB Atlas aceite conexões originadas pelo ambiente do Community Cloud.
+6. Reinicie o app e valide login, criação de período, disciplina, grade e sessão.
+
+Secrets para a aplicação publicada:
+
+```toml
+[mongodb]
+uri = "mongodb+srv://USERNAME:PASSWORD@CLUSTER/?retryWrites=true&w=majority"
+database = "plano_estudos"
+
+[auth]
+redirect_uri = "https://planejadordeestudos.streamlit.app/oauth2callback"
+cookie_secret = "GENERATE_A_DIFFERENT_LONG_RANDOM_SECRET"
+client_id = "GOOGLE_CLIENT_ID"
+client_secret = "GOOGLE_CLIENT_SECRET"
+server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
+```
+
+Alternativamente, a URI pode ser fornecida como Secret de topo `MONGODB_URI` e o banco como `MONGODB_DATABASE`, mas o formato `[mongodb]` acima é o padrão documentado do projeto.
+
+O app não usa SQLite, Google Drive nem arquivos locais como armazenamento persistente.
+
+## Segurança operacional
+
+- rotacione imediatamente qualquer credencial publicada ou enviada para commits;
+- use usuários Atlas dedicados e privilégios mínimos;
+- mantenha `.env` e `.streamlit/secrets.toml` fora do Git;
+- não imprima URI, tokens, senhas ou claims desnecessários;
+- revise o histórico Git quando houver suspeita de vazamento;
+- toda operação privada deve continuar filtrando `user_id` e, quando aplicável, período e entidade relacionada.
+
+## Contribuição
+
+Leia [AGENTS.md](AGENTS.md) antes de alterar o projeto. Use uma branch curta por sprint ou entrega, atualize testes e documentação no mesmo trabalho e abra Pull Request para `main`. O fluxo detalhado está em [docs/git-workflow.md](docs/git-workflow.md).
