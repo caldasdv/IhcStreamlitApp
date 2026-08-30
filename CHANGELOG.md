@@ -12,6 +12,7 @@
 - Edição/reagendamento, confirmação de exclusão e visão semanal adicionados.
 - Dashboard de progresso com métricas semanais e gráficos nativos adicionado.
 - Revisão de IHC/UX aplicada ao dashboard e aos fluxos de gravação, com estados de erro, tabela alternativa e foco visível.
+- Skill repo-local de auditoria de segurança adicionada, com checklist por stack, regras de evidência e geração de relatório PDF/Markdown para issues.
 
 ### Changed
 

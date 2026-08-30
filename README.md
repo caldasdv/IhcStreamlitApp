@@ -16,6 +16,8 @@ O projeto usa um monólito modular: Presentation (Streamlit) → Services → Do
 
 Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/database.md) e [docs/backlog.md](docs/backlog.md).
 
+Para auditorias de segurança, use a skill repo-local em [`skills/security-audit/SKILL.md`](skills/security-audit/SKILL.md). Ela define a descoberta da stack, a matriz de evidências e a geração validada do relatório PDF.
+
 O roadmap de evolução visual e componentes externos está em [docs/frontend-roadmap.md](docs/frontend-roadmap.md).
 
 ## Estrutura

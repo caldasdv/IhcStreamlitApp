@@ -32,6 +32,10 @@ Considere sempre o modelo reativo e o rerun completo, `st.session_state`, `st.ca
 
 Para qualquer requisito, feature, tela, fluxo, formulário, dashboard, revisão visual, acessibilidade ou avaliação de usabilidade, leia e aplique integralmente `SKILL-IHC-UX.md` antes de implementar. A análise deve considerar usuários, objetivos, contexto, tarefas, evidências, hipóteses, modelo conceitual, alternativas, estados, feedback, prevenção/recuperação de erros, usabilidade, experiência, acessibilidade e comunicabilidade. Não invente pesquisa ou preferências de usuários. Diferencie fatos, evidências, inferências, hipóteses, requisitos e decisões de design. Para alterações relevantes, registre o fluxo principal, estados, critérios de qualidade e como a solução será avaliada. Se o arquivo não estiver disponível, informe a ausência e aplique a melhor análise de IHC/UX possível sem declarar validação inexistente.
 
+## Skill de auditoria de segurança
+
+Quando for solicitada uma auditoria de segurança, leia e aplique `skills/security-audit/SKILL.md` e o checklist em `skills/security-audit/references/audit-checklist.md`. Detecte a stack antes de escolher os testes, reporte somente evidências verificadas com arquivo e linha, registre controles corretos e categorias não aplicáveis, redija segredos e valide o PDF antes de entregá-lo. A skill é somente para auditoria e geração dos artefatos solicitados; correções exigem autorização própria.
+
 ## MongoDB Atlas
 
 Não espalhe `MongoClient(...)`. Documente collections, campos, tipos, obrigatoriedade, índices justificados, cardinalidade, relacionamentos, embedding/reference e padrões de leitura/escrita antes de criar collections relevantes. Modele pelo acesso aos dados e crescimento dos documentos, não copiando SQL automaticamente.
