@@ -53,7 +53,7 @@ streamlit run app.py
 pytest -q
 ```
 
-No estado atual não há testes automatizados. As regras ainda estão acopladas ao módulo Streamlit e serão extraídas antes da cobertura unitária da Sprint 1.
+As primeiras regras de domínio já possuem testes em `tests/unit`; execute pytest após instalar `requirements-dev.txt`.
 
 ## Rodar em uma VPS ou no Community Cloud
 

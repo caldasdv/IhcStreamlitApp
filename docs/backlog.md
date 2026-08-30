@@ -88,7 +88,7 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 - Critérios de aceitação: validações e conflito cobertos; testes executam sem Atlas; pytest reproduzível.
 - Dependências: extração de Domain/Services.
 - Complexidade: M
-- Status: TODO.
+- Status: DONE.
 
 ## Sprints
 

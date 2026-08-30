@@ -9,6 +9,13 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
+from src.domain.session_rules import (
+    effective_status,
+    minutes_at,
+    sessions_conflict,
+    validate_new_session,
+)
+
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_DIR / ".env")
@@ -67,26 +74,9 @@ def seed_database(db) -> None:
     ])
 
 
-def effective_status(row: dict) -> str:
-    if row["status"] == "Pendente" and row["study_date"] < date.today().isoformat():
-        return "Atrasada"
-    return row["status"]
-
-
-def minutes_at(value: str) -> int:
-    hours, minutes = (int(part) for part in value.split(":"))
-    return hours * 60 + minutes
-
-
 def has_conflict(db, user_id, study_date: date, study_time: time, duration: int) -> bool:
-    start = study_time.hour * 60 + study_time.minute
-    end = start + duration
     existing = db.study_sessions.find({"user_id": user_id, "study_date": study_date.isoformat(), "status": "Pendente"}, {"study_time": 1, "duration": 1})
-    return any(
-        start < minutes_at(item["study_time"]) + item["duration"]
-        and minutes_at(item["study_time"]) < end
-        for item in existing
-    )
+    return sessions_conflict(study_time, duration, list(existing))
 
 
 def load_sessions(db, user_id) -> list[dict]:
@@ -230,16 +220,17 @@ elif page == "Nova sessão":
         priority = st.selectbox("Prioridade", ["Baixa", "Média", "Alta"], index=1)
         submitted = st.form_submit_button("Adicionar sessão", type="primary", use_container_width=True)
     if submitted:
-        if not topic.strip():
-            st.error("Informe o assunto da sessão.")
-        elif study_date < date.today():
-            st.error("Escolha hoje ou uma data futura para planejar uma sessão.")
-        elif has_conflict(db, user["_id"], study_date, study_time, duration):
-            st.error("Esse horário conflita com outra sessão pendente.")
+        try:
+            validate_new_session(topic=topic, study_date=study_date, duration=duration)
+        except ValueError as error:
+            st.error(str(error))
         else:
-            subject_id = next(s["_id"] for s in subjects if s["name"] == subject_name)
-            db.study_sessions.insert_one({"user_id": user["_id"], "subject_id": subject_id, "topic": topic.strip(), "study_date": study_date.isoformat(), "study_time": study_time.strftime("%H:%M"), "duration": duration, "priority": priority, "status": "Pendente", "goal": goal.strip()})
-            st.success("Sessão adicionada ao seu plano.")
+            if has_conflict(db, user["_id"], study_date, study_time, duration):
+                st.error("Esse horário conflita com outra sessão pendente.")
+            else:
+                subject_id = next(s["_id"] for s in subjects if s["name"] == subject_name)
+                db.study_sessions.insert_one({"user_id": user["_id"], "subject_id": subject_id, "topic": topic.strip(), "study_date": study_date.isoformat(), "study_time": study_time.strftime("%H:%M"), "duration": duration, "priority": priority, "status": "Pendente", "goal": goal.strip()})
+                st.success("Sessão adicionada ao seu plano.")
 
 elif page == "Progresso":
     st.caption("ACOMPANHAMENTO")
