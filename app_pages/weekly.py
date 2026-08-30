@@ -41,7 +41,7 @@ for day_offset, weekday in enumerate(weekdays):
     current_day = week_start + timedelta(days=day_offset)
     day_sessions = [session for session in sessions if session["study_date"] == current_day.isoformat()]
     with st.container(border=True):
-        st.subheader(f"{weekday}, {current_day.day:02d}/{current_day.month:02d}")
+        st.subheader(f"{weekday}, {current_day:%d/%m/%Y}")
         if not day_sessions:
             st.caption("Nenhuma sessão planejada.")
             continue

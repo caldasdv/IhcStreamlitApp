@@ -24,6 +24,7 @@ def apply_styles() -> None:
         .stButton button, .stFormSubmitButton button { border-radius: 4px; box-shadow: none; }
         .stButton button:focus-visible, .stFormSubmitButton button:focus-visible,
         input:focus-visible, textarea:focus-visible { outline: 3px solid #5e6ad2; outline-offset: 2px; }
+        button, input, textarea, select { min-height: 2.5rem; }
         .subject-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .35rem; vertical-align: .05rem; }
         @media (max-width: 640px) {
             .block-container { padding-top: 1.5rem; padding-left: 1rem; padding-right: 1rem; }
