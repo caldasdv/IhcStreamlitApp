@@ -199,6 +199,20 @@ configuração de callback local/Cloud; testes do service e validação sem cred
 **Definition of Done:** usuário anônimo não acessa páginas; usuário autenticado é criado/recuperado por identidade;
 queries usam o `user_id` resolvido; logout funciona; teste no ambiente Cloud é executado.
 
+### Sprint 7 — Feedback confiável após rerun
+
+**Objetivo:** manter o usuário informado quando uma ação de escrita provoca uma nova execução completa do Streamlit.
+
+**História:** US-010 — Como estudante quero confirmar o resultado de uma ação mesmo quando a tela é recarregada.
+
+- Prioridade: P1
+- Critérios de aceitação: confirmações de criar, editar, concluir, excluir e atualizar meta aparecem após o rerun; a mensagem é exibida uma vez; falhas continuam sem expor detalhes técnicos.
+- Dependências: `st.session_state` apenas para feedback transitório.
+- Complexidade: S
+- Status: DONE
+
+**Definition of Done:** feedback persistido no ciclo correto, sem uso de sessão como armazenamento de dados; testes e smoke test passam.
+
 ## Definition of Ready
 
 Objetivo, entrada, saída, critérios de aceitação, dependências e impacto arquitetural conhecidos.

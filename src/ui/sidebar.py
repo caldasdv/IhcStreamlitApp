@@ -5,7 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from src.services.container import ApplicationServices
-from src.ui.feedback import show_action_error
+from src.ui.feedback import set_success_flash, show_action_error
 
 
 def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
@@ -33,5 +33,5 @@ def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
         except Exception as error:
             show_action_error("atualizar sua meta", error)
         else:
-            st.sidebar.success("Meta atualizada.")
+            set_success_flash("Meta atualizada.")
             st.rerun()

@@ -8,6 +8,7 @@ from src.domain.session_rules import effective_status
 from src.ui.components.session_card import render_session_card
 from src.ui.context import load_page_context, load_page_sessions
 from src.ui.feedback import show_action_error
+from src.ui.feedback import set_success_flash
 from src.ui.sidebar import render_account_sidebar
 
 
@@ -58,7 +59,7 @@ if day_sessions:
         except Exception as error:
             show_action_error("concluir a sessão", error)
         else:
-            st.success("Sessão concluída.")
+            set_success_flash("Sessão concluída.")
             st.rerun()
     if action_col2.button("Excluir sessão", width="stretch"):
         st.session_state["confirm_delete_session_id"] = chosen["_id"]
@@ -75,7 +76,7 @@ if day_sessions:
                     show_action_error("excluir a sessão", error)
                 else:
                     st.session_state["confirm_delete_session_id"] = None
-                    st.success("Sessão excluída.")
+                    set_success_flash("Sessão excluída.")
                     st.rerun()
             if cancel_col.button("Cancelar", width="stretch"):
                 st.session_state["confirm_delete_session_id"] = None
@@ -107,5 +108,5 @@ if day_sessions:
             except Exception as error:
                 show_action_error("salvar as alterações", error)
             else:
-                st.success("Sessão atualizada.")
+                set_success_flash("Sessão atualizada.")
                 st.rerun()

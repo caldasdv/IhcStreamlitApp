@@ -5,7 +5,7 @@ from html import escape
 import re
 
 from src.ui.context import load_page_context
-from src.ui.feedback import show_action_error
+from src.ui.feedback import set_success_flash, show_action_error
 from src.ui.sidebar import render_account_sidebar
 
 
@@ -37,5 +37,5 @@ with st.form("new_subject"):
         except Exception as error:
             show_action_error("adicionar a disciplina", error)
         else:
-            st.success("Disciplina adicionada.")
+            set_success_flash("Disciplina adicionada.")
             st.rerun()
