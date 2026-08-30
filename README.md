@@ -14,7 +14,7 @@ Python, Streamlit, Authlib, PyMongo, Plotly, MongoDB Atlas e pytest. Pandas só 
 
 O projeto usa um monólito modular: Presentation (Streamlit) → Services → Domain → Repositories → MongoDB Atlas. A primeira extração foi concluída na Sprint 1; a UI agora usa services, a conexão/seed ficam em `src/database` e os adapters MongoDB em `src/repositories`.
 
-Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/database.md) e [docs/backlog.md](docs/backlog.md).
+Comece pelo [índice da documentação](docs/README.md). As fontes principais são [arquitetura](docs/architecture.md), [domínio](docs/domain.md), [banco](docs/database.md) e [backlog](docs/backlog.md).
 
 Para auditorias de segurança, use a skill repo-local em [`skills/security-audit/SKILL.md`](skills/security-audit/SKILL.md). Ela define a descoberta da stack, a matriz de evidências e a geração validada do relatório PDF.
 

@@ -1,5 +1,7 @@
 # AGENTS.md — regras de engenharia do Plano
 
+Este arquivo contém regras operacionais permanentes. Use `docs/README.md` como índice documental, `docs/backlog.md` como fonte de status das histórias, `docs/domain.md` para o domínio planejado e `docs/database.md` para o modelo persistido. Em caso de divergência, o código e os testes descrevem o comportamento atual; corrija a documentação no mesmo trabalho.
+
 ## Papel do agente
 
 Atue como Software Engineer, Python Developer, Streamlit Developer, MongoDB Developer, Software Architect, Code Reviewer e QA Engineer. Não seja apenas um gerador de código: descubra o contexto, avalie riscos, teste e documente as decisões.
@@ -17,7 +19,7 @@ Streamlit UI / Pages → Services → Domain → Repositories → MongoDB Atlas
 ```
 
 - Presentation contém Streamlit, páginas, componentes, entradas, tabelas, gráficos, navegação, UX e mensagens. Não acessa MongoDB diretamente.
-- Services coordenam casos de uso, por exemplo `create_customer()` ou `get_sales_summary()`.
+- Services coordenam casos de uso, por exemplo `create_academic_period()`, `schedule_study_session()` e `get_progress_summary()`.
 - Domain contém entidades, modelos, enums, validações, regras e exceções, sem depender de Streamlit.
 - Infrastructure contém configuração, logging, conexão MongoDB, repositories e integrações externas.
 - Centralize `MongoClient` em conexão/cache. Use repositories e permita mocks/fakes nos testes.
@@ -44,17 +46,11 @@ Não espalhe `MongoClient(...)`. Documente collections, campos, tipos, obrigator
 
 Nunca versione `.env` ou `.streamlit/secrets.toml`, nem coloque URI, credenciais, tokens ou secrets no código. Use `st.secrets` no Community Cloud e variáveis de ambiente localmente. Nunca registre secrets, URI completa ou dados pessoais desnecessários. Não faça armazenamento persistente local.
 
+O login usa Google OIDC. Identifique a conta por `identity.provider + identity.subject`, nunca apenas por e-mail. Toda leitura e escrita privada deve filtrar pelo `user_id` autenticado; IDs recebidos de widgets, estado, query params ou componentes não são fronteira de segurança. Services validam referências pertencentes ao usuário e repositories repetem o filtro de posse nas operações por ID.
+
 ## Qualidade e testes
 
 Use type hints, funções pequenas, nomes claros, responsabilidade única, baixo acoplamento e alta coesão. Evite globais, duplicação, funções gigantes, queries nas páginas e regras de negócio na UI. Use pytest, priorizando Domain, Services, validações, transformações, repositories e integrações. Regras devem ser testáveis sem executar Streamlit.
-
-## Processo de feature
-
-Para features médias/grandes siga: requisito → análise → impacto arquitetural → modelo de dados → User Story → critérios de aceitação → plano → implementação → testes → review → documentação → DONE. Antes de implementar, apresente objetivo, impacto, arquivos, modelo de dados, User Story, critérios, plano e riscos. Bugs pequenos e evidentes podem usar processo reduzido.
-
-Definition of Ready: objetivo, entrada, saída, critérios de aceitação, dependências e impacto arquitetural conhecidos.
-
-Definition of Done: código funcional, critérios atendidos, erros tratados, testes relevantes passando, nenhum segredo exposto e documentação atualizada.
 
 ## Auto-review
 
@@ -63,10 +59,6 @@ Após features relevantes, procure e corrija duplicação, funções grandes, im
 ## Simplicidade e deploy
 
 O padrão é `Streamlit + MongoDB Atlas + monólito modular`. Não introduza FastAPI, Redis, Celery, Kafka, microservices, Kubernetes, CQRS ou Docker obrigatório sem necessidade concreta. Mantenha `app.py` na raiz, `requirements.txt` correto, imports funcionando, caminhos relativos, secrets externos e compatibilidade com Streamlit Community Cloud.
-
-## Git e documentação
-
-Faça alterações coesas, use mensagens como `docs: add project inception and architecture`, e não faça push, merge ou ações destrutivas sem autorização. Atualize arquitetura, banco, backlog, ADRs, README e changelog quando necessário.
 
 ## Objetivo e princípios do produto
 
@@ -89,9 +81,9 @@ Use esta ordem sem pular dependências:
 
 Não implementar sem requisito aprovado: chat com IA/LLM, resumos ou flashcards gerados por IA, OCR, rede social, grupos, marketplace, videoconferência ou gamificação complexa. Funcionalidades inteligentes devem preferir regras, heurísticas, scoring e dados do próprio usuário. Consulte `docs/backlog.md` e `docs/frontend-roadmap.md` antes de escolher a próxima história. Não recrie funcionalidades que já existem.
 
-## Modelo de domínio futuro
+## Domínio e entidades
 
-O núcleo atual é `User`, `StudySession` e `Subject`. A evolução pode incluir, somente quando uma User Story aprovada exigir:
+O núcleo atual é `User`, `AcademicPeriod`, `Subject` e `StudySession`. A evolução planejada pode incluir, somente quando uma User Story aprovada exigir:
 
 ```text
 User
@@ -108,6 +100,8 @@ User
 Não crie collections antecipadamente. Antes de uma collection relevante, documente finalidade, campos, tipos, obrigatoriedade, índices justificados, cardinalidade, referência/embedding, crescimento e padrões de leitura/escrita em `docs/database.md`. MongoDB deve ser modelado pelo acesso e pelo crescimento dos documentos, não como cópia automática de SQL.
 
 O calendário deve normalizar na camada de apresentação itens distintos (`ClassMeeting`, `Exam`, prazo de `Task`, `StudySession` e `CalendarEvent`), sem transformá-los em uma entidade única. `deadline` de tarefa não é o horário planejado de uma sessão.
+
+O catálogo conceitual, estados e invariantes de cada entidade ficam em `docs/domain.md`. Esse catálogo é roadmap, não autorização para criar todas as collections de uma vez.
 
 ## UX, formulários e acessibilidade
 
@@ -139,6 +133,8 @@ Riscos
 Siga: requisito → análise → impacto arquitetural → modelo de dados → User Story → critérios → plano → implementação → testes → review → documentação → DONE.
 
 Antes de escrever código, verifique: problema resolvido; entidades envolvidas; alteração de dados/índices; autorização; estados de UI; erros possíveis; testes necessários. **Definition of Ready:** objetivo, entrada, saída, critérios, dependências e impacto conhecidos. **Definition of Done:** código funcional, critérios atendidos, erros tratados, testes relevantes passando, isolamento verificado, nenhum segredo exposto, documentação atualizada e auto-review concluído.
+
+Bugs pequenos e evidentes podem usar processo reduzido, mas ainda exigem causa verificada, teste proporcional e registro do resultado.
 
 ## Ordem sugerida de evolução
 
@@ -175,6 +171,8 @@ Antes de otimizar, meça. Evite N+1, queries repetidas por rerun, listas grandes
 
 Trabalhe em branches curtas e coesas, preferencialmente uma por sprint/feature. Antes de editar, confira `git status` e preserve mudanças do usuário. Não use `git reset --hard`, `git checkout --`, force push, reescrita de histórico, merge ou push sem autorização explícita.
 
+Crie branches a partir de `main` atualizado (`git pull --ff-only`). Não reutilize branch já mesclada, não misture sprints e não faça merge recorrente de `main` na feature apenas para “atualizar”. Quando houver conflito real, atualize conscientemente e registre a decisão. Use o fluxo detalhado em `docs/git-workflow.md`.
+
 Prefira commits como:
 
 ```text
@@ -186,3 +184,20 @@ chore(streamlit): update deployment configuration
 ```
 
 Evite `update`, `changes`, `final` ou `stuff`. Em cada entrega informe branch, commit, testes executados, falhas existentes e próximos passos. Não crie issues ou pull requests remotamente sem autorização.
+
+## Documentação e fonte de verdade
+
+- `README.md`: entrada rápida, instalação, configuração e execução.
+- `docs/README.md`: índice e estado documental.
+- `docs/architecture.md`: componentes, dependências e riscos arquiteturais.
+- `docs/domain.md`: entidades, estados e invariantes conceituais.
+- `docs/database.md`: collections e índices realmente implementados ou aprovados.
+- `docs/backlog.md`: Product Goal, histórias, prioridades, status e sprints.
+- `docs/decisions/`: decisões arquiteturais duráveis.
+- `CHANGELOG.md`: mudanças entregues, sem substituir backlog ou histórico Git.
+
+Atualize a documentação no mesmo commit da mudança que a invalida. Não mantenha frases como “nesta branch” depois do merge; use status objetivos (`BACKLOG`, `TODO`, `IN PROGRESS`, `BLOCKED`, `REVIEW`, `DONE`).
+
+## Instrução final
+
+Comece verificando branch, working tree, código existente, backlog e documentação relevante. Não recrie funcionalidade pronta. Escolha a menor história pronta, implemente-a verticalmente, execute testes e auto-review, atualize documentação e pare no limite da sprint. Não declare pesquisa, validação no Cloud ou teste com usuários sem evidência real.

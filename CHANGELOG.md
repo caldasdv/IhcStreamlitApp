@@ -15,6 +15,7 @@
 - Skill repo-local de auditoria de segurança adicionada, com checklist por stack, regras de evidência e geração de relatório PDF/Markdown para issues.
 - Testes de normalização, autorização de disciplina e confirmação de escritas MongoDB adicionados.
 - Períodos acadêmicos adicionados com seleção do período atual, arquivamento protegido e testes de domínio/service.
+- Índice documental, catálogo de domínio e workflow Git adicionados; `AGENTS.md` consolidado sem regras duplicadas.
 
 ### Changed
 
