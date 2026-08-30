@@ -1,0 +1,58 @@
+"""Casos de uso de sessões de estudo."""
+
+from __future__ import annotations
+
+from datetime import date, time
+from typing import Any
+
+from src.domain.session_rules import sessions_conflict, validate_new_session
+
+
+class SessionService:
+    def __init__(self, repository) -> None:
+        self.repository = repository
+
+    def list_for_user(self, user_id: Any, subjects: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        subjects_by_id = {subject["_id"]: subject for subject in subjects}
+        sessions = self.repository.list_by_user(user_id)
+        for session in sessions:
+            subject = subjects_by_id.get(session["subject_id"], {"name": "Sem disciplina", "color": "#787774"})
+            session["subject_name"] = subject["name"]
+            session["subject_color"] = subject["color"]
+        return sessions
+
+    def create(
+        self,
+        *,
+        user_id: Any,
+        subject_id: Any,
+        topic: str,
+        goal: str,
+        study_date: date,
+        study_time: time,
+        duration: int,
+        priority: str,
+    ) -> Any:
+        validate_new_session(topic=topic, study_date=study_date, duration=duration)
+        existing = self.repository.list_pending_by_date(user_id, study_date)
+        if sessions_conflict(study_time, duration, existing):
+            raise ValueError("Esse horário conflita com outra sessão pendente.")
+        return self.repository.create(
+            {
+                "user_id": user_id,
+                "subject_id": subject_id,
+                "topic": topic.strip(),
+                "study_date": study_date.isoformat(),
+                "study_time": study_time.strftime("%H:%M"),
+                "duration": duration,
+                "priority": priority,
+                "status": "Pendente",
+                "goal": goal.strip(),
+            }
+        )
+
+    def complete(self, session_id: Any, user_id: Any) -> None:
+        self.repository.mark_completed(session_id, user_id)
+
+    def delete(self, session_id: Any, user_id: Any) -> None:
+        self.repository.delete(session_id, user_id)

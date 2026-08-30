@@ -25,7 +25,7 @@ Database connection / MongoDB Atlas
 - **Domain:** modelos de usuário, disciplina e sessão; status, prioridades, validações e conflitos de horário.
 - **Infrastructure:** configuração (`st.secrets`/ambiente), conexão cacheada, índices, repositories e logging.
 
-Na Sprint 1, as regras puras de sessão foram extraídas para `src/domain/session_rules.py` e a UI passou a utilizá-las. O restante do protótipo permanece em `src/app.py` para preservar comportamento; repositories e services serão extraídos nas próximas fatias.
+Na Sprint 1, as regras puras de sessão foram extraídas para `src/domain/session_rules.py`, e a UI passou a depender de services. Conexão, índices e seed estão em `src/database`; adapters MongoDB estão em `src/repositories`. A próxima melhoria é separar as páginas visuais de `src/app.py`.
 
 ## Responsabilidades e dependências
 

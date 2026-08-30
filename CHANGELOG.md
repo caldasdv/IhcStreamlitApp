@@ -7,6 +7,7 @@
 - Preparação da Sprint 0: `AGENTS.md`, documentação de inception, arquitetura, banco e ADRs.
 - Template seguro de configuração do MongoDB Atlas para Streamlit Community Cloud.
 - Primeiras regras de domínio de sessões extraídas e testes unitários preparados.
+- Conexão, seed, repositories e services separados da UI; testes com fakes adicionados.
 
 ### Changed
 

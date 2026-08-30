@@ -12,7 +12,7 @@ Python, Streamlit, PyMongo, MongoDB Atlas e pytest. Pandas/Plotly só serão adi
 
 ## Arquitetura
 
-O alvo é um monólito modular: Presentation (Streamlit) → Services → Domain → Repositories → MongoDB Atlas. O protótipo atual ainda concentra essas responsabilidades em `src/app.py`; a extração ocorrerá por fatias na Sprint 1.
+O projeto usa um monólito modular: Presentation (Streamlit) → Services → Domain → Repositories → MongoDB Atlas. A primeira extração foi concluída na Sprint 1; a UI agora usa services, a conexão/seed ficam em `src/database` e os adapters MongoDB em `src/repositories`.
 
 Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/database.md) e [docs/backlog.md](docs/backlog.md).
 

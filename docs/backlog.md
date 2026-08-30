@@ -108,7 +108,7 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 
 **Histórias:** US-001, US-002, US-003, US-008.
 
-**Tarefas:** contratos de repository; modelos/validações; conexão e índices; testes unitários; páginas finas.
+**Tarefas:** contratos de repository; modelos/validações; conexão e índices; services; testes unitários; páginas finas.
 
 **Riscos:** compatibilidade com documentos existentes e seed.
 
