@@ -213,6 +213,19 @@ queries usam o `user_id` resolvido; logout funciona; teste no ambiente Cloud é 
 
 **Definition of Done:** feedback persistido no ciclo correto, sem uso de sessão como armazenamento de dados; testes e smoke test passam.
 
+## Roadmap de frontend
+
+As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md](frontend-roadmap.md):
+
+- Sprint 8 — fundação visual e design system leve;
+- Sprint 9 — componente externo de interação rica, condicionado a spike;
+- Sprint 10 — dashboard analítico avançado com Plotly somente se justificar;
+- Sprint 11 — responsividade e acessibilidade aplicada;
+- Sprint 12 — avaliação com usuários e polimento baseado em evidências.
+
+O roadmap não pressupõe React, FastAPI ou uma reescrita como SPA. Cada dependência externa precisa
+passar pela comparação com a solução nativa, pelo impacto no Community Cloud e pelos critérios de IHC.
+
 ## Definition of Ready
 
 Objetivo, entrada, saída, critérios de aceitação, dependências e impacto arquitetural conhecidos.

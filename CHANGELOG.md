@@ -21,3 +21,4 @@
 - Entrypoints `app.py` e `src/app.py` consolidados no mesmo shell para reduzir divergências de deploy.
 - Login Google OIDC, resolução de usuário por identidade estável e índice parcial de isolamento adicionados.
 - Confirmações de ações passaram a sobreviver ao rerun e são consumidas uma única vez.
+- Roadmap das Sprints 8–12 de frontend, componentes externos e avaliação de IHC documentado.

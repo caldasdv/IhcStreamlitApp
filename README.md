@@ -16,6 +16,8 @@ O projeto usa um monólito modular: Presentation (Streamlit) → Services → Do
 
 Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/database.md) e [docs/backlog.md](docs/backlog.md).
 
+O roadmap de evolução visual e componentes externos está em [docs/frontend-roadmap.md](docs/frontend-roadmap.md).
+
 ## Estrutura
 
 - `app.py`: shell, configuração visual e navegação nativa com `st.navigation`.
