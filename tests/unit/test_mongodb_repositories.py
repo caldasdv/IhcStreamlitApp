@@ -6,6 +6,7 @@ import pytest
 from src.domain.exceptions import EntityNotFoundError
 from src.repositories.mongodb.repositories import (
     MongoAcademicPeriodRepository,
+    MongoClassMeetingRepository,
     MongoStudySessionRepository,
     MongoSubjectRepository,
 )
@@ -28,6 +29,7 @@ class FakeCollection:
         return SimpleNamespace(matched_count=self.matched_count)
 
     def delete_one(self, query):
+        self.last_query = query
         return SimpleNamespace(deleted_count=self.deleted_count)
 
 
@@ -99,4 +101,34 @@ def test_legacy_subject_list_is_explicitly_scoped() -> None:
     assert collection.last_query == {
         "user_id": "user-id",
         "academic_period_id": {"$exists": False},
+    }
+
+
+def test_delete_class_meeting_rejects_missing_or_foreign_document() -> None:
+    collection = FakeCollection(deleted_count=0)
+    repository = MongoClassMeetingRepository(
+        SimpleNamespace(class_meetings=collection)
+    )
+
+    with pytest.raises(EntityNotFoundError):
+        repository.delete("user-id", "period-id", "meeting-id")
+
+    assert collection.last_query == {
+        "_id": "meeting-id",
+        "user_id": "user-id",
+        "academic_period_id": "period-id",
+    }
+
+
+def test_class_meeting_list_is_scoped_by_user_and_period() -> None:
+    collection = FakeCollection()
+    repository = MongoClassMeetingRepository(
+        SimpleNamespace(class_meetings=collection)
+    )
+
+    repository.list_by_period("user-id", "period-id")
+
+    assert collection.last_query == {
+        "user_id": "user-id",
+        "academic_period_id": "period-id",
     }

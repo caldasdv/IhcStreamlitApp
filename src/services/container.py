@@ -9,11 +9,13 @@ import streamlit as st
 from src.database.connection import get_database
 from src.repositories.mongodb.repositories import (
     MongoAcademicPeriodRepository,
+    MongoClassMeetingRepository,
     MongoStudySessionRepository,
     MongoSubjectRepository,
     MongoUserRepository,
 )
 from src.services.academic_period_service import AcademicPeriodService
+from src.services.class_meeting_service import ClassMeetingService
 from src.services.session_service import SessionService
 from src.services.subject_service import SubjectService
 from src.services.user_service import UserService
@@ -24,6 +26,7 @@ class ApplicationServices:
     users: UserService
     academic_periods: AcademicPeriodService
     subjects: SubjectService
+    class_meetings: ClassMeetingService
     sessions: SessionService
 
 
@@ -39,5 +42,10 @@ def get_application_services() -> ApplicationServices:
             academic_period_repository, user_repository
         ),
         subjects=SubjectService(subject_repository, academic_period_repository),
+        class_meetings=ClassMeetingService(
+            MongoClassMeetingRepository(database),
+            subject_repository,
+            academic_period_repository,
+        ),
         sessions=SessionService(MongoStudySessionRepository(database), subject_repository),
     )

@@ -41,4 +41,12 @@ def ensure_indexes(database) -> None:
     database.academic_periods.create_index(
         [("user_id", 1), ("status", 1), ("start_date", -1)]
     )
+    database.class_meetings.create_index(
+        [
+            ("user_id", 1),
+            ("academic_period_id", 1),
+            ("weekday", 1),
+            ("start_time", 1),
+        ]
+    )
     database.study_sessions.create_index([("user_id", 1), ("study_date", 1), ("study_time", 1)])

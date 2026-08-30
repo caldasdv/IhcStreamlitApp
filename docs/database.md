@@ -84,19 +84,42 @@ Finalidade: planejamento e acompanhamento de sessões.
 
 Relaciona-se por referência a `users`, `academic_periods` e `subjects`. Não embutir sessões em usuário ou disciplina: o array cresce e sessões são consultadas/atualizadas individualmente. Índice atual `{user_id: 1, study_date: 1, study_time: 1}` apoia agenda e checagem de conflito. Sessões legadas continuam legíveis por `subject_id`; novas sessões registram também o período atual.
 
+### `class_meetings`
+
+Finalidade: representar a grade semanal recorrente do período atual.
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `_id` | ObjectId | sim |
+| `user_id` | ObjectId | sim |
+| `academic_period_id` | ObjectId | sim |
+| `subject_id` | ObjectId | sim |
+| `weekday` | integer `0..6` | sim |
+| `start_time` | string `HH:MM` | sim |
+| `end_time` | string `HH:MM` | sim |
+| `location` | string | não |
+| `created_at` | BSON datetime UTC | sim |
+| `updated_at` | BSON datetime UTC | sim |
+
+Relacionamentos por referência preservam os ciclos de vida de período e disciplina. A leitura principal usa
+`{user_id: 1, academic_period_id: 1, weekday: 1, start_time: 1}` para montar a semana e verificar conflitos.
+Cada documento é pequeno; embedding na disciplina dificultaria autorização, ordenação global e conflito entre
+disciplinas.
+
 ## Consultas esperadas
 
 - Buscar o usuário ativo por `identity.provider + identity.subject`.
 - Listar disciplinas por `user_id + academic_period_id`, ordenadas por nome.
 - Listar separadamente disciplinas legadas sem `academic_period_id`.
 - Listar períodos acadêmicos por `user_id`, status e data inicial.
+- Listar aulas por `user_id + academic_period_id`, dia e horário.
 - Listar sessões de um usuário por intervalo de datas e horário.
 - Buscar sessões pendentes de uma data para validar sobreposição.
 - Agregar minutos concluídos por semana e disciplina.
 
 ## Escritas esperadas
 
-Criar/arquivar período e selecionar o atual; criar/editar/excluir disciplina; criar/editar/reagendar/concluir/excluir sessão; atualizar a meta semanal. Todas devem filtrar pelo usuário autorizado e validar referências.
+Criar/arquivar período e selecionar o atual; criar/editar/excluir disciplina; criar/excluir horário de aula; criar/editar/reagendar/concluir/excluir sessão; atualizar a meta semanal. Todas devem filtrar pelo usuário autorizado e validar referências.
 
 ## Pendências
 

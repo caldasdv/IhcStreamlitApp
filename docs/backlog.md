@@ -115,7 +115,17 @@ Como estudante quero associar minhas disciplinas ao período acadêmico atual pa
 - Critérios de aceitação: novas disciplinas são associadas a um período ativo pertencente ao usuário; listagens permitem considerar o período atual; documentos legados sem período recebem tratamento explícito, sem associação automática incorreta; toda leitura e escrita valida `user_id` e `period_id`; sessões existentes permanecem legíveis.
 - Dependências: US-016 integrada à `main`; definição da estratégia para documentos legados.
 - Complexidade: M
-- Status: REVIEW (implementada na PR #22; integração à `main` pendente).
+- Status: DONE (integrada à `main` pela PR #22).
+
+### US-018
+
+Como estudante quero cadastrar minha grade semanal para visualizar quando tenho aula de cada disciplina.
+
+- Prioridade: P0
+- Critérios de aceitação: somente disciplinas do período atual podem ser usadas; início deve ser anterior ao fim; aulas no mesmo dia não podem se sobrepor; grade ordenada por dia e horário; local é opcional; exclusão valida usuário e período; estados vazio, erro e sucesso são tratados.
+- Dependências: US-016 e US-017 integradas à `main`.
+- Complexidade: M
+- Status: IN PROGRESS.
 
 ## Sprints
 
@@ -277,7 +287,7 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 
 ### Sprint 15 — Disciplinas por período acadêmico
 
-**Status:** REVIEW (PR #22 aberta).
+**Status:** DONE (integrada à `main` pela PR #22).
 
 **Objetivo:** relacionar disciplinas ao contexto acadêmico atual sem corromper ou ocultar dados legados.
 
@@ -292,6 +302,23 @@ sessões antigas referenciando disciplinas sem `period_id`.
 
 **Definition of Done:** critérios da US-017 atendidos; estratégia de legado documentada; queries isoladas por
 usuário e período; testes relevantes e smoke test passam; PR revisada antes da integração à `main`.
+
+### Sprint 16 — Grade semanal de aulas
+
+**Status:** IN PROGRESS.
+
+**Objetivo:** permitir que o estudante registre horários recorrentes das disciplinas do período atual.
+
+**História:** US-018.
+
+**Tarefas:** regras de intervalo e conflito; collection e índice; repository/service isolados; página Streamlit;
+listagem semanal; remoção confirmada; testes e documentação.
+
+**Riscos:** conflitos de horário, referências cruzadas entre usuários/períodos e interpretação de timezone.
+A integração entre aulas e bloqueio de sessões de estudo não pertence a esta sprint.
+
+**Definition of Done:** critérios da US-018 atendidos; regras testadas sem Atlas; queries filtram usuário e
+período; página possui estados recuperáveis; documentação e smoke test atualizados.
 
 O roadmap não pressupõe React, FastAPI ou uma reescrita como SPA. Cada dependência externa precisa
 passar pela comparação com a solução nativa, pelo impacto no Community Cloud e pelos critérios de IHC.
