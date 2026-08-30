@@ -129,6 +129,17 @@ class MongoSubjectRepository:
             ).sort("name", 1)
         )
 
+    def find_legacy_owned(
+        self, user_id: Any, subject_id: Any
+    ) -> dict[str, Any] | None:
+        return self.collection.find_one(
+            {
+                "_id": subject_id,
+                "user_id": user_id,
+                "academic_period_id": {"$exists": False},
+            }
+        )
+
     def belongs_to_user_period(
         self, user_id: Any, subject_id: Any, academic_period_id: Any
     ) -> bool:
@@ -173,6 +184,37 @@ class MongoSubjectRepository:
             ).inserted_id
         except DuplicateKeyError as error:
             raise DuplicateSubjectError("Você já possui uma disciplina com esse nome.") from error
+
+    def assign_legacy_to_period(
+        self,
+        user_id: Any,
+        subject_id: Any,
+        academic_period_id: Any,
+        normalized_name: str,
+    ) -> None:
+        try:
+            result = self.collection.update_one(
+                {
+                    "_id": subject_id,
+                    "user_id": user_id,
+                    "academic_period_id": {"$exists": False},
+                },
+                {
+                    "$set": {
+                        "academic_period_id": academic_period_id,
+                        "name_normalized": normalized_name,
+                        "updated_at": datetime.now(UTC),
+                    }
+                },
+            )
+        except DuplicateKeyError as error:
+            raise DuplicateSubjectError(
+                "O período escolhido já possui uma disciplina com esse nome."
+            ) from error
+        if result.matched_count == 0:
+            raise EntityNotFoundError(
+                "A disciplina sem período não foi encontrada ou já foi associada."
+            )
 
 
 class MongoClassMeetingRepository:

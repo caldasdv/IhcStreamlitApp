@@ -48,6 +48,7 @@ Presentation pode depender de Services e modelos de saída. Services podem depen
 - O shell exige autenticação OIDC antes da navegação; o service resolve o usuário por `identity.provider` e `identity.subject`, e os repositories continuam filtrando por `user_id`.
 - O período acadêmico atual é uma referência no usuário; períodos possuem repository/service próprios e não são embutidos nem inferidos a partir de datas.
 - Disciplinas novas referenciam um período ativo. Registros legados sem período são preservados e apresentados explicitamente, sem migração automática.
+- A associação de uma disciplina legada é uma ação explícita e atômica; nenhuma sessão é reescrita e o repository impede associação cruzada entre usuários.
 
 ## Riscos
 

@@ -62,7 +62,7 @@ Finalidade: disciplinas pertencentes a um usuário.
 | `name_normalized` | string | sim para novos documentos |
 | `color` | string hexadecimal | sim |
 
-Relacionamento por referência a `users` e `academic_periods`; embedding não é adequado porque disciplinas são alteradas e consultadas separadamente. O índice `{user_id: 1, academic_period_id: 1, name: 1}` apoia a listagem do período. O índice parcial unique `{user_id: 1, academic_period_id: 1, name_normalized: 1}` permite repetir uma disciplina em semestres diferentes e impede duplicatas dentro do mesmo período. Documentos legados sem `academic_period_id` ficam fora do índice parcial e são listados explicitamente como “Sem período”.
+Relacionamento por referência a `users` e `academic_periods`; embedding não é adequado porque disciplinas são alteradas e consultadas separadamente. O índice `{user_id: 1, academic_period_id: 1, name: 1}` apoia a listagem do período. O índice parcial unique `{user_id: 1, academic_period_id: 1, name_normalized: 1}` permite repetir uma disciplina em semestres diferentes e impede duplicatas dentro do mesmo período. Documentos legados sem `academic_period_id` ficam fora do índice parcial e são listados explicitamente como “Sem período”; podem receber um período ativo por update manual filtrado por `_id + user_id + ausência de academic_period_id`.
 
 ### `study_sessions`
 
@@ -119,11 +119,11 @@ disciplinas.
 
 ## Escritas esperadas
 
-Criar/arquivar período e selecionar o atual; criar/editar/excluir disciplina; criar/excluir horário de aula; criar/editar/reagendar/concluir/excluir sessão; atualizar a meta semanal. Todas devem filtrar pelo usuário autorizado e validar referências.
+Criar/arquivar período e selecionar o atual; criar/editar/excluir disciplina; associar disciplina legada a período ativo; criar/excluir horário de aula; criar/editar/reagendar/concluir/excluir sessão; atualizar a meta semanal. Todas devem filtrar pelo usuário autorizado e validar referências.
 
 ## Pendências
 
 - Escolher se datas/horários passam para BSON `date` ou permanecem strings ISO; BSON é preferível quando consultas temporais crescerem.
 - Definir política de migração dos documentos legados sem `identity` ou `name_normalized`.
-- Definir um fluxo explícito para o usuário associar disciplinas legadas a períodos; nenhuma relação é inferida automaticamente.
+- Definir política para mover disciplinas já associadas sem quebrar aulas ou descontextualizar sessões históricas.
 - Adicionar validação de schema e índices finais na camada de infraestrutura.

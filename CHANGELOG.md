@@ -18,6 +18,7 @@
 - Índice documental, catálogo de domínio e workflow Git adicionados; `AGENTS.md` consolidado sem regras duplicadas.
 - Disciplinas e novas sessões associadas ao período acadêmico atual, com isolamento por usuário/período e tratamento explícito dos registros legados.
 - Grade semanal de aulas adicionada com validação de referências, conflitos de horário, remoção protegida e estados Streamlit recuperáveis.
+- Associação manual de disciplinas legadas adicionada com confirmação, validação de período, proteção contra duplicidade e update atômico.
 
 ### Changed
 

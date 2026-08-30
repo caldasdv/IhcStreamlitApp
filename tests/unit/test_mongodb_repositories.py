@@ -26,6 +26,8 @@ class FakeCollection:
         return []
 
     def update_one(self, query, update):
+        self.last_query = query
+        self.last_update = update
         return SimpleNamespace(matched_count=self.matched_count)
 
     def delete_one(self, query):
@@ -132,3 +134,30 @@ def test_class_meeting_list_is_scoped_by_user_and_period() -> None:
         "user_id": "user-id",
         "academic_period_id": "period-id",
     }
+
+
+def test_assign_legacy_subject_uses_atomic_ownership_and_legacy_filter() -> None:
+    collection = FakeCollection()
+    repository = MongoSubjectRepository(SimpleNamespace(subjects=collection))
+
+    repository.assign_legacy_to_period(
+        "user-id", "subject-id", "period-id", "ihc"
+    )
+
+    assert collection.last_query == {
+        "_id": "subject-id",
+        "user_id": "user-id",
+        "academic_period_id": {"$exists": False},
+    }
+    assert collection.last_update["$set"]["academic_period_id"] == "period-id"
+    assert collection.last_update["$set"]["name_normalized"] == "ihc"
+
+
+def test_assign_legacy_subject_rejects_race_or_foreign_document() -> None:
+    collection = FakeCollection(matched_count=0)
+    repository = MongoSubjectRepository(SimpleNamespace(subjects=collection))
+
+    with pytest.raises(EntityNotFoundError):
+        repository.assign_legacy_to_period(
+            "user-id", "subject-id", "period-id", "ihc"
+        )

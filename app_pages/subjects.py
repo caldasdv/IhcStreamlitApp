@@ -80,5 +80,48 @@ if legacy_subjects:
         "Estes registros antigos continuam preservados e identificando sessões existentes. "
         "Eles não foram associados automaticamente para evitar colocá-los no semestre errado."
     )
+    try:
+        periods = services.academic_periods.list_for_user(user["_id"])
+    except Exception as error:
+        show_action_error("carregar os períodos para associação", error)
+        if st.button("Tentar novamente", key="retry_subject_assignment_periods"):
+            st.rerun()
+        st.stop()
+    active_periods = [period for period in periods if period.get("status") == "ACTIVE"]
+    periods_by_id = {period["_id"]: period for period in active_periods}
+    if not active_periods:
+        st.info("Crie um período ativo para associar estas disciplinas.")
     for subject in legacy_subjects:
-        st.write(f"- {subject['name']}")
+        with st.container(border=True):
+            st.write(f"**{subject['name']}**")
+            if not active_periods:
+                continue
+            with st.form(f"assign_legacy_subject_{subject['_id']}"):
+                destination_period_id = st.selectbox(
+                    "Período de destino",
+                    list(periods_by_id),
+                    format_func=lambda value: periods_by_id[value]["name"],
+                    key=f"legacy_subject_period_{subject['_id']}",
+                )
+                confirmed = st.checkbox(
+                    "Confirmo que esta disciplina pertence ao período escolhido.",
+                    key=f"confirm_legacy_subject_{subject['_id']}",
+                )
+                assign_submitted = st.form_submit_button(
+                    "Associar ao período", type="primary"
+                )
+            if assign_submitted:
+                if not confirmed:
+                    st.error("Confirme o período escolhido antes de associar.")
+                    continue
+                try:
+                    services.subjects.assign_legacy_to_period(
+                        user["_id"], subject["_id"], destination_period_id
+                    )
+                except ValueError as error:
+                    st.error(str(error))
+                except Exception as error:
+                    show_action_error("associar a disciplina ao período", error)
+                else:
+                    set_success_flash("Disciplina associada ao período escolhido.")
+                    st.rerun()

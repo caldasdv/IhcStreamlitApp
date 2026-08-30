@@ -55,3 +55,31 @@ class SubjectService:
         return self.repository.create(
             user_id, academic_period_id, cleaned_name, normalized_name, color
         )
+
+    def assign_legacy_to_period(
+        self,
+        user_id: Any,
+        subject_id: Any,
+        academic_period_id: Any,
+    ) -> None:
+        subject = self.repository.find_legacy_owned(user_id, subject_id)
+        if subject is None:
+            raise ValueError(
+                "A disciplina sem período não foi encontrada ou já foi associada."
+            )
+        if not self.academic_period_repository.is_active_owned_by(
+            user_id, academic_period_id
+        ):
+            raise ValueError("Selecione um período acadêmico ativo do seu plano.")
+        normalized_name = normalize_subject_name(str(subject.get("name", "")))
+        if not normalized_name:
+            raise ValueError("A disciplina antiga não possui um nome válido.")
+        if self.repository.exists_by_normalized_name(
+            user_id, academic_period_id, normalized_name
+        ):
+            raise DuplicateSubjectError(
+                "O período escolhido já possui uma disciplina com esse nome."
+            )
+        self.repository.assign_legacy_to_period(
+            user_id, subject_id, academic_period_id, normalized_name
+        )

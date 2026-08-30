@@ -125,7 +125,17 @@ Como estudante quero cadastrar minha grade semanal para visualizar quando tenho 
 - Critérios de aceitação: somente disciplinas do período atual podem ser usadas; início deve ser anterior ao fim; aulas no mesmo dia não podem se sobrepor; grade ordenada por dia e horário; local é opcional; exclusão valida usuário e período; estados vazio, erro e sucesso são tratados.
 - Dependências: US-016 e US-017 integradas à `main`.
 - Complexidade: M
-- Status: REVIEW (implementada na PR #23; integração à `main` pendente).
+- Status: DONE (integrada à `main` pela PR #23).
+
+### US-019
+
+Como estudante quero associar uma disciplina antiga a um período para organizar meus dados legados corretamente.
+
+- Prioridade: P0
+- Critérios de aceitação: somente disciplina sem período e pertencente ao usuário pode ser associada; destino deve ser período ativo do usuário; confirmação explícita; conflito de nome rejeitado; update atômico; sessões existentes preservadas; feedback de erro e sucesso após rerun.
+- Dependências: US-017 integrada à `main`.
+- Complexidade: S
+- Status: IN PROGRESS.
 
 ## Sprints
 
@@ -305,7 +315,7 @@ usuário e período; testes relevantes e smoke test passam; PR revisada antes da
 
 ### Sprint 16 — Grade semanal de aulas
 
-**Status:** REVIEW (PR #23 aberta).
+**Status:** DONE (integrada à `main` pela PR #23).
 
 **Objetivo:** permitir que o estudante registre horários recorrentes das disciplinas do período atual.
 
@@ -319,6 +329,23 @@ A integração entre aulas e bloqueio de sessões de estudo não pertence a esta
 
 **Definition of Done:** critérios da US-018 atendidos; regras testadas sem Atlas; queries filtram usuário e
 período; página possui estados recuperáveis; documentação e smoke test atualizados.
+
+### Sprint 17 — Associação manual de disciplinas legadas
+
+**Status:** IN PROGRESS.
+
+**Objetivo:** permitir que o usuário atribua conscientemente disciplinas antigas sem período a um período ativo.
+
+**História:** US-019.
+
+**Tarefas:** update atômico no repository; validação de posse/período/conflito no service; escolha e confirmação
+na tela de disciplinas; testes de autorização, corrida e duplicidade; documentação.
+
+**Riscos:** escolha incorreta do período e conflito com disciplina já existente. A movimentação de disciplinas
+que já possuem período não pertence a esta sprint porque afeta grade e histórico de sessões.
+
+**Definition of Done:** critérios da US-019 atendidos; nenhuma sessão alterada; filtro de update inclui usuário
+e ausência de período; testes e smoke test passam; documentação consistente.
 
 O roadmap não pressupõe React, FastAPI ou uma reescrita como SPA. Cada dependência externa precisa
 passar pela comparação com a solução nativa, pelo impacto no Community Cloud e pelos critérios de IHC.
