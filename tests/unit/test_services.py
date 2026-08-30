@@ -66,8 +66,8 @@ class FakeSubjectRepository:
         self.normalized_names = set()
         self.created = []
 
-    def belongs_to_user(self, user_id, subject_id):
-        return subject_id in self.valid_subject_ids
+    def belongs_to_user_period(self, user_id, subject_id, academic_period_id):
+        return subject_id in self.valid_subject_ids and academic_period_id == "period-id"
 
     def list_by_user(self, user_id):
         return [
@@ -75,13 +75,38 @@ class FakeSubjectRepository:
             for index, name in enumerate(getattr(self, "legacy_names", []))
         ]
 
-    def exists_by_normalized_name(self, user_id, normalized_name):
-        return normalized_name in self.normalized_names
+    def list_by_period(self, user_id, academic_period_id):
+        return [
+            subject
+            for subject in self.list_by_user(user_id)
+            if subject.get("academic_period_id") == academic_period_id
+        ]
 
-    def create(self, user_id, name, normalized_name, color):
-        self.created.append((user_id, name, normalized_name, color))
-        self.normalized_names.add(normalized_name)
+    def list_without_period(self, user_id):
+        return [
+            subject
+            for subject in self.list_by_user(user_id)
+            if "academic_period_id" not in subject
+        ]
+
+    def exists_by_normalized_name(self, user_id, academic_period_id, normalized_name):
+        return (academic_period_id, normalized_name) in self.normalized_names
+
+    def create(self, user_id, academic_period_id, name, normalized_name, color):
+        self.created.append((user_id, academic_period_id, name, normalized_name, color))
+        self.normalized_names.add((academic_period_id, normalized_name))
         return "subject-id"
+
+
+class FakeAcademicPeriodRepository:
+    def is_active_owned_by(self, user_id, academic_period_id):
+        return user_id == "user-id" and academic_period_id == "period-id"
+
+
+def build_subject_service(repository=None):
+    return SubjectService(
+        repository or FakeSubjectRepository(), FakeAcademicPeriodRepository()
+    )
 
 
 def test_session_service_creates_normalized_session():
@@ -90,6 +115,7 @@ def test_session_service_creates_normalized_session():
 
     result = service.create(
         user_id="user-id",
+        academic_period_id="period-id",
         subject_id="subject-id",
         topic="  Heurísticas  ",
         goal="  Revisar  ",
@@ -103,6 +129,7 @@ def test_session_service_creates_normalized_session():
     assert repository.created[0]["topic"] == "Heurísticas"
     assert repository.created[0]["goal"] == "Revisar"
     assert repository.created[0]["status"] == "Pendente"
+    assert repository.created[0]["academic_period_id"] == "period-id"
 
 
 def test_session_service_rejects_conflicting_session():
@@ -112,6 +139,7 @@ def test_session_service_rejects_conflicting_session():
     with pytest.raises(ValueError, match="conflita"):
         service.create(
             user_id="user-id",
+            academic_period_id="period-id",
             subject_id="subject-id",
             topic="Revisão",
             goal="",
@@ -131,6 +159,7 @@ def test_session_service_updates_own_session_without_self_conflict():
     service.update(
         session_id="session-id",
         user_id="user-id",
+        academic_period_id="period-id",
         subject_id="subject-id",
         topic="Revisão",
         goal="",
@@ -146,32 +175,40 @@ def test_session_service_updates_own_session_without_self_conflict():
 
 def test_subject_service_rejects_blank_name():
     with pytest.raises(ValueError, match="nome"):
-        SubjectService(FakeSubjectRepository()).create("user-id", "  ", "#5E6AD2")
+        build_subject_service().create("user-id", "period-id", "  ", "#5E6AD2")
 
 
 def test_subject_service_rejects_equivalent_duplicate_name():
     repository = FakeSubjectRepository()
-    repository.normalized_names.add("interação humano-computador")
+    repository.normalized_names.add(("period-id", "interação humano-computador"))
 
     with pytest.raises(ValueError, match="já possui"):
-        SubjectService(repository).create(
-            "user-id", "  INTERAÇÃO   HUMANO-COMPUTADOR ", "#5E6AD2"
+        build_subject_service(repository).create(
+            "user-id", "period-id", "  INTERAÇÃO   HUMANO-COMPUTADOR ", "#5E6AD2"
         )
 
 
-def test_subject_service_rejects_duplicate_legacy_name():
+def test_subject_service_does_not_assign_or_block_legacy_name_implicitly():
     repository = FakeSubjectRepository()
     repository.legacy_names = ["Interação Humano-Computador"]
 
-    with pytest.raises(ValueError, match="já possui"):
-        SubjectService(repository).create(
-            "user-id", " interação  humano-computador ", "#5E6AD2"
-        )
+    build_subject_service(repository).create(
+        "user-id", "period-id", " interação  humano-computador ", "#5E6AD2"
+    )
+
+    assert repository.created
 
 
 def test_subject_service_rejects_invalid_color():
     with pytest.raises(ValueError, match="cor válida"):
-        SubjectService(FakeSubjectRepository()).create("user-id", "IHC", "red")
+        build_subject_service().create("user-id", "period-id", "IHC", "red")
+
+
+def test_subject_service_requires_active_owned_period():
+    with pytest.raises(ValueError, match="período acadêmico ativo"):
+        build_subject_service().create(
+            "user-id", "another-period", "IHC", "#5E6AD2"
+        )
 
 
 def test_session_service_rejects_subject_from_another_user():
@@ -181,7 +218,28 @@ def test_session_service_rejects_subject_from_another_user():
     with pytest.raises(ValueError, match="disciplina válida"):
         service.create(
             user_id="user-id",
+            academic_period_id="period-id",
             subject_id="another-user-subject",
+            topic="Revisão",
+            goal="",
+            study_date=date(2026, 8, 30),
+            study_time=time(14, 0),
+            duration=30,
+            priority="Média",
+        )
+
+    assert repository.created == []
+
+
+def test_session_service_rejects_subject_from_another_period():
+    repository = FakeSessionRepository()
+    service = SessionService(repository, FakeSubjectRepository())
+
+    with pytest.raises(ValueError, match="período acadêmico atual"):
+        service.create(
+            user_id="user-id",
+            academic_period_id="another-period",
+            subject_id="subject-id",
             topic="Revisão",
             goal="",
             study_date=date(2026, 8, 30),

@@ -40,7 +40,7 @@ Finalidade: representar semestres ou ciclos acadêmicos do usuário sem misturá
 | `created_at` | BSON datetime UTC | sim |
 | `updated_at` | BSON datetime UTC | sim |
 
-Cardinalidade: um usuário possui vários períodos; um período pertence a um usuário. A collection é referenciada, não embutida, porque períodos possuem ciclo de vida próprio e serão associados a disciplinas em uma história posterior.
+Cardinalidade: um usuário possui vários períodos; um período pertence a um usuário e pode ser referenciado por várias disciplinas. A collection é referenciada, não embutida, porque períodos possuem ciclo de vida próprio.
 
 Índices:
 
@@ -57,11 +57,12 @@ Finalidade: disciplinas pertencentes a um usuário.
 |---|---|---|
 | `_id` | ObjectId | sim |
 | `user_id` | ObjectId | sim |
+| `academic_period_id` | ObjectId | sim para novos documentos |
 | `name` | string | sim |
 | `name_normalized` | string | sim para novos documentos |
 | `color` | string hexadecimal | sim |
 
-Relacionamento por referência a `users`; embedding não é adequado porque disciplinas são alteradas e consultadas separadamente. O índice `{user_id: 1, name: 1}` apoia ordenação. O índice parcial unique `{user_id: 1, name_normalized: 1}` impede novas duplicatas sem bloquear documentos legados; o service também normaliza e compara nomes legados.
+Relacionamento por referência a `users` e `academic_periods`; embedding não é adequado porque disciplinas são alteradas e consultadas separadamente. O índice `{user_id: 1, academic_period_id: 1, name: 1}` apoia a listagem do período. O índice parcial unique `{user_id: 1, academic_period_id: 1, name_normalized: 1}` permite repetir uma disciplina em semestres diferentes e impede duplicatas dentro do mesmo período. Documentos legados sem `academic_period_id` ficam fora do índice parcial e são listados explicitamente como “Sem período”.
 
 ### `study_sessions`
 
@@ -71,6 +72,7 @@ Finalidade: planejamento e acompanhamento de sessões.
 |---|---|---|
 | `_id` | ObjectId | sim |
 | `user_id` | ObjectId | sim |
+| `academic_period_id` | ObjectId | sim para novas sessões |
 | `subject_id` | ObjectId | sim |
 | `topic` | string | sim |
 | `study_date` | string ISO `YYYY-MM-DD` (atual) | sim |
@@ -80,12 +82,13 @@ Finalidade: planejamento e acompanhamento de sessões.
 | `status` | enum string | sim |
 | `goal` | string | não |
 
-Relaciona-se por referência a `users` e `subjects`. Não embutir sessões em usuário ou disciplina: o array cresce e sessões são consultadas/atualizadas individualmente. Índice atual `{user_id: 1, study_date: 1, study_time: 1}` apoia agenda e checagem de conflito.
+Relaciona-se por referência a `users`, `academic_periods` e `subjects`. Não embutir sessões em usuário ou disciplina: o array cresce e sessões são consultadas/atualizadas individualmente. Índice atual `{user_id: 1, study_date: 1, study_time: 1}` apoia agenda e checagem de conflito. Sessões legadas continuam legíveis por `subject_id`; novas sessões registram também o período atual.
 
 ## Consultas esperadas
 
 - Buscar o usuário ativo por `identity.provider + identity.subject`.
-- Listar disciplinas por `user_id`, ordenadas por nome.
+- Listar disciplinas por `user_id + academic_period_id`, ordenadas por nome.
+- Listar separadamente disciplinas legadas sem `academic_period_id`.
 - Listar períodos acadêmicos por `user_id`, status e data inicial.
 - Listar sessões de um usuário por intervalo de datas e horário.
 - Buscar sessões pendentes de uma data para validar sobreposição.
@@ -99,5 +102,5 @@ Criar/arquivar período e selecionar o atual; criar/editar/excluir disciplina; c
 
 - Escolher se datas/horários passam para BSON `date` ou permanecem strings ISO; BSON é preferível quando consultas temporais crescerem.
 - Definir política de migração dos documentos legados sem `identity` ou `name_normalized`.
-- Associar disciplinas existentes a períodos somente por fluxo explícito ou migração aprovada; a Sprint 14 não infere essa relação.
+- Definir um fluxo explícito para o usuário associar disciplinas legadas a períodos; nenhuma relação é inferida automaticamente.
 - Adicionar validação de schema e índices finais na camada de infraestrutura.

@@ -36,11 +36,26 @@ class AcademicPeriodRepository(Protocol):
 class SubjectRepository(Protocol):
     def list_by_user(self, user_id: Any) -> list[dict[str, Any]]: ...
 
-    def belongs_to_user(self, user_id: Any, subject_id: Any) -> bool: ...
+    def list_by_period(self, user_id: Any, academic_period_id: Any) -> list[dict[str, Any]]: ...
 
-    def exists_by_normalized_name(self, user_id: Any, normalized_name: str) -> bool: ...
+    def list_without_period(self, user_id: Any) -> list[dict[str, Any]]: ...
 
-    def create(self, user_id: Any, name: str, normalized_name: str, color: str) -> Any: ...
+    def belongs_to_user_period(
+        self, user_id: Any, subject_id: Any, academic_period_id: Any
+    ) -> bool: ...
+
+    def exists_by_normalized_name(
+        self, user_id: Any, academic_period_id: Any, normalized_name: str
+    ) -> bool: ...
+
+    def create(
+        self,
+        user_id: Any,
+        academic_period_id: Any,
+        name: str,
+        normalized_name: str,
+        color: str,
+    ) -> Any: ...
 
 
 class StudySessionRepository(Protocol):

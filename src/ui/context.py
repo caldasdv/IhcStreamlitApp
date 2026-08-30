@@ -47,3 +47,39 @@ def load_page_sessions(
             st.rerun()
         st.stop()
         return []
+
+
+def load_current_period_subjects(
+    services: ApplicationServices,
+    user: dict,
+    *,
+    retry_key: str,
+) -> list[dict]:
+    """Carrega disciplinas do período atual sem deixar uma falha apagar a página."""
+    try:
+        return services.subjects.list_for_period(
+            user["_id"], user.get("current_academic_period_id")
+        )
+    except Exception as error:
+        show_action_error("carregar as disciplinas do período atual", error)
+        if st.button("Tentar novamente", key=retry_key):
+            st.rerun()
+        st.stop()
+        return []
+
+
+def load_legacy_subjects(
+    services: ApplicationServices,
+    user: dict,
+    *,
+    retry_key: str,
+) -> list[dict]:
+    """Carrega registros sem período de forma explícita e recuperável."""
+    try:
+        return services.subjects.list_without_period(user["_id"])
+    except Exception as error:
+        show_action_error("carregar as disciplinas sem período", error)
+        if st.button("Tentar novamente", key=retry_key):
+            st.rerun()
+        st.stop()
+        return []

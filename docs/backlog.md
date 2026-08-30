@@ -105,7 +105,7 @@ Como estudante quero criar, visualizar e escolher meu período acadêmico atual 
 - Critérios de aceitação: nome e intervalo válidos; nome único por usuário; primeiro período torna-se atual; somente período ativo e pertencente ao usuário pode ser selecionado; arquivamento preserva histórico e não remove o período atual; estados vazio, erro e sucesso tratados.
 - Dependências: identidade OIDC, repositories e MongoDB Atlas.
 - Complexidade: M
-- Status: REVIEW (implementada na PR #21; integração à `main` pendente).
+- Status: DONE (integrada à `main` pela PR #21).
 
 ### US-017
 
@@ -115,7 +115,7 @@ Como estudante quero associar minhas disciplinas ao período acadêmico atual pa
 - Critérios de aceitação: novas disciplinas são associadas a um período ativo pertencente ao usuário; listagens permitem considerar o período atual; documentos legados sem período recebem tratamento explícito, sem associação automática incorreta; toda leitura e escrita valida `user_id` e `period_id`; sessões existentes permanecem legíveis.
 - Dependências: US-016 integrada à `main`; definição da estratégia para documentos legados.
 - Complexidade: M
-- Status: BACKLOG.
+- Status: REVIEW (implementada na PR #22; integração à `main` pendente).
 
 ## Sprints
 
@@ -263,7 +263,7 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 
 ### Sprint 14 — Períodos acadêmicos
 
-**Status:** REVIEW (PR #21 aberta).
+**Status:** DONE (integrada à `main` pela PR #21).
 
 **Objetivo:** adicionar o contexto temporal acadêmico que antecede a organização de disciplinas.
 
@@ -277,7 +277,7 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 
 ### Sprint 15 — Disciplinas por período acadêmico
 
-**Status:** BACKLOG.
+**Status:** REVIEW (PR #22 aberta).
 
 **Objetivo:** relacionar disciplinas ao contexto acadêmico atual sem corromper ou ocultar dados legados.
 

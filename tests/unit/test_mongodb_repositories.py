@@ -7,6 +7,7 @@ from src.domain.exceptions import EntityNotFoundError
 from src.repositories.mongodb.repositories import (
     MongoAcademicPeriodRepository,
     MongoStudySessionRepository,
+    MongoSubjectRepository,
 )
 
 
@@ -20,7 +21,7 @@ class FakeCollection:
         self.last_query = query
         return self
 
-    def sort(self, ordering):
+    def sort(self, *ordering):
         return []
 
     def update_one(self, query, update):
@@ -75,3 +76,27 @@ def test_archive_period_rejects_missing_or_foreign_period() -> None:
 
     with pytest.raises(EntityNotFoundError):
         repository.archive("user-id", "period-id")
+
+
+def test_subject_list_is_scoped_by_user_and_period() -> None:
+    collection = FakeCollection()
+    repository = MongoSubjectRepository(SimpleNamespace(subjects=collection))
+
+    repository.list_by_period("user-id", "period-id")
+
+    assert collection.last_query == {
+        "user_id": "user-id",
+        "academic_period_id": "period-id",
+    }
+
+
+def test_legacy_subject_list_is_explicitly_scoped() -> None:
+    collection = FakeCollection()
+    repository = MongoSubjectRepository(SimpleNamespace(subjects=collection))
+
+    repository.list_without_period("user-id")
+
+    assert collection.last_query == {
+        "user_id": "user-id",
+        "academic_period_id": {"$exists": False},
+    }

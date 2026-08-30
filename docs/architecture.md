@@ -25,7 +25,7 @@ Database connection / MongoDB Atlas
 - **Domain:** modelos de usuário, disciplina e sessão; status, prioridades, validações e conflitos de horário.
 - **Infrastructure:** configuração (`st.secrets`/ambiente), conexão cacheada, índices, repositories e logging.
 
-As regras puras ficam em `src/domain`, a UI depende de services e as telas são scripts em `app_pages/` usando `st.navigation`. O shell compartilhado em `src/ui/app_shell.py` garante o mesmo comportamento quando o Community Cloud ou uma configuração local usa `app.py` ou `src/app.py`. Conexão e índices estão em `src/database`; adapters MongoDB ficam em `src/repositories`. Consultas de agenda/progresso recebem intervalos de data, e services validam posse das disciplinas antes de persistir sessões.
+As regras puras ficam em `src/domain`, a UI depende de services e as telas são scripts em `app_pages/` usando `st.navigation`. O shell compartilhado em `src/ui/app_shell.py` garante o mesmo comportamento quando o Community Cloud ou uma configuração local usa `app.py` ou `src/app.py`. Conexão e índices estão em `src/database`; adapters MongoDB ficam em `src/repositories`. Consultas de agenda/progresso recebem intervalos de data, e services validam posse do usuário e vínculo da disciplina ao período atual antes de persistir sessões.
 
 ## Responsabilidades e dependências
 
@@ -47,6 +47,7 @@ Presentation pode depender de Services e modelos de saída. Services podem depen
 - Segredos fora do Git; `st.secrets` no Cloud e ambiente local para desenvolvimento.
 - O shell exige autenticação OIDC antes da navegação; o service resolve o usuário por `identity.provider` e `identity.subject`, e os repositories continuam filtrando por `user_id`.
 - O período acadêmico atual é uma referência no usuário; períodos possuem repository/service próprios e não são embutidos nem inferidos a partir de datas.
+- Disciplinas novas referenciam um período ativo. Registros legados sem período são preservados e apresentados explicitamente, sem migração automática.
 
 ## Riscos
 

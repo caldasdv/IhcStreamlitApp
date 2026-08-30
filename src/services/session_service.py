@@ -32,6 +32,7 @@ class SessionService:
         self,
         *,
         user_id: Any,
+        academic_period_id: Any,
         subject_id: Any,
         topic: str,
         goal: str,
@@ -41,13 +42,14 @@ class SessionService:
         priority: str,
     ) -> Any:
         validate_new_session(topic=topic, study_date=study_date, duration=duration)
-        self._validate_subject_ownership(user_id, subject_id)
+        self._validate_subject_ownership(user_id, subject_id, academic_period_id)
         existing = self.repository.list_pending_by_date(user_id, study_date)
         if sessions_conflict(study_time, duration, existing):
             raise ValueError("Esse horário conflita com outra sessão pendente.")
         return self.repository.create(
             {
                 "user_id": user_id,
+                "academic_period_id": academic_period_id,
                 "subject_id": subject_id,
                 "topic": topic.strip(),
                 "study_date": study_date.isoformat(),
@@ -67,6 +69,7 @@ class SessionService:
         *,
         session_id: Any,
         user_id: Any,
+        academic_period_id: Any,
         subject_id: Any,
         topic: str,
         goal: str,
@@ -77,7 +80,7 @@ class SessionService:
     ) -> None:
         """Edita uma sessão e revalida conflito, ignorando a própria sessão."""
         validate_new_session(topic=topic, study_date=study_date, duration=duration)
-        self._validate_subject_ownership(user_id, subject_id)
+        self._validate_subject_ownership(user_id, subject_id, academic_period_id)
         existing = [
             item
             for item in self.repository.list_pending_by_date(user_id, study_date)
@@ -90,6 +93,7 @@ class SessionService:
             user_id,
             {
                 "subject_id": subject_id,
+                "academic_period_id": academic_period_id,
                 "topic": topic.strip(),
                 "study_date": study_date.isoformat(),
                 "study_time": study_time.strftime("%H:%M"),
@@ -102,6 +106,10 @@ class SessionService:
     def delete(self, session_id: Any, user_id: Any) -> None:
         self.repository.delete(session_id, user_id)
 
-    def _validate_subject_ownership(self, user_id: Any, subject_id: Any) -> None:
-        if not self.subject_repository.belongs_to_user(user_id, subject_id):
-            raise ValueError("Selecione uma disciplina válida do seu plano.")
+    def _validate_subject_ownership(
+        self, user_id: Any, subject_id: Any, academic_period_id: Any
+    ) -> None:
+        if not self.subject_repository.belongs_to_user_period(
+            user_id, subject_id, academic_period_id
+        ):
+            raise ValueError("Selecione uma disciplina válida do período acadêmico atual.")

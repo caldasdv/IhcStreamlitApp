@@ -1,19 +1,51 @@
 """Tela de disciplinas."""
 
-import streamlit as st
 from html import escape
 import re
 
-from src.ui.context import load_page_context
+import streamlit as st
+
+from src.ui.context import (
+    load_current_period_subjects,
+    load_legacy_subjects,
+    load_page_context,
+)
 from src.ui.components.page_header import render_page_header
 from src.ui.feedback import set_success_flash, show_action_error
 from src.ui.sidebar import render_account_sidebar
 
 
-services, user, subjects = load_page_context()
+services, user, _all_subjects = load_page_context()
 render_account_sidebar(services, user)
 
-render_page_header("ORGANIZAÇÃO", "Disciplinas", "Use poucas disciplinas e dê uma cor para reconhecer cada uma rapidamente.")
+current_period_id = user.get("current_academic_period_id")
+subjects = load_current_period_subjects(
+    services, user, retry_key="retry_current_period_subjects"
+)
+legacy_subjects = load_legacy_subjects(
+    services, user, retry_key="retry_legacy_subjects"
+)
+
+render_page_header(
+    "ORGANIZAÇÃO",
+    "Disciplinas",
+    "Organize as disciplinas do período atual e use cores para reconhecê-las rapidamente.",
+)
+if current_period_id is None:
+    st.info("Defina um período acadêmico atual antes de adicionar disciplinas.")
+    if st.button("Gerenciar períodos acadêmicos", icon=":material/date_range:"):
+        st.switch_page("app_pages/academic_periods.py")
+    if legacy_subjects:
+        st.subheader("Disciplinas sem período")
+        st.caption(
+            "Estes registros antigos foram preservados e não serão associados automaticamente."
+        )
+        for subject in legacy_subjects:
+            st.write(f"- {subject['name']}")
+    st.stop()
+
+if not subjects:
+    st.info("Nenhuma disciplina cadastrada no período atual. Adicione a primeira abaixo.")
 for subject in subjects:
     color = subject.get("color", "#787774")
     safe_color = color if re.fullmatch(r"#[0-9A-Fa-f]{6}", color) else "#787774"
@@ -30,7 +62,9 @@ with st.form("new_subject"):
     color = st.color_picker("Cor", "#5E6AD2")
     if st.form_submit_button("Adicionar disciplina", type="primary", width="stretch"):
         try:
-            services.subjects.create(user["_id"], subject_name, color)
+            services.subjects.create(
+                user["_id"], current_period_id, subject_name, color
+            )
         except ValueError as error:
             st.error(str(error))
         except Exception as error:
@@ -38,3 +72,13 @@ with st.form("new_subject"):
         else:
             set_success_flash("Disciplina adicionada.")
             st.rerun()
+
+if legacy_subjects:
+    st.divider()
+    st.subheader("Disciplinas sem período")
+    st.caption(
+        "Estes registros antigos continuam preservados e identificando sessões existentes. "
+        "Eles não foram associados automaticamente para evitar colocá-los no semestre errado."
+    )
+    for subject in legacy_subjects:
+        st.write(f"- {subject['name']}")
