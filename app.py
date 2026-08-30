@@ -114,12 +114,33 @@ def session_card(row: sqlite3.Row) -> None:
 st.set_page_config(page_title="Plano", page_icon="◷", layout="wide")
 setup_database()
 
+st.markdown(
+    """
+    <style>
+    /* Aparência inspirada em ferramentas de notas, sem alterar os componentes. */
+    .stApp { background: #ffffff; color: #37352f; }
+    [data-testid="stSidebar"] { background: #f7f6f3; border-right: 1px solid #e9e9e7; }
+    [data-testid="stSidebar"] section { padding-top: 1.5rem; }
+    .block-container { max-width: 960px; padding-top: 3.5rem; padding-bottom: 5rem; }
+    h1, h2, h3 { color: #37352f; font-weight: 650; letter-spacing: -0.02em; }
+    h1 { font-size: 2.35rem; margin-bottom: .35rem; }
+    h2 { font-size: 1.45rem; }
+    h3 { font-size: 1.08rem; }
+    [data-testid="stCaptionContainer"] p { color: #9b9a97; letter-spacing: .04em; }
+    [data-testid="stVerticalBlockBorderWrapper"] { border-color: #e9e9e7; border-radius: 5px; box-shadow: none; }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p { color: #787774; }
+    .stButton button, .stFormSubmitButton button { border-radius: 4px; box-shadow: none; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 user = query("SELECT * FROM users LIMIT 1")[0]
 subjects = query("SELECT * FROM subjects WHERE user_id = ? ORDER BY name", (user["id"],))
 
 with st.sidebar:
-    st.markdown("### Plano")
-    st.caption("Planejador de estudos")
+    st.markdown("## Plano")
+    st.caption("Seu espaço de estudos")
     page = st.selectbox("Navegação", ["Visão geral", "Nova sessão", "Disciplinas"], label_visibility="collapsed")
     st.divider()
     st.caption("Usuário de teste")
@@ -149,7 +170,8 @@ if page == "Visão geral":
     st.divider()
     selected_date = st.date_input("Ver dia", value=date.today(), format="DD/MM/YYYY")
     day_sessions = [s for s in all_sessions if s["study_date"] == str(selected_date)]
-    st.subheader(selected_date.strftime("%A, %d de %B").capitalize())
+    weekdays = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"]
+    st.subheader(f"{weekdays[selected_date.weekday()]}, {selected_date.day:02d}/{selected_date.month:02d}")
     if not day_sessions:
         st.info("Nenhuma sessão planejada para este dia.")
     for row in day_sessions:
