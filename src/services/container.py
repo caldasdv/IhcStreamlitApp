@@ -31,12 +31,13 @@ class ApplicationServices:
 def get_application_services() -> ApplicationServices:
     database = get_database()
     subject_repository = MongoSubjectRepository(database)
+    academic_period_repository = MongoAcademicPeriodRepository(database)
     user_repository = MongoUserRepository(database)
     return ApplicationServices(
         users=UserService(user_repository),
         academic_periods=AcademicPeriodService(
-            MongoAcademicPeriodRepository(database), user_repository
+            academic_period_repository, user_repository
         ),
-        subjects=SubjectService(subject_repository),
+        subjects=SubjectService(subject_repository, academic_period_repository),
         sessions=SessionService(MongoStudySessionRepository(database), subject_repository),
     )

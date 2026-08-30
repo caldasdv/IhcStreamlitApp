@@ -115,19 +115,57 @@ class MongoSubjectRepository:
     def list_by_user(self, user_id: Any) -> list[dict[str, Any]]:
         return list(self.collection.find({"user_id": user_id}).sort("name", 1))
 
-    def belongs_to_user(self, user_id: Any, subject_id: Any) -> bool:
-        return self.collection.find_one({"_id": subject_id, "user_id": user_id}, {"_id": 1}) is not None
+    def list_by_period(self, user_id: Any, academic_period_id: Any) -> list[dict[str, Any]]:
+        return list(
+            self.collection.find(
+                {"user_id": user_id, "academic_period_id": academic_period_id}
+            ).sort("name", 1)
+        )
 
-    def exists_by_normalized_name(self, user_id: Any, normalized_name: str) -> bool:
+    def list_without_period(self, user_id: Any) -> list[dict[str, Any]]:
+        return list(
+            self.collection.find(
+                {"user_id": user_id, "academic_period_id": {"$exists": False}}
+            ).sort("name", 1)
+        )
+
+    def belongs_to_user_period(
+        self, user_id: Any, subject_id: Any, academic_period_id: Any
+    ) -> bool:
         return self.collection.find_one(
-            {"user_id": user_id, "name_normalized": normalized_name}, {"_id": 1}
+            {
+                "_id": subject_id,
+                "user_id": user_id,
+                "academic_period_id": academic_period_id,
+            },
+            {"_id": 1},
         ) is not None
 
-    def create(self, user_id: Any, name: str, normalized_name: str, color: str) -> Any:
+    def exists_by_normalized_name(
+        self, user_id: Any, academic_period_id: Any, normalized_name: str
+    ) -> bool:
+        return self.collection.find_one(
+            {
+                "user_id": user_id,
+                "academic_period_id": academic_period_id,
+                "name_normalized": normalized_name,
+            },
+            {"_id": 1},
+        ) is not None
+
+    def create(
+        self,
+        user_id: Any,
+        academic_period_id: Any,
+        name: str,
+        normalized_name: str,
+        color: str,
+    ) -> Any:
         try:
             return self.collection.insert_one(
                 {
                     "user_id": user_id,
+                    "academic_period_id": academic_period_id,
                     "name": name,
                     "name_normalized": normalized_name,
                     "color": color,

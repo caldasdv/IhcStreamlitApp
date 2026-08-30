@@ -14,11 +14,24 @@ def ensure_indexes(database) -> None:
             "identity.subject": {"$exists": True},
         },
     )
-    database.subjects.create_index([("user_id", 1), ("name", 1)])
+    existing_subject_indexes = {
+        index["name"]: index for index in database.subjects.list_indexes()
+    }
+    legacy_unique_subject_index = existing_subject_indexes.get(
+        "user_id_1_name_normalized_1"
+    )
+    if legacy_unique_subject_index and legacy_unique_subject_index.get("unique"):
+        database.subjects.drop_index("user_id_1_name_normalized_1")
     database.subjects.create_index(
-        [("user_id", 1), ("name_normalized", 1)],
+        [("user_id", 1), ("academic_period_id", 1), ("name", 1)]
+    )
+    database.subjects.create_index(
+        [("user_id", 1), ("academic_period_id", 1), ("name_normalized", 1)],
         unique=True,
-        partialFilterExpression={"name_normalized": {"$exists": True}},
+        partialFilterExpression={
+            "academic_period_id": {"$exists": True},
+            "name_normalized": {"$exists": True},
+        },
     )
     database.academic_periods.create_index(
         [("user_id", 1), ("name_normalized", 1)],

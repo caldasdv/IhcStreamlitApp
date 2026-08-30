@@ -63,11 +63,13 @@ Representa disciplina pertencente ao usuário.
 
 Invariantes atuais:
 
-- nome não vazio e único por usuário após normalização;
+- nome não vazio e único por usuário e período após normalização;
 - cor hexadecimal válida;
-- uma sessão só pode referenciar disciplina pertencente ao mesmo usuário.
+- disciplina nova pertence a um período acadêmico ativo do mesmo usuário;
+- uma sessão nova ou reagendada só pode referenciar disciplina do período atual;
+- disciplinas legadas sem período permanecem explícitas e preservadas.
 
-Próxima decisão: associar disciplina ao período acadêmico atual e tratar documentos legados sem inferir vínculo incorreto.
+Próxima decisão: oferecer um fluxo manual para associar disciplinas legadas a um período sem inferir vínculo incorreto.
 
 ### StudySession
 

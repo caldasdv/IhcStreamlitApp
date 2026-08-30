@@ -19,9 +19,11 @@ class FakeCollection:
         self.created.append((keys, options))
 
 
-def test_indexes_replace_email_identity_with_oidc_and_subject_scope() -> None:
+def test_indexes_replace_email_identity_and_scope_subjects_by_period() -> None:
     users = FakeCollection([{"name": "email_1", "unique": True}])
-    subjects = FakeCollection()
+    subjects = FakeCollection(
+        [{"name": "user_id_1_name_normalized_1", "unique": True}]
+    )
     sessions = FakeCollection()
     academic_periods = FakeCollection()
     database = SimpleNamespace(
@@ -40,10 +42,16 @@ def test_indexes_replace_email_identity_with_oidc_and_subject_scope() -> None:
         for keys, options in users.created
     )
     assert any(
-        keys == [("user_id", 1), ("name_normalized", 1)]
+        keys
+        == [
+            ("user_id", 1),
+            ("academic_period_id", 1),
+            ("name_normalized", 1),
+        ]
         and options["unique"] is True
         for keys, options in subjects.created
     )
+    assert subjects.dropped == ["user_id_1_name_normalized_1"]
     assert any(
         keys == [("user_id", 1), ("name_normalized", 1)]
         and options["unique"] is True

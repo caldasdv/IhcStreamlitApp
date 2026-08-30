@@ -7,7 +7,11 @@ import streamlit as st
 from src.domain.session_rules import effective_status
 from src.ui.components.session_card import render_session_card
 from src.ui.components.page_header import render_page_header
-from src.ui.context import load_page_context, load_page_sessions
+from src.ui.context import (
+    load_current_period_subjects,
+    load_page_context,
+    load_page_sessions,
+)
 from src.ui.feedback import show_action_error
 from src.ui.feedback import set_success_flash
 from src.ui.sidebar import render_account_sidebar
@@ -15,6 +19,10 @@ from src.ui.sidebar import render_account_sidebar
 
 services, user, subjects = load_page_context()
 render_account_sidebar(services, user)
+current_period_id = user.get("current_academic_period_id")
+current_subjects = load_current_period_subjects(
+    services, user, retry_key="retry_overview_subjects"
+)
 
 render_page_header(
     "SEMANA DE ESTUDOS",
@@ -115,11 +123,11 @@ if day_sessions:
                 st.session_state["confirm_delete_session_id"] = None
                 st.rerun()
 
-    if not subjects:
-        st.info("Cadastre uma disciplina para editar ou reagendar esta sessão.")
+    if not current_subjects:
+        st.info("Cadastre uma disciplina no período atual para editar ou reagendar esta sessão.")
     else:
         with st.expander("Editar ou reagendar sessão"):
-            subjects_by_id = {subject["_id"]: subject for subject in subjects}
+            subjects_by_id = {subject["_id"]: subject for subject in current_subjects}
             subject_ids = list(subjects_by_id)
             current_subject_id = (
                 chosen["subject_id"] if chosen["subject_id"] in subjects_by_id else subject_ids[0]
@@ -166,6 +174,7 @@ if day_sessions:
                     services.sessions.update(
                         session_id=chosen["_id"],
                         user_id=user["_id"],
+                        academic_period_id=current_period_id,
                         subject_id=edit_subject_id,
                         topic=edit_topic,
                         goal=edit_goal,

@@ -4,7 +4,7 @@ from datetime import date, time
 
 import streamlit as st
 
-from src.ui.context import load_page_context
+from src.ui.context import load_current_period_subjects, load_page_context
 from src.ui.components.page_header import render_page_header
 from src.ui.feedback import set_success_flash, show_action_error
 from src.ui.sidebar import render_account_sidebar
@@ -13,13 +13,21 @@ from src.ui.sidebar import render_account_sidebar
 services, user, subjects = load_page_context()
 render_account_sidebar(services, user)
 
-if not subjects:
-    st.info("Cadastre uma disciplina antes de criar uma sessão.")
+current_period_id = user.get("current_academic_period_id")
+current_subjects = load_current_period_subjects(
+    services, user, retry_key="retry_new_session_subjects"
+)
+
+if current_period_id is None:
+    st.info("Defina um período acadêmico atual antes de criar uma sessão.")
+    st.stop()
+if not current_subjects:
+    st.info("Cadastre uma disciplina no período atual antes de criar uma sessão.")
     st.stop()
 
 render_page_header("PLANEJAMENTO", "Nova sessão", "Defina uma sessão pequena e objetiva para facilitar o início do estudo.")
 with st.form("new_session"):
-    subjects_by_id = {subject["_id"]: subject for subject in subjects}
+    subjects_by_id = {subject["_id"]: subject for subject in current_subjects}
     subject_id = st.selectbox(
         "Disciplina",
         list(subjects_by_id),
@@ -37,6 +45,7 @@ if submitted:
     try:
         services.sessions.create(
             user_id=user["_id"], subject_id=subject_id, topic=topic, goal=goal,
+            academic_period_id=current_period_id,
             study_date=study_date, study_time=study_time, duration=duration, priority=priority,
         )
     except ValueError as error:
