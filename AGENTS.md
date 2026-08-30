@@ -28,6 +28,10 @@ Não misture UI, consultas, regras, configuração, validação e transformaçã
 
 Considere sempre o modelo reativo e o rerun completo, `st.session_state`, `st.cache_resource`, `st.cache_data`, `st.form`, navegação multipage, UX, erros, performance, Secrets e as limitações do Streamlit Community Cloud. Nunca crie um novo `MongoClient` em cada rerun; prefira `@st.cache_resource` para a conexão. Use `st.cache_data` somente quando houver benefício real. `st.session_state` é estado de sessão/UI, nunca persistência.
 
+## Skill obrigatória de IHC/UX
+
+Para qualquer requisito, feature, tela, fluxo, formulário, dashboard, revisão visual, acessibilidade ou avaliação de usabilidade, leia e aplique integralmente `SKILL-IHC-UX.md` antes de implementar. A análise deve considerar usuários, objetivos, contexto, tarefas, evidências, hipóteses, modelo conceitual, alternativas, estados, feedback, prevenção/recuperação de erros, usabilidade, experiência, acessibilidade e comunicabilidade. Não invente pesquisa ou preferências de usuários. Diferencie fatos, evidências, inferências, hipóteses, requisitos e decisões de design. Para alterações relevantes, registre o fluxo principal, estados, critérios de qualidade e como a solução será avaliada. Se o arquivo não estiver disponível, informe a ausência e aplique a melhor análise de IHC/UX possível sem declarar validação inexistente.
+
 ## MongoDB Atlas
 
 Não espalhe `MongoClient(...)`. Documente collections, campos, tipos, obrigatoriedade, índices justificados, cardinalidade, relacionamentos, embedding/reference e padrões de leitura/escrita antes de criar collections relevantes. Modele pelo acesso aos dados e crescimento dos documentos, não copiando SQL automaticamente.
