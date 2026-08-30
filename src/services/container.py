@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import streamlit as st
-
 from src.database.connection import get_database
 from src.repositories.mongodb.repositories import (
     MongoAcademicPeriodRepository,
@@ -30,8 +28,8 @@ class ApplicationServices:
     sessions: SessionService
 
 
-@st.cache_resource
 def get_application_services() -> ApplicationServices:
+    """Compõe services atuais; somente a conexão de banco permanece em cache."""
     database = get_database()
     subject_repository = MongoSubjectRepository(database)
     academic_period_repository = MongoAcademicPeriodRepository(database)
