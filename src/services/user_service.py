@@ -17,3 +17,6 @@ class UserService:
         if not 1 <= hours <= 80:
             raise ValueError("A meta semanal deve ficar entre 1 e 80 horas.")
         self.repository.update_weekly_goal(user_id, round(hours * 60))
+
+    def update_current_academic_period(self, user_id: Any, period_id: Any) -> None:
+        self.repository.update_current_academic_period(user_id, period_id)

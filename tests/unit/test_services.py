@@ -56,6 +56,9 @@ class FakeUserRepository:
     def update_weekly_goal(self, user_id, minutes):
         self.goal = (user_id, minutes)
 
+    def update_current_academic_period(self, user_id, period_id):
+        self.current_period = (user_id, period_id)
+
 
 class FakeSubjectRepository:
     def __init__(self, valid_subject_ids=None):
@@ -228,3 +231,11 @@ def test_user_service_rejects_weekly_goal_outside_allowed_range(hours):
 
     with pytest.raises(ValueError, match="entre 1 e 80"):
         service.update_weekly_goal("user-id", hours)
+
+
+def test_user_service_updates_current_academic_period():
+    repository = FakeUserRepository()
+
+    UserService(repository).update_current_academic_period("user-id", "period-id")
+
+    assert repository.current_period == ("user-id", "period-id")

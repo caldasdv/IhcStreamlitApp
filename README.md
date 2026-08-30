@@ -14,7 +14,7 @@ Python, Streamlit, Authlib, PyMongo, Plotly, MongoDB Atlas e pytest. Pandas só 
 
 O projeto usa um monólito modular: Presentation (Streamlit) → Services → Domain → Repositories → MongoDB Atlas. A primeira extração foi concluída na Sprint 1; a UI agora usa services, a conexão/seed ficam em `src/database` e os adapters MongoDB em `src/repositories`.
 
-Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/database.md) e [docs/backlog.md](docs/backlog.md).
+Comece pelo [índice da documentação](docs/README.md). As fontes principais são [arquitetura](docs/architecture.md), [domínio](docs/domain.md), [banco](docs/database.md) e [backlog](docs/backlog.md).
 
 Para auditorias de segurança, use a skill repo-local em [`skills/security-audit/SKILL.md`](skills/security-audit/SKILL.md). Ela define a descoberta da stack, a matriz de evidências e a geração validada do relatório PDF.
 
@@ -23,7 +23,7 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 ## Estrutura
 
 - `app.py`: shell, configuração visual e navegação nativa com `st.navigation`.
-- `app_pages/`: uma página Streamlit por fluxo da aplicação, incluindo a visão semanal.
+- `app_pages/`: uma página Streamlit por fluxo da aplicação, incluindo visão semanal e períodos acadêmicos.
 - `src/ui/`: contexto, sidebar, estilos e componentes reutilizáveis.
 - `src/services/`: casos de uso sem dependência direta da UI.
 - `src/repositories/`: contratos e adapters MongoDB.
@@ -39,6 +39,7 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 - a visão geral acompanha a meta semanal em horas;
 - a página de progresso resume o tempo concluído por disciplina;
 - a conexão usa `MONGODB_URI` e o banco `plano_estudos` no Atlas.
+- o primeiro período acadêmico criado vira o atual; períodos não atuais podem ser arquivados sem apagar o histórico.
 
 ## Rodar localmente
 

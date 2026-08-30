@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-O Plano é um planejador de estudos web para estudantes. O MVP Streamlit possui autenticação Google OIDC, disciplinas, sessões, meta semanal, agenda e visão de progresso, com isolamento por usuário. A arquitetura é um monólito modular adequado ao tamanho atual e ao deploy no Streamlit Community Cloud.
+O Plano é um planejador de estudos web para estudantes. O MVP Streamlit possui autenticação Google OIDC, períodos acadêmicos, disciplinas, sessões, meta semanal, agenda e visão de progresso, com isolamento por usuário. A arquitetura é um monólito modular adequado ao tamanho atual e ao deploy no Streamlit Community Cloud.
 
 ## Componentes
 
@@ -46,11 +46,13 @@ Presentation pode depender de Services e modelos de saída. Services podem depen
 - Streamlit como presentation e Community Cloud como alvo de deploy.
 - Segredos fora do Git; `st.secrets` no Cloud e ambiente local para desenvolvimento.
 - O shell exige autenticação OIDC antes da navegação; o service resolve o usuário por `identity.provider` e `identity.subject`, e os repositories continuam filtrando por `user_id`.
+- O período acadêmico atual é uma referência no usuário; períodos possuem repository/service próprios e não são embutidos nem inferidos a partir de datas.
 
 ## Riscos
 
 - Documentos legados sem identidade não são associados automaticamente a uma conta autenticada; o seed demonstrativo não é executado pelo container da aplicação.
 - Documentos legados de disciplina ainda podem não possuir `name_normalized`; o service cobre duplicidade, mas uma migração controlada continua pendente.
+- Disciplinas ainda não estão vinculadas a períodos; essa associação requer fluxo explícito e tratamento dos dados legados.
 - A configuração aceita o schema de Secrets (`mongodb.uri`/`mongodb.database`) e mantém fallback local por ambiente.
 - Falhas de rede, limites do plano do Atlas e reruns podem causar latência ou operações repetidas.
 - Há testes unitários, mas ainda faltam testes automatizados de UI, integração Atlas e validação de acessibilidade em navegador real.

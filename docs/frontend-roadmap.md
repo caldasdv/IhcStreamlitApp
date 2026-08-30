@@ -4,10 +4,10 @@
 
 ### Evidências no código
 
-- O frontend é composto por `st.navigation`, páginas Streamlit, formulários, containers e gráficos nativos.
+- O frontend é composto por `st.navigation`, páginas Streamlit, formulários, containers, Plotly e um Custom Component v2 com fallback nativo.
 - Existe CSS global em `src/ui/styles.py`, com alguns seletores baseados em `data-testid` interno do Streamlit.
-- Não há uma biblioteca de componentes frontend, bundle JavaScript ou sistema formal de tokens visuais.
-- O dashboard usa gráficos nativos; Plotly ainda não é uma dependência do projeto.
+- Não há framework frontend paralelo; o componente de agenda mantém HTML, CSS e JavaScript locais e restritos à apresentação.
+- O dashboard usa Plotly quando há ganho de interação e oferece tabela equivalente.
 - A aplicação possui estados vazios, loading e feedback de ação, mas ainda não há avaliação com usuários.
 
 ### Inferências
@@ -35,10 +35,9 @@
 
 ### Plotly
 
-Usar para perguntas analíticas que os gráficos nativos não respondem bem: evolução temporal,
-tooltip com unidade, comparação selecionável e seleção de pontos. Adicionar apenas quando uma
-história da Sprint 10 entrar em desenvolvimento. A integração oficial é `st.plotly_chart`; sua
-dependência deve ser avaliada no `requirements.txt` junto com o impacto de build.
+É usado para perguntas analíticas que os gráficos nativos não respondem tão bem: evolução temporal,
+tooltip com unidade e comparação selecionável. A integração ocorre por `st.plotly_chart`, com dados
+agregados antes da apresentação e alternativa tabular.
 
 ### Custom Component v2
 
@@ -84,7 +83,7 @@ introduzir frontend paralelo.
 
 **Tarefas:** protótipo comparativo (Streamlit nativo versus componente); contrato de entrada/saída; fallback; segurança de HTML/JS; teste no Community Cloud.
 
-### Sprint 10 — Dashboard analítico avançado (DONE nesta branch)
+### Sprint 10 — Dashboard analítico avançado
 
 **Objetivo:** melhorar decisões de planejamento com visualizações interativas justificadas.
 
@@ -102,7 +101,7 @@ introduzir frontend paralelo.
 com filtro temporal e de disciplina aplicado antes das agregações, tooltips em minutos e tabela
 alternativa. A dependência foi adicionada como `plotly>=5.0`.
 
-### Sprint 11 — Responsividade e acessibilidade aplicada (DONE nesta branch)
+### Sprint 11 — Responsividade e acessibilidade aplicada
 
 **Objetivo:** tornar as tarefas principais utilizáveis em viewport estreito, teclado e tecnologias assistivas quando aplicável.
 
@@ -124,7 +123,7 @@ redução de movimento.
 **Limitação:** a verificação em viewport estreito e por teclado foi estática; ainda requer avaliação
 manual no navegador e teste com pessoas na Sprint 12.
 
-### Sprint 12 — Avaliação e polimento de produto (PLANO PREPARADO)
+### Sprint 12 — Avaliação e polimento de produto
 
 **Objetivo:** verificar se o refinamento visual melhora tarefas reais antes de declarar o frontend concluído.
 

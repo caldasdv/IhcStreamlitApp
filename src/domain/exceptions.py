@@ -7,3 +7,7 @@ class EntityNotFoundError(LookupError):
 
 class DuplicateSubjectError(ValueError):
     """Indica que o usuário já possui uma disciplina com o mesmo nome."""
+
+
+class DuplicateAcademicPeriodError(ValueError):
+    """Indica que o usuário já possui um período acadêmico com o mesmo nome."""

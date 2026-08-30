@@ -1,5 +1,12 @@
 # Backlog do produto
 
+## Estado e fonte de verdade
+
+Este documento organiza o planejamento do produto. O estado de entrega deve refletir evidência no
+GitHub: `DONE` significa código integrado à `main`; `REVIEW` significa implementação em Pull Request;
+e validações que dependem de pessoas ou do Streamlit Community Cloud permanecem pendentes até sua
+execução real. O índice documental está em [docs/README.md](README.md).
+
 ## Product Goal
 
 Permitir que estudantes planejem, executem e acompanhem suas sessões de estudo com clareza, baixo atrito e feedback útil.
@@ -89,6 +96,26 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 - Dependências: extração de Domain/Services.
 - Complexidade: M
 - Status: DONE.
+
+### US-016
+
+Como estudante quero criar, visualizar e escolher meu período acadêmico atual para organizar meu planejamento no contexto correto.
+
+- Prioridade: P0
+- Critérios de aceitação: nome e intervalo válidos; nome único por usuário; primeiro período torna-se atual; somente período ativo e pertencente ao usuário pode ser selecionado; arquivamento preserva histórico e não remove o período atual; estados vazio, erro e sucesso tratados.
+- Dependências: identidade OIDC, repositories e MongoDB Atlas.
+- Complexidade: M
+- Status: REVIEW (implementada na PR #21; integração à `main` pendente).
+
+### US-017
+
+Como estudante quero associar minhas disciplinas ao período acadêmico atual para separar o planejamento de cada semestre.
+
+- Prioridade: P0
+- Critérios de aceitação: novas disciplinas são associadas a um período ativo pertencente ao usuário; listagens permitem considerar o período atual; documentos legados sem período recebem tratamento explícito, sem associação automática incorreta; toda leitura e escrita valida `user_id` e `period_id`; sessões existentes permanecem legíveis.
+- Dependências: US-016 integrada à `main`; definição da estratégia para documentos legados.
+- Complexidade: M
+- Status: BACKLOG.
 
 ## Sprints
 
@@ -216,13 +243,15 @@ queries usam o `user_id` resolvido; logout funciona; teste no ambiente Cloud é 
 
 As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md](frontend-roadmap.md):
 
-- Sprint 8 — fundação visual e design system leve (DONE nesta branch);
-- Sprint 9 — componente externo de interação rica, condicionado a spike (SPIKE CONCLUÍDO nesta branch);
-- Sprint 10 — dashboard analítico avançado com Plotly somente se justificar (DONE nesta branch);
-- Sprint 11 — responsividade e acessibilidade aplicada (DONE nesta branch);
-- Sprint 12 — avaliação com usuários e polimento baseado em evidências (PLANO PREPARADO nesta branch).
+- Sprint 8 — fundação visual e design system leve (DONE);
+- Sprint 9 — componente externo de interação rica, condicionado a spike (SPIKE CONCLUÍDO);
+- Sprint 10 — dashboard analítico avançado com Plotly justificado (DONE);
+- Sprint 11 — responsividade e acessibilidade aplicada (DONE);
+- Sprint 12 — avaliação com usuários e polimento baseado em evidências (TODO; plano preparado).
 
 ### Sprint 13 — Hardening pós-revisão
+
+**Status:** DONE (integrada à `main` pela PR #20).
 
 **Objetivo:** corrigir inconsistências de dados, escopo temporal, feedback de persistência e reprodutibilidade de testes antes de ampliar o domínio.
 
@@ -231,6 +260,38 @@ As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md]
 **Riscos:** documentos legados sem campos normalizados e permissões de gerenciamento de índices no Atlas.
 
 **Definition of Done:** testes unitários passam pelos comandos documentados; smoke test inicia; índices e consultas estão documentados; nenhuma credencial é versionada.
+
+### Sprint 14 — Períodos acadêmicos
+
+**Status:** REVIEW (PR #21 aberta).
+
+**Objetivo:** adicionar o contexto temporal acadêmico que antecede a organização de disciplinas.
+
+**História:** US-016.
+
+**Tarefas:** regras puras de nome/intervalo; collection e índices; repository e service isolados por usuário; primeiro período como atual; seleção de período ativo; arquivamento protegido; página Streamlit com feedback e recuperação; testes e documentação.
+
+**Riscos:** disciplinas e sessões legadas ainda não possuem referência de período; a associação será uma história separada para evitar migração automática incorreta.
+
+**Definition of Done:** critérios da US-016 atendidos; testes passam sem Atlas; página acessível pela navegação; nenhum acesso MongoDB na UI; documentação consistente; smoke test iniciado.
+
+### Sprint 15 — Disciplinas por período acadêmico
+
+**Status:** BACKLOG.
+
+**Objetivo:** relacionar disciplinas ao contexto acadêmico atual sem corromper ou ocultar dados legados.
+
+**História:** US-017.
+
+**Tarefas:** definir compatibilidade dos documentos legados; atualizar modelo, repository e service; adaptar
+formulários e filtros; criar índices somente após confirmar os padrões de leitura; cobrir isolamento e
+compatibilidade com testes.
+
+**Riscos:** associação automática ao período errado; disciplinas com mesmo nome em períodos diferentes;
+sessões antigas referenciando disciplinas sem `period_id`.
+
+**Definition of Done:** critérios da US-017 atendidos; estratégia de legado documentada; queries isoladas por
+usuário e período; testes relevantes e smoke test passam; PR revisada antes da integração à `main`.
 
 O roadmap não pressupõe React, FastAPI ou uma reescrita como SPA. Cada dependência externa precisa
 passar pela comparação com a solução nativa, pelo impacto no Community Cloud e pelos critérios de IHC.

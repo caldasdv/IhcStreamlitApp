@@ -20,4 +20,12 @@ def ensure_indexes(database) -> None:
         unique=True,
         partialFilterExpression={"name_normalized": {"$exists": True}},
     )
+    database.academic_periods.create_index(
+        [("user_id", 1), ("name_normalized", 1)],
+        unique=True,
+        partialFilterExpression={"name_normalized": {"$exists": True}},
+    )
+    database.academic_periods.create_index(
+        [("user_id", 1), ("status", 1), ("start_date", -1)]
+    )
     database.study_sessions.create_index([("user_id", 1), ("study_date", 1), ("study_time", 1)])
