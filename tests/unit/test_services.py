@@ -65,6 +65,7 @@ class FakeSubjectRepository:
         self.valid_subject_ids = set(valid_subject_ids or ["subject-id"])
         self.normalized_names = set()
         self.created = []
+        self.assigned = []
 
     def belongs_to_user_period(self, user_id, subject_id, academic_period_id):
         return subject_id in self.valid_subject_ids and academic_period_id == "period-id"
@@ -89,6 +90,16 @@ class FakeSubjectRepository:
             if "academic_period_id" not in subject
         ]
 
+    def find_legacy_owned(self, user_id, subject_id):
+        return next(
+            (
+                subject
+                for subject in self.list_without_period(user_id)
+                if subject["_id"] == subject_id
+            ),
+            None,
+        )
+
     def exists_by_normalized_name(self, user_id, academic_period_id, normalized_name):
         return (academic_period_id, normalized_name) in self.normalized_names
 
@@ -96,6 +107,13 @@ class FakeSubjectRepository:
         self.created.append((user_id, academic_period_id, name, normalized_name, color))
         self.normalized_names.add((academic_period_id, normalized_name))
         return "subject-id"
+
+    def assign_legacy_to_period(
+        self, user_id, subject_id, academic_period_id, normalized_name
+    ):
+        self.assigned.append(
+            (user_id, subject_id, academic_period_id, normalized_name)
+        )
 
 
 class FakeAcademicPeriodRepository:
@@ -209,6 +227,49 @@ def test_subject_service_requires_active_owned_period():
         build_subject_service().create(
             "user-id", "another-period", "IHC", "#5E6AD2"
         )
+
+
+def test_subject_service_assigns_legacy_subject_to_active_period():
+    repository = FakeSubjectRepository()
+    repository.legacy_names = ["  Interação   Humano-Computador "]
+
+    build_subject_service(repository).assign_legacy_to_period(
+        "user-id", 0, "period-id"
+    )
+
+    assert repository.assigned == [
+        ("user-id", 0, "period-id", "interação humano-computador")
+    ]
+
+
+def test_subject_service_rejects_missing_or_already_assigned_legacy_subject():
+    with pytest.raises(ValueError, match="não foi encontrada"):
+        build_subject_service().assign_legacy_to_period(
+            "user-id", "foreign-subject", "period-id"
+        )
+
+
+def test_subject_service_rejects_inactive_destination_period():
+    repository = FakeSubjectRepository()
+    repository.legacy_names = ["IHC"]
+
+    with pytest.raises(ValueError, match="período acadêmico ativo"):
+        build_subject_service(repository).assign_legacy_to_period(
+            "user-id", 0, "archived-period"
+        )
+
+
+def test_subject_service_rejects_duplicate_name_in_destination_period():
+    repository = FakeSubjectRepository()
+    repository.legacy_names = ["IHC"]
+    repository.normalized_names.add(("period-id", "ihc"))
+
+    with pytest.raises(ValueError, match="já possui"):
+        build_subject_service(repository).assign_legacy_to_period(
+            "user-id", 0, "period-id"
+        )
+
+    assert repository.assigned == []
 
 
 def test_session_service_rejects_subject_from_another_user():

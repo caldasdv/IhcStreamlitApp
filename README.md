@@ -41,6 +41,7 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 - a conexão usa `MONGODB_URI` e o banco `plano_estudos` no Atlas.
 - o primeiro período acadêmico criado vira o atual; períodos não atuais podem ser arquivados sem apagar o histórico.
 - disciplinas novas pertencem ao período atual; registros antigos sem período continuam preservados e identificados.
+- disciplinas antigas podem ser associadas manualmente a um período ativo, sem alterar suas sessões existentes.
 - a grade semanal registra aulas recorrentes por disciplina e rejeita sobreposição de horários.
 
 ## Rodar localmente

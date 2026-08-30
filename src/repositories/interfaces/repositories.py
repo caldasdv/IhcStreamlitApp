@@ -40,6 +40,10 @@ class SubjectRepository(Protocol):
 
     def list_without_period(self, user_id: Any) -> list[dict[str, Any]]: ...
 
+    def find_legacy_owned(
+        self, user_id: Any, subject_id: Any
+    ) -> dict[str, Any] | None: ...
+
     def belongs_to_user_period(
         self, user_id: Any, subject_id: Any, academic_period_id: Any
     ) -> bool: ...
@@ -56,6 +60,14 @@ class SubjectRepository(Protocol):
         normalized_name: str,
         color: str,
     ) -> Any: ...
+
+    def assign_legacy_to_period(
+        self,
+        user_id: Any,
+        subject_id: Any,
+        academic_period_id: Any,
+        normalized_name: str,
+    ) -> None: ...
 
 
 class ClassMeetingRepository(Protocol):

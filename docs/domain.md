@@ -67,9 +67,10 @@ Invariantes atuais:
 - cor hexadecimal válida;
 - disciplina nova pertence a um período acadêmico ativo do mesmo usuário;
 - uma sessão nova ou reagendada só pode referenciar disciplina do período atual;
-- disciplinas legadas sem período permanecem explícitas e preservadas.
+- disciplinas legadas sem período permanecem explícitas até associação manual confirmada;
+- associação manual aceita apenas período ativo do mesmo usuário e preserva as sessões referenciadas.
 
-Próxima decisão: oferecer um fluxo manual para associar disciplinas legadas a um período sem inferir vínculo incorreto.
+Mover uma disciplina que já possui período continua fora do escopo, pois exige decidir o impacto sobre aulas e histórico de sessões.
 
 ### ClassMeeting
 

@@ -8,9 +8,10 @@ Este diretório concentra as fontes de verdade do Plano. Documentos históricos 
 - Sprint 13: hardening concluído e incorporado à `main` pelo PR #20.
 - Sprint 14: períodos acadêmicos integrados à `main` pelo PR #21.
 - Sprint 15: associação de disciplinas ao período atual integrada à `main` pela PR #22.
-- Sprint 16: grade semanal de aulas em revisão na PR #23.
+- Sprint 16: grade semanal de aulas integrada à `main` pela PR #23.
+- Sprint 17: associação manual de disciplinas legadas em revisão na PR #24.
 - Sprint 12: protocolo de avaliação preparado, ainda pendente de participantes e evidência real.
-- Próximas decisões: associação manual de disciplinas legadas e integração da grade com o planejamento de sessões.
+- Próxima decisão: integração da grade com o planejamento de sessões e política para mover disciplinas já associadas.
 
 ## Fontes de verdade
 
