@@ -2,6 +2,15 @@
 
 Protótipo de um planejador de estudos feito com Streamlit e SQLite. O banco é criado automaticamente na primeira execução e recebe um usuário de teste com disciplinas e sessões de exemplo.
 
+## Regras atuais
+
+- sessões só podem ser planejadas para hoje ou uma data futura;
+- sessões pendentes com data passada aparecem como atrasadas;
+- horários de sessões pendentes não podem se sobrepor;
+- a visão geral acompanha a meta semanal em horas;
+- a página de progresso resume o tempo concluído por disciplina;
+- o banco possui uma migração simples para manter instalações anteriores funcionando.
+
 ## Rodar localmente
 
 ```bash

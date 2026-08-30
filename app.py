@@ -29,7 +29,8 @@ def setup_database() -> None:
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                email TEXT NOT NULL UNIQUE
+                email TEXT NOT NULL UNIQUE,
+                weekly_goal_minutes INTEGER NOT NULL DEFAULT 300
             );
 
             CREATE TABLE IF NOT EXISTS subjects (
@@ -53,6 +54,9 @@ def setup_database() -> None:
             );
             """
         )
+        user_columns = {row["name"] for row in conn.execute("PRAGMA table_info(users)")}
+        if "weekly_goal_minutes" not in user_columns:
+            conn.execute("ALTER TABLE users ADD COLUMN weekly_goal_minutes INTEGER NOT NULL DEFAULT 300")
         user = conn.execute("SELECT id FROM users LIMIT 1").fetchone()
         if user:
             return
@@ -97,6 +101,32 @@ def execute(sql: str, params: tuple = ()) -> None:
         conn.execute(sql, params)
 
 
+def effective_status(row: sqlite3.Row) -> str:
+    if row["status"] == "Pendente" and row["study_date"] < date.today().isoformat():
+        return "Atrasada"
+    return row["status"]
+
+
+def minutes_at(value: str) -> int:
+    hours, minutes = (int(part) for part in value.split(":"))
+    return hours * 60 + minutes
+
+
+def has_conflict(user_id: int, study_date: date, study_time: time, duration: int) -> bool:
+    start = study_time.hour * 60 + study_time.minute
+    end = start + duration
+    existing = query(
+        """SELECT study_time, duration FROM study_sessions
+        WHERE user_id = ? AND study_date = ? AND status = 'Pendente'""",
+        (user_id, str(study_date)),
+    )
+    return any(
+        start < minutes_at(item["study_time"]) + item["duration"]
+        and minutes_at(item["study_time"]) < end
+        for item in existing
+    )
+
+
 def session_card(row: sqlite3.Row) -> None:
     with st.container(border=True):
         info_col, status_col = st.columns([5, 1])
@@ -105,8 +135,11 @@ def session_card(row: sqlite3.Row) -> None:
         info_col.subheader(row["topic"])
         if row["goal"]:
             info_col.write(row["goal"])
-        if row["status"] == "Concluída":
+        status = effective_status(row)
+        if status == "Concluída":
             status_col.success("Concluída")
+        elif status == "Atrasada":
+            status_col.error("Atrasada")
         else:
             status_col.warning("Pendente")
 
@@ -141,13 +174,20 @@ subjects = query("SELECT * FROM subjects WHERE user_id = ? ORDER BY name", (user
 with st.sidebar:
     st.markdown("## Plano")
     st.caption("Seu espaço de estudos")
-    page = st.selectbox("Navegação", ["Visão geral", "Nova sessão", "Disciplinas"], label_visibility="collapsed")
+    page = st.selectbox("Navegação", ["Visão geral", "Nova sessão", "Progresso", "Disciplinas"], label_visibility="collapsed")
     st.divider()
     st.caption("Usuário de teste")
     st.write(user["name"])
     st.caption(user["email"])
     st.divider()
     st.caption(f"Banco: `{DB_PATH.name}`")
+    st.divider()
+    st.caption("Meta semanal")
+    goal_hours = st.number_input("Horas", min_value=1.0, max_value=80.0, value=user["weekly_goal_minutes"] / 60, step=0.5, label_visibility="collapsed")
+    if st.button("Salvar meta", use_container_width=True):
+        execute("UPDATE users SET weekly_goal_minutes = ? WHERE id = ?", (round(goal_hours * 60), user["id"]))
+        st.success("Meta atualizada.")
+        st.rerun()
 
 if page == "Visão geral":
     st.caption("SEMANA DE ESTUDOS")
@@ -158,15 +198,21 @@ if page == "Visão geral":
         JOIN subjects ON subjects.id = s.subject_id WHERE s.user_id = ?
         ORDER BY s.study_date, s.study_time""", (user["id"],)
     )
-    pending = [s for s in all_sessions if s["status"] == "Pendente"]
-    completed = [s for s in all_sessions if s["status"] == "Concluída"]
+    pending = [s for s in all_sessions if effective_status(s) in ("Pendente", "Atrasada")]
+    completed = [s for s in all_sessions if effective_status(s) == "Concluída"]
+    week_start = date.today() - timedelta(days=date.today().weekday())
+    week_end = week_start + timedelta(days=6)
+    week_sessions = [s for s in all_sessions if str(week_start) <= s["study_date"] <= str(week_end)]
+    completed_minutes = sum(s["duration"] for s in week_sessions if effective_status(s) == "Concluída")
+    goal_minutes = user["weekly_goal_minutes"]
     col1, col2, col3 = st.columns(3)
-    col1.write("**Sessões pendentes**")
+    col1.write("**Pendências**")
     col1.title(len(pending))
-    col2.write("**Horas planejadas**")
-    col2.title(f"{sum(s['duration'] for s in pending) / 60:.1f}h")
-    col3.write("**Concluídas**")
+    col2.write("**Progresso da semana**")
+    col2.title(f"{completed_minutes / 60:.1f} / {goal_minutes / 60:.1f}h")
+    col3.write("**Sessões concluídas**")
     col3.title(len(completed))
+    st.progress(min(completed_minutes / goal_minutes, 1.0) if goal_minutes else 0.0, text=f"{completed_minutes / goal_minutes * 100:.0f}% da meta semanal" if goal_minutes else "Sem meta")
     st.divider()
     selected_date = st.date_input("Ver dia", value=date.today(), format="DD/MM/YYYY")
     day_sessions = [s for s in all_sessions if s["study_date"] == str(selected_date)]
@@ -188,7 +234,7 @@ if page == "Visão geral":
         chosen_id = session_labels[chosen_label]
         chosen = next(item for item in day_sessions if item["id"] == chosen_id)
         action_col1, action_col2 = st.columns([1, 1])
-        if chosen["status"] == "Pendente" and action_col1.button("Marcar como concluída", use_container_width=True):
+        if effective_status(chosen) != "Concluída" and action_col1.button("Marcar como concluída", use_container_width=True):
             execute("UPDATE study_sessions SET status = 'Concluída' WHERE id = ?", (chosen["id"],))
             st.rerun()
         if action_col2.button("Excluir sessão", use_container_width=True):
@@ -213,6 +259,10 @@ elif page == "Nova sessão":
     if submitted:
         if not topic.strip():
             st.error("Informe o assunto da sessão.")
+        elif study_date < date.today():
+            st.error("Escolha hoje ou uma data futura para planejar uma sessão.")
+        elif has_conflict(user["id"], study_date, study_time, duration):
+            st.error("Esse horário conflita com outra sessão pendente.")
         else:
             subject_id = next(s["id"] for s in subjects if s["name"] == subject_name)
             execute(
@@ -222,6 +272,26 @@ elif page == "Nova sessão":
                 (user["id"], subject_id, topic.strip(), str(study_date), study_time.strftime("%H:%M"), duration, priority, goal.strip()),
             )
             st.success("Sessão adicionada ao seu plano.")
+
+elif page == "Progresso":
+    st.caption("ACOMPANHAMENTO")
+    st.title("Seu progresso")
+    st.write("Acompanhe o que foi planejado e concluído em cada disciplina.")
+    progress_sessions = query(
+        """SELECT subjects.name AS subject_name, subjects.color, s.*
+        FROM study_sessions s JOIN subjects ON subjects.id = s.subject_id
+        WHERE s.user_id = ? ORDER BY subjects.name, s.study_date""", (user["id"],)
+    )
+    if not progress_sessions:
+        st.info("Adicione uma sessão para começar a acompanhar seu progresso.")
+    for subject in subjects:
+        rows = [s for s in progress_sessions if s["subject_id"] == subject["id"]]
+        planned = sum(s["duration"] for s in rows)
+        done = sum(s["duration"] for s in rows if effective_status(s) == "Concluída")
+        with st.container(border=True):
+            st.write(f"**{subject['name']}**")
+            st.progress(done / planned if planned else 0, text=f"{done} de {planned} minutos concluídos")
+            st.caption(f"{len(rows)} sessões · {len([s for s in rows if effective_status(s) == 'Atrasada'])} atrasadas")
 
 else:
     st.caption("ORGANIZAÇÃO")
