@@ -217,7 +217,7 @@ queries usam o `user_id` resolvido; logout funciona; teste no ambiente Cloud é 
 
 As próximas sprints de frontend estão detalhadas em [docs/frontend-roadmap.md](frontend-roadmap.md):
 
-- Sprint 8 — fundação visual e design system leve;
+- Sprint 8 — fundação visual e design system leve (DONE nesta branch);
 - Sprint 9 — componente externo de interação rica, condicionado a spike;
 - Sprint 10 — dashboard analítico avançado com Plotly somente se justificar;
 - Sprint 11 — responsividade e acessibilidade aplicada;

@@ -5,6 +5,7 @@ from datetime import date, time
 import streamlit as st
 
 from src.ui.context import load_page_context
+from src.ui.components.page_header import render_page_header
 from src.ui.feedback import show_action_error
 from src.ui.sidebar import render_account_sidebar
 
@@ -16,9 +17,7 @@ if not subjects:
     st.info("Cadastre uma disciplina antes de criar uma sessão.")
     st.stop()
 
-st.caption("PLANEJAMENTO")
-st.title("Nova sessão")
-st.write("Defina uma sessão pequena e objetiva para facilitar o início do estudo.")
+render_page_header("PLANEJAMENTO", "Nova sessão", "Defina uma sessão pequena e objetiva para facilitar o início do estudo.")
 with st.form("new_session"):
     subject_names = [s["name"] for s in subjects]
     subject_name = st.selectbox("Disciplina", subject_names)

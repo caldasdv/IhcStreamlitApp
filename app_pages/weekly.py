@@ -6,6 +6,7 @@ import streamlit as st
 
 from src.domain.session_rules import effective_status
 from src.ui.context import load_page_context, load_page_sessions
+from src.ui.components.page_header import render_page_header
 from src.ui.feedback import show_action_error
 from src.ui.feedback import set_success_flash
 from src.ui.sidebar import render_account_sidebar
@@ -14,9 +15,7 @@ from src.ui.sidebar import render_account_sidebar
 services, user, subjects = load_page_context()
 render_account_sidebar(services, user)
 
-st.caption("PLANEJAMENTO")
-st.title("Visão semanal")
-st.write("Revise sua carga de estudos e conclua sessões rapidamente.")
+render_page_header("PLANEJAMENTO", "Visão semanal", "Revise sua carga de estudos e conclua sessões rapidamente.")
 
 sessions = load_page_sessions(services, user, subjects)
 week_start = date.today() - timedelta(days=date.today().weekday())
