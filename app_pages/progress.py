@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import streamlit as st
 
 from src.services.report_service import build_subject_summary, build_week_summary
+from src.ui.components.page_header import render_page_header
 from src.ui.context import load_page_context, load_page_sessions
 from src.ui.sidebar import render_account_sidebar
 
@@ -12,9 +13,7 @@ from src.ui.sidebar import render_account_sidebar
 services, user, subjects = load_page_context()
 render_account_sidebar(services, user)
 
-st.caption("ACOMPANHAMENTO")
-st.title("Seu progresso")
-st.write("Entenda sua carga de estudos e o que já foi concluído.")
+render_page_header("ACOMPANHAMENTO", "Seu progresso", "Entenda sua carga de estudos e o que já foi concluído.")
 progress_sessions = load_page_sessions(services, user, subjects)
 selected_week_day = st.date_input(
     "Escolha um dia da semana",

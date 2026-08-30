@@ -147,3 +147,15 @@ introduzir frontend paralelo.
 - [ ] bundle/dependência documentado;
 - [ ] smoke test no Community Cloud passa;
 - [ ] revisão de IHC registra evidências, hipóteses e limitações.
+
+## Execução da Sprint 8
+
+**Status:** DONE
+
+Foi criada a primeira fundação visual reutilizável: cabeçalho de página, apresentação consistente
+de estados de sessão, indicador textual e visual de disciplina, tokens CSS, foco visível, viewport
+estreito e respeito a `prefers-reduced-motion`. Nenhuma dependência externa foi adicionada nesta
+etapa porque a tarefa ainda era consistência visual, não interação que exigisse JavaScript.
+
+**Limitação:** a revisão responsiva foi estática/smoke test. A avaliação com estudantes permanece
+planejada para a Sprint 12.
