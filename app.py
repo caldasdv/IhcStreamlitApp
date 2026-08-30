@@ -6,9 +6,11 @@ from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
 import streamlit as st
+from dotenv import load_dotenv
 
 
 APP_DIR = Path(__file__).parent
+load_dotenv(APP_DIR / ".env")
 DRIVE_DB = Path("/content/drive/MyDrive/IhcStreamlitApp/estudos.db")
 LOCAL_DB = APP_DIR / "estudos.db"
 DB_PATH = Path(os.getenv("STUDY_DB_PATH", DRIVE_DB if DRIVE_DB.parent.exists() else LOCAL_DB))

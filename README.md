@@ -18,6 +18,16 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+## Variáveis de ambiente
+
+As credenciais locais ficam no arquivo `.env`, que não é versionado. Para configurar:
+
+```bash
+cp .env.example .env
+```
+
+Depois substitua `<db_password>` pela senha do usuário criado no MongoDB Atlas. A URI está disponível para a próxima etapa de migração do SQLite para o Atlas.
+
 ## Rodar no Google Colab com dados persistentes
 
 Monte o Google Drive antes de iniciar o app:
