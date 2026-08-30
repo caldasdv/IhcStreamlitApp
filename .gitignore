@@ -1,4 +1,7 @@
 .env
+.venv/
+.agents/skills/
+.claude/skills/
 __pycache__/
 *.py[cod]
 estudos.db
