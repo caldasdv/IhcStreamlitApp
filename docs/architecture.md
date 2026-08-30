@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-O Plano é um planejador de estudos web para estudantes. O MVP Streamlit possui autenticação Google OIDC, períodos acadêmicos, disciplinas, sessões, meta semanal, agenda e visão de progresso, com isolamento por usuário. A arquitetura é um monólito modular adequado ao tamanho atual e ao deploy no Streamlit Community Cloud.
+O Plano é um planejador de estudos web para estudantes. O MVP Streamlit possui autenticação Google OIDC, períodos acadêmicos, disciplinas, grade de aulas, sessões, meta semanal, agenda e visão de progresso, com isolamento por usuário. A arquitetura é um monólito modular adequado ao tamanho atual e ao deploy no Streamlit Community Cloud.
 
 ## Componentes
 

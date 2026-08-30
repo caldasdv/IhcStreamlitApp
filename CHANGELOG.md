@@ -17,6 +17,7 @@
 - Períodos acadêmicos adicionados com seleção do período atual, arquivamento protegido e testes de domínio/service.
 - Índice documental, catálogo de domínio e workflow Git adicionados; `AGENTS.md` consolidado sem regras duplicadas.
 - Disciplinas e novas sessões associadas ao período acadêmico atual, com isolamento por usuário/período e tratamento explícito dos registros legados.
+- Grade semanal de aulas adicionada com validação de referências, conflitos de horário, remoção protegida e estados Streamlit recuperáveis.
 
 ### Changed
 

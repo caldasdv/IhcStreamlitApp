@@ -71,6 +71,22 @@ Invariantes atuais:
 
 Próxima decisão: oferecer um fluxo manual para associar disciplinas legadas a um período sem inferir vínculo incorreto.
 
+### ClassMeeting
+
+Representa um horário de aula recorrente na semana para uma disciplina do período atual.
+
+Invariantes:
+
+- pertence ao mesmo usuário, período e disciplina;
+- dia da semana varia de segunda (`0`) a domingo (`6`);
+- horário inicial é anterior ao final;
+- aulas do mesmo usuário e período não se sobrepõem no mesmo dia;
+- horários adjacentes são permitidos;
+- local é opcional e não participa da identidade da aula.
+
+A entidade registra recorrência semanal, não ocorrências por data. Exceções de calendário e bloqueio de
+sessões de estudo exigem histórias posteriores.
+
 ### StudySession
 
 Representa um bloco planejado de estudo, não uma tarefa nem execução de cronômetro.
@@ -96,7 +112,6 @@ Invariantes:
 
 | Entidade | Finalidade | Prioridade indicativa | Dependências |
 |---|---|---:|---|
-| ClassMeeting | aula recorrente de uma disciplina | P0/P1 | período + disciplina |
 | Topic | conteúdo e progresso dentro da disciplina | P1 | disciplina |
 | Task/SubTask | entrega com prazo e progresso parcial | P1 | disciplina/período |
 | Exam/ExamTopic | prova e conteúdos cobrados | P1 | disciplina + tópicos |

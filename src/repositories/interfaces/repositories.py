@@ -58,6 +58,22 @@ class SubjectRepository(Protocol):
     ) -> Any: ...
 
 
+class ClassMeetingRepository(Protocol):
+    def list_by_period(
+        self, user_id: Any, academic_period_id: Any
+    ) -> list[dict[str, Any]]: ...
+
+    def list_by_weekday(
+        self, user_id: Any, academic_period_id: Any, weekday: int
+    ) -> list[dict[str, Any]]: ...
+
+    def create(self, data: dict[str, Any]) -> Any: ...
+
+    def delete(
+        self, user_id: Any, academic_period_id: Any, meeting_id: Any
+    ) -> None: ...
+
+
 class StudySessionRepository(Protocol):
     def list_by_user(
         self, user_id: Any, start_date: date | None = None, end_date: date | None = None

@@ -175,6 +175,52 @@ class MongoSubjectRepository:
             raise DuplicateSubjectError("Você já possui uma disciplina com esse nome.") from error
 
 
+class MongoClassMeetingRepository:
+    def __init__(self, database) -> None:
+        self.collection = database.class_meetings
+
+    def list_by_period(
+        self, user_id: Any, academic_period_id: Any
+    ) -> list[dict[str, Any]]:
+        return list(
+            self.collection.find(
+                {"user_id": user_id, "academic_period_id": academic_period_id}
+            ).sort([("weekday", 1), ("start_time", 1), ("subject_id", 1)])
+        )
+
+    def list_by_weekday(
+        self, user_id: Any, academic_period_id: Any, weekday: int
+    ) -> list[dict[str, Any]]:
+        return list(
+            self.collection.find(
+                {
+                    "user_id": user_id,
+                    "academic_period_id": academic_period_id,
+                    "weekday": weekday,
+                },
+                {"start_time": 1, "end_time": 1},
+            ).sort("start_time", 1)
+        )
+
+    def create(self, data: dict[str, Any]) -> Any:
+        now = datetime.now(UTC)
+        document = {**data, "created_at": now, "updated_at": now}
+        return self.collection.insert_one(document).inserted_id
+
+    def delete(
+        self, user_id: Any, academic_period_id: Any, meeting_id: Any
+    ) -> None:
+        result = self.collection.delete_one(
+            {
+                "_id": meeting_id,
+                "user_id": user_id,
+                "academic_period_id": academic_period_id,
+            }
+        )
+        if result.deleted_count == 0:
+            raise EntityNotFoundError("A aula não foi encontrada ou não está mais disponível.")
+
+
 class MongoStudySessionRepository:
     def __init__(self, database) -> None:
         self.collection = database.study_sessions
