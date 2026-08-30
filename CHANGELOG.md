@@ -19,3 +19,4 @@
 - `.gitignore` reforçado para secrets, ambientes virtuais e caches de teste.
 - Relatório de inspeção heurística registrado em `docs/ihc-review.md`.
 - Entrypoints `app.py` e `src/app.py` consolidados no mesmo shell para reduzir divergências de deploy.
+- Login Google OIDC, resolução de usuário por identidade estável e índice parcial de isolamento adicionados.
