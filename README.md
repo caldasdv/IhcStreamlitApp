@@ -1,6 +1,6 @@
 # Plano — planejador de estudos
 
-Protótipo de um planejador de estudos feito com Streamlit e SQLite. O banco é criado automaticamente na primeira execução e recebe um usuário de teste com disciplinas e sessões de exemplo.
+Protótipo de um planejador de estudos feito com Streamlit e MongoDB Atlas. O banco é preparado automaticamente na primeira execução e recebe um usuário de teste com disciplinas e sessões de exemplo.
 
 ## Regras atuais
 
@@ -9,7 +9,7 @@ Protótipo de um planejador de estudos feito com Streamlit e SQLite. O banco é 
 - horários de sessões pendentes não podem se sobrepor;
 - a visão geral acompanha a meta semanal em horas;
 - a página de progresso resume o tempo concluído por disciplina;
-- o banco possui uma migração simples para manter instalações anteriores funcionando.
+- a conexão usa `MONGODB_URI` e o banco `plano_estudos` no Atlas.
 
 ## Rodar localmente
 
@@ -28,15 +28,6 @@ cp .env.example .env
 
 Depois substitua `<db_password>` pela senha do usuário criado no MongoDB Atlas. A URI está disponível para a próxima etapa de migração do SQLite para o Atlas.
 
-## Rodar no Google Colab com dados persistentes
+## Rodar em uma VPS ou no Community Cloud
 
-Monte o Google Drive antes de iniciar o app:
-
-```python
-from google.colab import drive
-drive.mount('/content/drive')
-```
-
-Se a pasta `/content/drive/MyDrive/IhcStreamlitApp` existir, o app salva automaticamente o banco em `estudos.db` dentro dela. Caso contrário, ele usa um banco local temporário.
-
-Para usar o fluxo do notebook original, instale o Streamlit e exponha a porta 8501 com Localtunnel. O endereço público é temporário.
+Configure `MONGODB_URI` nas variáveis de ambiente da VPS ou nos Secrets do Community Cloud. O app não depende mais de SQLite ou Google Drive.

@@ -1,109 +1,48 @@
 from __future__ import annotations
 
 import os
-import sqlite3
-from datetime import date, datetime, time, timedelta
+from datetime import date, time, timedelta
 from pathlib import Path
 
 import streamlit as st
 from dotenv import load_dotenv
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 
 
 APP_DIR = Path(__file__).parent
 load_dotenv(APP_DIR / ".env")
-DRIVE_DB = Path("/content/drive/MyDrive/IhcStreamlitApp/estudos.db")
-LOCAL_DB = APP_DIR / "estudos.db"
-DB_PATH = Path(os.getenv("STUDY_DB_PATH", DRIVE_DB if DRIVE_DB.parent.exists() else LOCAL_DB))
 
 
-def connection() -> sqlite3.Connection:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+@st.cache_resource
+def get_database():
+    uri = os.getenv("MONGODB_URI")
+    if not uri:
+        raise RuntimeError("MONGODB_URI não foi encontrada no arquivo .env.")
+    client = MongoClient(uri, server_api=ServerApi("1"), serverSelectionTimeoutMS=5000)
+    client.admin.command("ping")
+    return client["plano_estudos"]
 
 
-def setup_database() -> None:
-    with connection() as conn:
-        conn.executescript(
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL UNIQUE,
-                weekly_goal_minutes INTEGER NOT NULL DEFAULT 300
-            );
-
-            CREATE TABLE IF NOT EXISTS subjects (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                name TEXT NOT NULL,
-                color TEXT NOT NULL DEFAULT '#5E6AD2'
-            );
-
-            CREATE TABLE IF NOT EXISTS study_sessions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                subject_id INTEGER NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
-                topic TEXT NOT NULL,
-                study_date TEXT NOT NULL,
-                study_time TEXT NOT NULL,
-                duration INTEGER NOT NULL,
-                priority TEXT NOT NULL,
-                status TEXT NOT NULL DEFAULT 'Pendente',
-                goal TEXT NOT NULL DEFAULT ''
-            );
-            """
-        )
-        user_columns = {row["name"] for row in conn.execute("PRAGMA table_info(users)")}
-        if "weekly_goal_minutes" not in user_columns:
-            conn.execute("ALTER TABLE users ADD COLUMN weekly_goal_minutes INTEGER NOT NULL DEFAULT 300")
-        user = conn.execute("SELECT id FROM users LIMIT 1").fetchone()
-        if user:
-            return
-
-        user_id = conn.execute(
-            "INSERT INTO users (name, email) VALUES (?, ?)",
-            ("Marina Oliveira", "marina.teste@exemplo.com"),
-        ).lastrowid
-        subjects = [
-            (user_id, "Interação Humano-Computador", "#5E6AD2"),
-            (user_id, "Banco de Dados", "#2E8B72"),
-            (user_id, "Programação Web", "#C47F17"),
-        ]
-        conn.executemany(
-            "INSERT INTO subjects (user_id, name, color) VALUES (?, ?, ?)", subjects
-        )
-        subject_ids = {
-            row["name"]: row["id"]
-            for row in conn.execute("SELECT id, name FROM subjects WHERE user_id = ?", (user_id,))
-        }
-        today = date.today()
-        sessions = [
-            (user_id, subject_ids["Interação Humano-Computador"], "Heurísticas de Nielsen", str(today), "14:00", 60, "Alta", "Revisar as 10 heurísticas e fazer anotações.", "Pendente"),
-            (user_id, subject_ids["Banco de Dados"], "Relacionamentos e chaves", str(today + timedelta(days=1)), "16:30", 45, "Média", "Resolver cinco exercícios do material.", "Pendente"),
-            (user_id, subject_ids["Programação Web"], "Revisão de formulários", str(today - timedelta(days=1)), "19:00", 50, "Baixa", "Praticar validação de campos.", "Concluída"),
-        ]
-        conn.executemany(
-            """INSERT INTO study_sessions
-            (user_id, subject_id, topic, study_date, study_time, duration, priority, goal, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            sessions,
-        )
+def seed_database(db) -> None:
+    if db.users.find_one({}):
+        return
+    user_id = db.users.insert_one({"name": "Marina Oliveira", "email": "marina.teste@exemplo.com", "weekly_goal_minutes": 300}).inserted_id
+    subjects = [
+        {"user_id": user_id, "name": "Interação Humano-Computador", "color": "#5E6AD2"},
+        {"user_id": user_id, "name": "Banco de Dados", "color": "#2E8B72"},
+        {"user_id": user_id, "name": "Programação Web", "color": "#C47F17"},
+    ]
+    subject_ids = [db.subjects.insert_one(subject).inserted_id for subject in subjects]
+    today = date.today()
+    db.study_sessions.insert_many([
+        {"user_id": user_id, "subject_id": subject_ids[0], "topic": "Heurísticas de Nielsen", "study_date": today.isoformat(), "study_time": "14:00", "duration": 60, "priority": "Alta", "status": "Pendente", "goal": "Revisar as 10 heurísticas e fazer anotações."},
+        {"user_id": user_id, "subject_id": subject_ids[1], "topic": "Relacionamentos e chaves", "study_date": (today + timedelta(days=1)).isoformat(), "study_time": "16:30", "duration": 45, "priority": "Média", "status": "Pendente", "goal": "Resolver cinco exercícios do material."},
+        {"user_id": user_id, "subject_id": subject_ids[2], "topic": "Revisão de formulários", "study_date": (today - timedelta(days=1)).isoformat(), "study_time": "19:00", "duration": 50, "priority": "Baixa", "status": "Concluída", "goal": "Praticar validação de campos."},
+    ])
 
 
-def query(sql: str, params: tuple = ()) -> list[sqlite3.Row]:
-    with connection() as conn:
-        return conn.execute(sql, params).fetchall()
-
-
-def execute(sql: str, params: tuple = ()) -> None:
-    with connection() as conn:
-        conn.execute(sql, params)
-
-
-def effective_status(row: sqlite3.Row) -> str:
+def effective_status(row: dict) -> str:
     if row["status"] == "Pendente" and row["study_date"] < date.today().isoformat():
         return "Atrasada"
     return row["status"]
@@ -114,14 +53,10 @@ def minutes_at(value: str) -> int:
     return hours * 60 + minutes
 
 
-def has_conflict(user_id: int, study_date: date, study_time: time, duration: int) -> bool:
+def has_conflict(db, user_id, study_date: date, study_time: time, duration: int) -> bool:
     start = study_time.hour * 60 + study_time.minute
     end = start + duration
-    existing = query(
-        """SELECT study_time, duration FROM study_sessions
-        WHERE user_id = ? AND study_date = ? AND status = 'Pendente'""",
-        (user_id, str(study_date)),
-    )
+    existing = db.study_sessions.find({"user_id": user_id, "study_date": study_date.isoformat(), "status": "Pendente"}, {"study_time": 1, "duration": 1})
     return any(
         start < minutes_at(item["study_time"]) + item["duration"]
         and minutes_at(item["study_time"]) < end
@@ -129,7 +64,17 @@ def has_conflict(user_id: int, study_date: date, study_time: time, duration: int
     )
 
 
-def session_card(row: sqlite3.Row) -> None:
+def load_sessions(db, user_id) -> list[dict]:
+    subjects_by_id = {subject["_id"]: subject for subject in db.subjects.find({"user_id": user_id})}
+    sessions = list(db.study_sessions.find({"user_id": user_id}).sort([("study_date", 1), ("study_time", 1)]))
+    for session in sessions:
+        subject = subjects_by_id.get(session["subject_id"], {"name": "Sem disciplina", "color": "#787774"})
+        session["subject_name"] = subject["name"]
+        session["subject_color"] = subject["color"]
+    return sessions
+
+
+def session_card(row: dict) -> None:
     with st.container(border=True):
         info_col, status_col = st.columns([5, 1])
         info_col.caption(f"{row['study_time']} · {row['duration']} minutos")
@@ -147,7 +92,6 @@ def session_card(row: sqlite3.Row) -> None:
 
 
 st.set_page_config(page_title="Plano", page_icon="◷", layout="wide")
-setup_database()
 
 st.markdown(
     """
@@ -170,8 +114,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-user = query("SELECT * FROM users LIMIT 1")[0]
-subjects = query("SELECT * FROM subjects WHERE user_id = ? ORDER BY name", (user["id"],))
+try:
+    db = get_database()
+    seed_database(db)
+except Exception as error:
+    st.error("Não foi possível conectar ao MongoDB Atlas.")
+    st.code(str(error))
+    st.stop()
+
+user = db.users.find_one({})
+subjects = list(db.subjects.find({"user_id": user["_id"]}).sort("name", 1))
 
 with st.sidebar:
     st.markdown("## Plano")
@@ -182,12 +134,12 @@ with st.sidebar:
     st.write(user["name"])
     st.caption(user["email"])
     st.divider()
-    st.caption(f"Banco: `{DB_PATH.name}`")
+    st.caption("MongoDB Atlas · plano_estudos")
     st.divider()
     st.caption("Meta semanal")
-    goal_hours = st.number_input("Horas", min_value=1.0, max_value=80.0, value=user["weekly_goal_minutes"] / 60, step=0.5, label_visibility="collapsed")
+    goal_hours = st.number_input("Horas", min_value=1.0, max_value=80.0, value=user.get("weekly_goal_minutes", 300) / 60, step=0.5, label_visibility="collapsed")
     if st.button("Salvar meta", use_container_width=True):
-        execute("UPDATE users SET weekly_goal_minutes = ? WHERE id = ?", (round(goal_hours * 60), user["id"]))
+        db.users.update_one({"_id": user["_id"]}, {"$set": {"weekly_goal_minutes": round(goal_hours * 60)}})
         st.success("Meta atualizada.")
         st.rerun()
 
@@ -195,18 +147,14 @@ if page == "Visão geral":
     st.caption("SEMANA DE ESTUDOS")
     st.title(f"Olá, {user['name'].split()[0]}")
     st.write("Aqui está o que você planejou para os próximos dias.")
-    all_sessions = query(
-        """SELECT s.*, subjects.name AS subject_name FROM study_sessions s
-        JOIN subjects ON subjects.id = s.subject_id WHERE s.user_id = ?
-        ORDER BY s.study_date, s.study_time""", (user["id"],)
-    )
+    all_sessions = load_sessions(db, user["_id"])
     pending = [s for s in all_sessions if effective_status(s) in ("Pendente", "Atrasada")]
     completed = [s for s in all_sessions if effective_status(s) == "Concluída"]
     week_start = date.today() - timedelta(days=date.today().weekday())
     week_end = week_start + timedelta(days=6)
     week_sessions = [s for s in all_sessions if str(week_start) <= s["study_date"] <= str(week_end)]
     completed_minutes = sum(s["duration"] for s in week_sessions if effective_status(s) == "Concluída")
-    goal_minutes = user["weekly_goal_minutes"]
+    goal_minutes = user.get("weekly_goal_minutes", 300)
     col1, col2, col3 = st.columns(3)
     col1.write("**Pendências**")
     col1.title(len(pending))
@@ -226,21 +174,19 @@ if page == "Visão geral":
         session_card(row)
     if day_sessions:
         st.subheader("Atualizar sessão")
-        # Use apenas strings no selectbox. sqlite3.Row não pode ser serializado
-        # pelo estado do Streamlit entre os reruns do aplicativo.
         session_labels = {
-            f"{item['study_time']} — {item['topic']}": item["id"]
+            f"{item['study_time']} — {item['topic']}": item["_id"]
             for item in day_sessions
         }
         chosen_label = st.selectbox("Escolha uma sessão", list(session_labels))
         chosen_id = session_labels[chosen_label]
-        chosen = next(item for item in day_sessions if item["id"] == chosen_id)
+        chosen = next(item for item in day_sessions if item["_id"] == chosen_id)
         action_col1, action_col2 = st.columns([1, 1])
         if effective_status(chosen) != "Concluída" and action_col1.button("Marcar como concluída", use_container_width=True):
-            execute("UPDATE study_sessions SET status = 'Concluída' WHERE id = ?", (chosen["id"],))
+            db.study_sessions.update_one({"_id": chosen["_id"]}, {"$set": {"status": "Concluída"}})
             st.rerun()
         if action_col2.button("Excluir sessão", use_container_width=True):
-            execute("DELETE FROM study_sessions WHERE id = ?", (chosen["id"],))
+            db.study_sessions.delete_one({"_id": chosen["_id"]})
             st.rerun()
 
 elif page == "Nova sessão":
@@ -263,31 +209,22 @@ elif page == "Nova sessão":
             st.error("Informe o assunto da sessão.")
         elif study_date < date.today():
             st.error("Escolha hoje ou uma data futura para planejar uma sessão.")
-        elif has_conflict(user["id"], study_date, study_time, duration):
+        elif has_conflict(db, user["_id"], study_date, study_time, duration):
             st.error("Esse horário conflita com outra sessão pendente.")
         else:
-            subject_id = next(s["id"] for s in subjects if s["name"] == subject_name)
-            execute(
-                """INSERT INTO study_sessions
-                (user_id, subject_id, topic, study_date, study_time, duration, priority, goal)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                (user["id"], subject_id, topic.strip(), str(study_date), study_time.strftime("%H:%M"), duration, priority, goal.strip()),
-            )
+            subject_id = next(s["_id"] for s in subjects if s["name"] == subject_name)
+            db.study_sessions.insert_one({"user_id": user["_id"], "subject_id": subject_id, "topic": topic.strip(), "study_date": study_date.isoformat(), "study_time": study_time.strftime("%H:%M"), "duration": duration, "priority": priority, "status": "Pendente", "goal": goal.strip()})
             st.success("Sessão adicionada ao seu plano.")
 
 elif page == "Progresso":
     st.caption("ACOMPANHAMENTO")
     st.title("Seu progresso")
     st.write("Acompanhe o que foi planejado e concluído em cada disciplina.")
-    progress_sessions = query(
-        """SELECT subjects.name AS subject_name, subjects.color, s.*
-        FROM study_sessions s JOIN subjects ON subjects.id = s.subject_id
-        WHERE s.user_id = ? ORDER BY subjects.name, s.study_date""", (user["id"],)
-    )
+    progress_sessions = load_sessions(db, user["_id"])
     if not progress_sessions:
         st.info("Adicione uma sessão para começar a acompanhar seu progresso.")
     for subject in subjects:
-        rows = [s for s in progress_sessions if s["subject_id"] == subject["id"]]
+        rows = [s for s in progress_sessions if s["subject_id"] == subject["_id"]]
         planned = sum(s["duration"] for s in rows)
         done = sum(s["duration"] for s in rows if effective_status(s) == "Concluída")
         with st.container(border=True):
@@ -307,7 +244,7 @@ else:
         color = st.color_picker("Cor", "#5E6AD2")
         if st.form_submit_button("Adicionar disciplina", type="primary"):
             if subject_name.strip():
-                execute("INSERT INTO subjects (user_id, name, color) VALUES (?, ?, ?)", (user["id"], subject_name.strip(), color))
+                db.subjects.insert_one({"user_id": user["_id"], "name": subject_name.strip(), "color": color})
                 st.success("Disciplina adicionada.")
                 st.rerun()
             st.error("Informe o nome da disciplina.")
