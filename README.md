@@ -16,6 +16,16 @@ O projeto usa um monólito modular: Presentation (Streamlit) → Services → Do
 
 Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/database.md) e [docs/backlog.md](docs/backlog.md).
 
+## Estrutura
+
+- `app.py`: shell, configuração visual e navegação nativa com `st.navigation`.
+- `app_pages/`: uma página Streamlit por fluxo da aplicação.
+- `src/ui/`: contexto, sidebar, estilos e componentes reutilizáveis.
+- `src/services/`: casos de uso sem dependência direta da UI.
+- `src/repositories/`: contratos e adapters MongoDB.
+- `src/domain/`: regras testáveis sem Streamlit.
+- `tests/`: testes unitários de domínio e services.
+
 ## Regras atuais
 
 - sessões só podem ser planejadas para hoje ou uma data futura;

@@ -20,12 +20,12 @@ Repositories
 Database connection / MongoDB Atlas
 ```
 
-- **Presentation:** páginas, formulários, navegação, tabelas, gráficos, estados vazios e mensagens.
+- **Presentation:** `app.py`, `app_pages/` e `src/ui/` contêm páginas, formulários, navegação, tabelas, gráficos, estados vazios e mensagens.
 - **Application/Services:** coordenação de criação, atualização, conclusão, reagendamento e consultas de progresso.
 - **Domain:** modelos de usuário, disciplina e sessão; status, prioridades, validações e conflitos de horário.
 - **Infrastructure:** configuração (`st.secrets`/ambiente), conexão cacheada, índices, repositories e logging.
 
-Na Sprint 1, as regras puras de sessão foram extraídas para `src/domain/session_rules.py`, e a UI passou a depender de services. Conexão, índices e seed estão em `src/database`; adapters MongoDB estão em `src/repositories`. A próxima melhoria é separar as páginas visuais de `src/app.py`.
+Na Sprint 1, as regras puras de sessão foram extraídas para `src/domain/session_rules.py`, a UI passou a depender de services e as quatro telas foram separadas em `app_pages/` usando `st.navigation`. Conexão, índices e seed estão em `src/database`; adapters MongoDB estão em `src/repositories`. O carregamento de cada tela mostra spinner e erro visível, sem bloquear a navegação antes de selecionar uma página.
 
 ## Responsabilidades e dependências
 
