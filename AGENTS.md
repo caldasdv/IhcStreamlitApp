@@ -67,3 +67,122 @@ O padrão é `Streamlit + MongoDB Atlas + monólito modular`. Não introduza Fas
 ## Git e documentação
 
 Faça alterações coesas, use mensagens como `docs: add project inception and architecture`, e não faça push, merge ou ações destrutivas sem autorização. Atualize arquitetura, banco, backlog, ADRs, README e changelog quando necessário.
+
+## Objetivo e princípios do produto
+
+O Plano é um planejador de estudos para organizar o período acadêmico, disciplinas, sessões e acompanhamento de progresso. O fluxo principal é:
+
+```text
+PLANEJAR → AGENDAR → ESTUDAR → REGISTRAR → ANALISAR → REPLANEJAR
+```
+
+Não confunda tarefa, prova, aula, sessão de estudo e evento de calendário. Eles podem aparecer juntos em uma visão, mas possuem dados e regras diferentes. Toda nova feature deve melhorar pelo menos uma etapa desse fluxo.
+
+## Escopo e prioridades do produto
+
+Use esta ordem sem pular dependências:
+
+- **P0/MVP:** identidade/perfil, período, disciplinas, sessões de estudo, visão de hoje/semana, conclusão e progresso básico.
+- **P1:** tarefas e subtarefas, provas e conteúdos, calendário completo, focus/Pomodoro, analytics, metas, materiais, pesquisa, filtros e disponibilidade.
+- **P2:** heurísticas de prioridade, divisão em sessões, detector de sobrecarga e planejamento/replanejamento automático.
+- **P3:** diferenciais futuros que não bloqueiam o fluxo principal.
+
+Não implementar sem requisito aprovado: chat com IA/LLM, resumos ou flashcards gerados por IA, OCR, rede social, grupos, marketplace, videoconferência ou gamificação complexa. Funcionalidades inteligentes devem preferir regras, heurísticas, scoring e dados do próprio usuário. Consulte `docs/backlog.md` e `docs/frontend-roadmap.md` antes de escolher a próxima história. Não recrie funcionalidades que já existem.
+
+## Modelo de domínio futuro
+
+O núcleo atual é `User`, `StudySession` e `Subject`. A evolução pode incluir, somente quando uma User Story aprovada exigir:
+
+```text
+User
+├── AcademicPeriod
+├── Subject ── ClassMeeting / Topic / Material / Grade
+├── Task ── SubTask
+├── Exam ── ExamTopic
+├── StudySession ── FocusSession
+├── Availability
+├── Goal / Habit / Reminder
+└── CalendarEvent
+```
+
+Não crie collections antecipadamente. Antes de uma collection relevante, documente finalidade, campos, tipos, obrigatoriedade, índices justificados, cardinalidade, referência/embedding, crescimento e padrões de leitura/escrita em `docs/database.md`. MongoDB deve ser modelado pelo acesso e pelo crescimento dos documentos, não como cópia automática de SQL.
+
+O calendário deve normalizar na camada de apresentação itens distintos (`ClassMeeting`, `Exam`, prazo de `Task`, `StudySession` e `CalendarEvent`), sem transformá-los em uma entidade única. `deadline` de tarefa não é o horário planejado de uma sessão.
+
+## UX, formulários e acessibilidade
+
+Toda tela deve ter propósito claro e estados de loading, erro, vazio e sucesso. Um empty state deve explicar a situação e oferecer uma ação recomendada; não mostrar somente “Nenhum dado”. Mensagens técnicas devem ir para logs, não diretamente ao usuário.
+
+Todo formulário deve ter label, validação, erro por campo, valores padrão adequados, estado de envio, proteção contra submissão duplicada e feedback de sucesso. Confirme ações destrutivas ou de perda relevante e prefira archive/soft delete quando o histórico importar. Undo é desejável quando tecnicamente viável.
+
+Considere desktop, tablet e celular; mantenha foco visível, contraste, teclado, semântica, labels e não dependa apenas de cor. Para componentes customizados, valide comunicação, fallback e comportamento quando JavaScript não carregar. Alterações de interface devem aplicar `SKILL-IHC-UX.md`.
+
+## Datas e timezone
+
+Separe `date`, `datetime` e horário local. Armazene timestamps de forma consistente, respeite o timezone do usuário e não assuma o timezone do servidor. Teste virada de dia, horários próximos à meia-noite, datas passadas e filtros por período.
+
+## Processo para features
+
+Para uma feature média/grande, apresente antes de codificar:
+
+```text
+Objetivo
+Impacto arquitetural
+Arquivos envolvidos
+Modelo de dados
+User Story
+Critérios de aceitação
+Plano de implementação
+Riscos
+```
+
+Siga: requisito → análise → impacto arquitetural → modelo de dados → User Story → critérios → plano → implementação → testes → review → documentação → DONE.
+
+Antes de escrever código, verifique: problema resolvido; entidades envolvidas; alteração de dados/índices; autorização; estados de UI; erros possíveis; testes necessários. **Definition of Ready:** objetivo, entrada, saída, critérios, dependências e impacto conhecidos. **Definition of Done:** código funcional, critérios atendidos, erros tratados, testes relevantes passando, isolamento verificado, nenhum segredo exposto, documentação atualizada e auto-review concluído.
+
+## Ordem sugerida de evolução
+
+Valide o estado real e o backlog antes de avançar:
+
+```text
+1. Estrutura/configuração
+2. Identidade e perfil
+3. Período acadêmico
+4. Disciplinas
+5. Grade de aulas
+6. Tópicos/conteúdos
+7. Tarefas/subtarefas
+8. Provas e tópicos de prova
+9. Sessões de estudo
+10. Calendário
+11. Dashboard Hoje/Progresso
+12. Responsividade e acessibilidade P0
+13. Testes dos fluxos MVP
+14. Focus/Pomodoro, analytics, metas e materiais
+15. Pesquisa, filtros, disponibilidade e notificações
+16. Priorização e replanejamento heurísticos
+```
+
+O MVP só está completo quando o usuário consegue planejar sessões, visualizar o que precisa fazer, registrar conclusão e ver o progresso atualizado sem erros.
+
+## Testes e performance
+
+Use pytest e priorize: domínio/invariantes; services, autorização e validações; transformações, datas e progresso; repositories com fakes/mocks; integrações Atlas quando configuradas; e fluxos essenciais de UI/deploy. Cubra isolamento por usuário, conflitos de horário, sessões passadas, progresso e estados de erro/vazio/loading. Testes unitários não devem exigir Streamlit ou credenciais reais.
+
+Antes de otimizar, meça. Evite N+1, queries repetidas por rerun, listas grandes sem paginação, refetch desnecessário e falta de índices em consultas frequentes. Prefira ordenação determinística e carregamento sob demanda. Cache não substitui consistência nem autorização.
+
+## Commits e colaboração
+
+Trabalhe em branches curtas e coesas, preferencialmente uma por sprint/feature. Antes de editar, confira `git status` e preserve mudanças do usuário. Não use `git reset --hard`, `git checkout --`, force push, reescrita de histórico, merge ou push sem autorização explícita.
+
+Prefira commits como:
+
+```text
+feat(subjects): add subject creation
+fix(auth): prevent cross-user resource access
+test(tasks): add progress calculation tests
+docs(security): add audit report
+chore(streamlit): update deployment configuration
+```
+
+Evite `update`, `changes`, `final` ou `stuff`. Em cada entrega informe branch, commit, testes executados, falhas existentes e próximos passos. Não crie issues ou pull requests remotamente sem autorização.
