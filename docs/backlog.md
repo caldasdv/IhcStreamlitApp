@@ -132,7 +132,7 @@ Como mantenedor quero testes unitários das regras fora do Streamlit para evolui
 
 **Histórias:** US-004 e melhorias de UX/visualização.
 
-**Tarefas:** agregações, gráficos Plotly somente se trouxerem benefício real, acessibilidade e performance.
+**Tarefas:** agregações nativas, gráficos Streamlit somente quando responderem a uma pergunta, acessibilidade e performance.
 
 **Riscos:** queries caras e uso excessivo de reruns.
 

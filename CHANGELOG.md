@@ -10,6 +10,7 @@
 - Conexão, seed, repositories e services separados da UI; testes com fakes adicionados.
 - Telas separadas em `app_pages/` com navegação nativa e carregamento com feedback visível.
 - Edição/reagendamento, confirmação de exclusão e visão semanal adicionados.
+- Dashboard de progresso com métricas semanais e gráficos nativos adicionado.
 
 ### Changed
 
