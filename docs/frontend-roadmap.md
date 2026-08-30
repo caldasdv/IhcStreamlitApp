@@ -124,7 +124,7 @@ redução de movimento.
 **Limitação:** a verificação em viewport estreito e por teclado foi estática; ainda requer avaliação
 manual no navegador e teste com pessoas na Sprint 12.
 
-### Sprint 12 — Avaliação e polimento de produto
+### Sprint 12 — Avaliação e polimento de produto (PLANO PREPARADO)
 
 **Objetivo:** verificar se o refinamento visual melhora tarefas reais antes de declarar o frontend concluído.
 
@@ -137,6 +137,9 @@ manual no navegador e teste com pessoas na Sprint 12.
 - Status: BACKLOG
 
 **Tarefas:** roteiro DECIDE; teste de criar/concluir/reagendar; leitura do dashboard; viewport estreito; relatório de IHC; revisão do backlog.
+
+O protocolo executável está em `docs/usability-test-plan.md`. A sprint não será marcada como concluída
+antes da coleta e análise reais.
 
 ## Definition of Ready para frontend externo
 

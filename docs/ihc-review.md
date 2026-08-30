@@ -6,8 +6,9 @@ Foi feita uma inspeção heurística estática dos fluxos de visão geral, nova 
 progresso e disciplinas. O escopo considerou usabilidade, comunicabilidade, acessibilidade,
 prevenção/recuperação de erros e estados de dashboard, conforme `SKILL-IHC-UX.md`.
 
-Não houve teste com usuários nem sessão interativa no Streamlit Community Cloud nesta revisão.
-Portanto, os itens marcados como hipótese precisam ser confirmados com uso real.
+Não houve teste com usuários nesta revisão. A avaliação interativa e o roteiro de tarefas estão em
+[`docs/usability-test-plan.md`](usability-test-plan.md); portanto, os itens marcados como hipótese
+precisam ser confirmados com uso real.
 
 ## Correções aplicadas
 
@@ -24,7 +25,7 @@ Portanto, os itens marcados como hipótese precisam ser confirmados com uso real
 
 | ID | Classificação | Achado | Próxima avaliação |
 |---|---|---|---|
-| IHC-002 | Alto / hipótese | O protótipo usa um usuário ativo único; ainda não há autenticação nem isolamento por identidade real. | Definir provedor e validar com stakeholders antes da implementação de US-007. |
+| IHC-002 | Resolvido tecnicamente / validar | Google OIDC e isolamento por `provider + subject` foram implementados. | Confirmar login, logout e isolamento com duas contas no Community Cloud. |
 | IHC-007 | Médio | Editar/excluir está disponível na visão geral, mas não na visão semanal. | Observar a tarefa de correção do plano e decidir se ações rápidas são necessárias. |
 | IHC-010 | Médio / hipótese | CSS usa seletores internos do Streamlit e pode variar após atualização. | Verificar visualmente no Community Cloud após cada atualização relevante. |
 
