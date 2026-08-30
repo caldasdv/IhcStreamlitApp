@@ -102,7 +102,7 @@ introduzir frontend paralelo.
 com filtro temporal e de disciplina aplicado antes das agregações, tooltips em minutos e tabela
 alternativa. A dependência foi adicionada como `plotly>=5.0`.
 
-### Sprint 11 — Responsividade e acessibilidade aplicada
+### Sprint 11 — Responsividade e acessibilidade aplicada (DONE nesta branch)
 
 **Objetivo:** tornar as tarefas principais utilizáveis em viewport estreito, teclado e tecnologias assistivas quando aplicável.
 
@@ -115,6 +115,14 @@ alternativa. A dependência foi adicionada como `plotly>=5.0`.
 - Status: BACKLOG
 
 **Tarefas:** percurso cognitivo; revisão de ordem de foco; densidade; labels; alternativa de dados; inspeção heurística e comunicabilidade.
+
+**Execução:** datas completas e filtros ativos ficaram visíveis; o carregamento de sessões ganhou
+recuperação com tentativa novamente; a agenda usa layout responsivo e foco de teclado; gráficos
+mantêm tabela alternativa; alvos de interação receberam tamanho mínimo e a interface respeita
+redução de movimento.
+
+**Limitação:** a verificação em viewport estreito e por teclado foi estática; ainda requer avaliação
+manual no navegador e teste com pessoas na Sprint 12.
 
 ### Sprint 12 — Avaliação e polimento de produto
 

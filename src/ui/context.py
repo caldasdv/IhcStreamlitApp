@@ -33,5 +33,7 @@ def load_page_sessions(
         return services.sessions.list_for_user(user["_id"], subjects)
     except Exception as error:
         show_action_error("carregar suas sessões", error)
+        if st.button("Tentar novamente", key="retry_sessions_loading"):
+            st.rerun()
         st.stop()
         return []

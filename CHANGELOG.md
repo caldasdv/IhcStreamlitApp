@@ -25,3 +25,4 @@
 - Fundação visual da Sprint 8 aplicada com componentes reutilizáveis, tokens CSS e ajustes responsivos.
 - Spike da Sprint 9 adicionado com agenda visual em Custom Component v2 e fallback textual.
 - Dashboard da Sprint 10 atualizado com Plotly, filtro por disciplina e tooltips com unidades.
+- Sprint 11 aplicada com filtros visíveis, datas completas, retry de carregamento e ajustes responsivos/acessíveis.

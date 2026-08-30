@@ -85,7 +85,7 @@ def render_study_agenda(
     weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
     days = [
         {
-            "label": f"{weekday} {(week_start + timedelta(days=offset)):%d/%m}",
+            "label": f"{weekday} {(week_start + timedelta(days=offset)):%d/%m/%Y}",
             "date": (week_start + timedelta(days=offset)).isoformat(),
             "sessions": sessions_by_date.get((week_start + timedelta(days=offset)).isoformat(), []),
         }

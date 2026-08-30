@@ -34,6 +34,7 @@ subject_options = {"Todas as disciplinas": None}
 subject_options.update({subject["name"]: subject["_id"] for subject in subjects})
 selected_subject_name = st.selectbox("Disciplina", list(subject_options), key="progress_subject")
 selected_subject_id = subject_options[selected_subject_name]
+st.caption(f"Filtros ativos: semana de {week_start:%d/%m/%Y} a {week_end:%d/%m/%Y} · {selected_subject_name}.")
 filtered_week_sessions = [
     session for session in week_sessions
     if selected_subject_id is None or session["subject_id"] == selected_subject_id
@@ -91,7 +92,7 @@ else:
                 for row in week_summary
             ],
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
         )
 
     st.subheader("Detalhamento por disciplina")
