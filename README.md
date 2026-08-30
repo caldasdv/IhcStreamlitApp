@@ -25,6 +25,7 @@ Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/datab
 - `src/repositories/`: contratos e adapters MongoDB.
 - `src/domain/`: regras testáveis sem Streamlit.
 - `tests/`: testes unitários de domínio e services.
+- A tela `Progresso` inclui métricas semanais e visualizações nativas por disciplina e por dia.
 
 ## Regras atuais
 
