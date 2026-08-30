@@ -66,7 +66,7 @@ introduzir frontend paralelo.
 - Critérios: tokens de cor/espaçamento/tipografia documentados; componentes de cabeçalho, card, status e ação reutilizados; foco e contraste revisados; desktop e viewport estreito verificados.
 - Dependências: revisão IHC, `src/ui/components` e `styles.py`.
 - Complexidade: M
-- Status: BACKLOG
+- Status: DONE
 
 **Tarefas:** inventário visual; tokens; componente de status; componente de feedback; revisão de CSS; estados de loading/vazio/erro.
 
@@ -80,7 +80,7 @@ introduzir frontend paralelo.
 - Critérios: componente mostra sessões e estado textual; seleção retorna um identificador; teclado e alternativa textual funcionam; falha do componente não impede a página; nenhum acesso direto ao MongoDB.
 - Dependências: Sprint 8; spike de Custom Component v2; decisão registrada em ADR.
 - Complexidade: L
-- Status: BACKLOG
+- Status: DONE (spike e fallback implementados)
 
 **Tarefas:** protótipo comparativo (Streamlit nativo versus componente); contrato de entrada/saída; fallback; segurança de HTML/JS; teste no Community Cloud.
 
@@ -94,7 +94,7 @@ introduzir frontend paralelo.
 - Critérios: pergunta analítica explícita por gráfico; tooltip com unidade; filtros visíveis; tabela equivalente; estado sem dados; performance aceitável; dados agregados antes da UI.
 - Dependências: Sprint 8; transformações de relatório; decisão sobre Plotly.
 - Complexidade: M
-- Status: BACKLOG
+- Status: DONE
 
 **Tarefas:** avaliar gráficos nativos versus Plotly; adicionar somente gráficos que ganhem interação real; testar séries vazias e muitos dados; documentar dependência.
 
@@ -112,7 +112,7 @@ alternativa. A dependência foi adicionada como `plotly>=5.0`.
 - Critérios: navegação compreensível; alvos acionáveis; formulários sem corte; tabela/gráfico com alternativa; foco perceptível; mensagens sem dependência de cor; teste manual em viewport estreito.
 - Dependências: Sprints 8–10.
 - Complexidade: M
-- Status: BACKLOG
+- Status: DONE
 
 **Tarefas:** percurso cognitivo; revisão de ordem de foco; densidade; labels; alternativa de dados; inspeção heurística e comunicabilidade.
 
@@ -134,7 +134,7 @@ manual no navegador e teste com pessoas na Sprint 12.
 - Critérios: objetivo, tarefas, perfil e consentimento definidos; evidências separadas de hipóteses; problemas classificados; correções priorizadas; limitações registradas.
 - Dependências: Sprints 8–11 e acesso a participantes.
 - Complexidade: M
-- Status: BACKLOG
+- Status: TODO (plano preparado; depende de avaliação real)
 
 **Tarefas:** roteiro DECIDE; teste de criar/concluir/reagendar; leitura do dashboard; viewport estreito; relatório de IHC; revisão do backlog.
 

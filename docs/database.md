@@ -1,8 +1,8 @@
 # Modelo de dados — MongoDB Atlas
 
-## Escopo da Sprint 0
+## Escopo atual
 
-Os requisitos disponíveis permitem identificar os conceitos `users`, `subjects` e `study_sessions`, já usados pelo protótipo. O schema abaixo é conceitual e deve ser consolidado antes da extração dos repositories. Não há entidades adicionais inventadas.
+O MVP utiliza `users`, `subjects` e `study_sessions`. O schema abaixo descreve a persistência vigente e as decisões de isolamento aplicadas pelos repositories.
 
 ## Collections
 
@@ -15,9 +15,11 @@ Finalidade: identidade mínima do usuário e meta semanal.
 | `_id` | ObjectId | sim |
 | `name` | string | sim |
 | `email` | string | sim |
+| `identity.provider` | string | sim para usuários autenticados |
+| `identity.subject` | string | sim para usuários autenticados |
 | `weekly_goal_minutes` | integer | sim |
 
-Índice: `{email: 1}` unique, para identidade única. Crescimento: um documento por usuário.
+Identidade única: `{identity.provider: 1, identity.subject: 1}` unique e parcial. O e-mail é atributo de perfil, não chave de identidade, e não possui unicidade global. Crescimento: um documento por usuário.
 
 ### `subjects`
 
@@ -28,9 +30,10 @@ Finalidade: disciplinas pertencentes a um usuário.
 | `_id` | ObjectId | sim |
 | `user_id` | ObjectId | sim |
 | `name` | string | sim |
+| `name_normalized` | string | sim para novos documentos |
 | `color` | string hexadecimal | sim |
 
-Relacionamento por referência a `users`; embedding não é adequado porque disciplinas são alteradas e consultadas separadamente. Índice atual `{user_id: 1, name: 1}`; avaliar unicidade por usuário na implementação de criação.
+Relacionamento por referência a `users`; embedding não é adequado porque disciplinas são alteradas e consultadas separadamente. O índice `{user_id: 1, name: 1}` apoia ordenação. O índice parcial unique `{user_id: 1, name_normalized: 1}` impede novas duplicatas sem bloquear documentos legados; o service também normaliza e compara nomes legados.
 
 ### `study_sessions`
 
@@ -53,9 +56,9 @@ Relaciona-se por referência a `users` e `subjects`. Não embutir sessões em us
 
 ## Consultas esperadas
 
-- Buscar o usuário ativo por `_id`/email.
+- Buscar o usuário ativo por `identity.provider + identity.subject`.
 - Listar disciplinas por `user_id`, ordenadas por nome.
-- Listar sessões de um usuário por data e horário.
+- Listar sessões de um usuário por intervalo de datas e horário.
 - Buscar sessões pendentes de uma data para validar sobreposição.
 - Agregar minutos concluídos por semana e disciplina.
 
@@ -65,7 +68,6 @@ Criar/editar/excluir disciplina; criar/editar/reagendar/concluir/excluir sessão
 
 ## Pendências
 
-- Definir autenticação/seleção de usuário antes de produção.
 - Escolher se datas/horários passam para BSON `date` ou permanecem strings ISO; BSON é preferível quando consultas temporais crescerem.
-- Definir política de seed e migrações.
+- Definir política de migração dos documentos legados sem `identity` ou `name_normalized`.
 - Adicionar validação de schema e índices finais na camada de infraestrutura.

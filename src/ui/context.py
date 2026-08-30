@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import streamlit as st
 
 from src.services.container import ApplicationServices, get_application_services
@@ -26,14 +28,22 @@ def load_page_context() -> tuple[ApplicationServices, dict, list[dict]]:
 
 
 def load_page_sessions(
-    services: ApplicationServices, user: dict, subjects: list[dict]
+    services: ApplicationServices,
+    user: dict,
+    subjects: list[dict],
+    *,
+    start_date: date | None = None,
+    end_date: date | None = None,
+    retry_key: str = "retry_sessions_loading",
 ) -> list[dict]:
     """Carrega sessões com o mesmo tratamento de falha usado no contexto inicial."""
     try:
-        return services.sessions.list_for_user(user["_id"], subjects)
+        return services.sessions.list_for_user(
+            user["_id"], subjects, start_date=start_date, end_date=end_date
+        )
     except Exception as error:
         show_action_error("carregar suas sessões", error)
-        if st.button("Tentar novamente", key="retry_sessions_loading"):
+        if st.button("Tentar novamente", key=retry_key):
             st.rerun()
         st.stop()
         return []

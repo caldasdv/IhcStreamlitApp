@@ -4,7 +4,7 @@
 
 Permitir que estudantes planejem, executem e acompanhem sessões de estudo com clareza e baixo atrito.
 
-Este repositório está na Sprint 0: a aplicação existente é um protótipo funcional e a base de arquitetura, segurança e planejamento foi documentada antes da próxima refatoração.
+O MVP funcional já passou pelas Sprints 0–11; a Sprint 12 possui plano de avaliação com usuários e o hardening técnico atual reforça consistência, isolamento e operação no Community Cloud.
 
 ## Stack
 
@@ -29,7 +29,7 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 - `src/repositories/`: contratos e adapters MongoDB.
 - `src/domain/`: regras testáveis sem Streamlit.
 - `tests/`: testes unitários de domínio e services.
-- A tela `Progresso` inclui métricas semanais e visualizações nativas por disciplina e por dia.
+- A tela `Progresso` inclui métricas semanais e visualizações Plotly por disciplina e por dia, com tabela textual equivalente.
 
 ## Regras atuais
 
@@ -43,8 +43,8 @@ O roadmap de evolução visual e componentes externos está em [docs/frontend-ro
 ## Rodar localmente
 
 ```bash
-pip install -r requirements.txt
-streamlit run app.py
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
 ```
 
 Para desenvolvimento e testes, instale também `requirements-dev.txt`.
@@ -70,11 +70,11 @@ em `MONGODB_DATABASE` no ambiente local.
 ## Execução e testes
 
 ```bash
-streamlit run app.py
-pytest -q
+python -m streamlit run app.py
+python -m pytest -q
 ```
 
-As primeiras regras de domínio já possuem testes em `tests/unit`; execute pytest após instalar `requirements-dev.txt`.
+As regras de domínio, services, transformações, gráficos e resultados de escrita dos repositories possuem testes em `tests/unit`; execute pytest após instalar `requirements-dev.txt`. O projeto suporta Python 3.11 a 3.14, conforme `pyproject.toml`.
 
 ## Rodar em uma VPS ou no Community Cloud
 

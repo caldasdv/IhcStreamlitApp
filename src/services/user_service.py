@@ -14,4 +14,6 @@ class UserService:
         return self.repository.find_or_create_by_identity(identity)
 
     def update_weekly_goal(self, user_id: Any, hours: float) -> None:
+        if not 1 <= hours <= 80:
+            raise ValueError("A meta semanal deve ficar entre 1 e 80 horas.")
         self.repository.update_weekly_goal(user_id, round(hours * 60))

@@ -15,7 +15,6 @@ services, user, subjects = load_page_context()
 render_account_sidebar(services, user)
 
 render_page_header("ACOMPANHAMENTO", "Seu progresso", "Entenda sua carga de estudos e o que já foi concluído.")
-progress_sessions = load_page_sessions(services, user, subjects)
 selected_week_day = st.date_input(
     "Escolha um dia da semana",
     value=date.today() - timedelta(days=date.today().weekday()),
@@ -26,17 +25,35 @@ week_start = selected_week_day - timedelta(days=selected_week_day.weekday())
 week_end = week_start + timedelta(days=6)
 if selected_week_day != week_start:
     st.caption(f"A semana exibida começa na segunda-feira, {week_start:%d/%m/%Y}.")
-week_sessions = [
-    session for session in progress_sessions
-    if week_start.isoformat() <= session["study_date"] <= week_end.isoformat()
-]
-subject_options = {"Todas as disciplinas": None}
-subject_options.update({subject["name"]: subject["_id"] for subject in subjects})
-selected_subject_name = st.selectbox("Disciplina", list(subject_options), key="progress_subject")
-selected_subject_id = subject_options[selected_subject_name]
-st.caption(f"Filtros ativos: semana de {week_start:%d/%m/%Y} a {week_end:%d/%m/%Y} · {selected_subject_name}.")
+progress_sessions = load_page_sessions(
+    services,
+    user,
+    subjects,
+    start_date=week_start,
+    end_date=week_end,
+    retry_key="retry_progress_sessions",
+)
+subjects_by_id = {subject["_id"]: subject for subject in subjects}
+subject_options = [None, *subjects_by_id]
+selected_subject_id = st.selectbox(
+    "Disciplina",
+    subject_options,
+    format_func=lambda value: (
+        "Todas as disciplinas" if value is None else subjects_by_id[value]["name"]
+    ),
+    key="progress_subject",
+)
+selected_subject_name = (
+    "Todas as disciplinas"
+    if selected_subject_id is None
+    else subjects_by_id[selected_subject_id]["name"]
+)
+st.caption(
+    f"Filtros ativos: semana de {week_start:%d/%m/%Y} a {week_end:%d/%m/%Y} "
+    f"· {selected_subject_name}."
+)
 filtered_week_sessions = [
-    session for session in week_sessions
+    session for session in progress_sessions
     if selected_subject_id is None or session["subject_id"] == selected_subject_id
 ]
 filtered_subjects = [
@@ -50,8 +67,11 @@ completed_minutes = sum(row["concluídos"] for row in week_summary)
 pending_count = sum(row["pendentes"] for row in week_summary)
 overdue_count = sum(row["atrasadas"] for row in week_summary)
 
-if not progress_sessions:
-    st.info("Adicione uma sessão para começar a acompanhar seu progresso.")
+if not filtered_week_sessions:
+    st.info(
+        "Não há sessões para os filtros selecionados. Escolha outra semana ou disciplina, "
+        "ou adicione uma nova sessão."
+    )
 else:
     metric_cols = st.columns(4)
     metric_cols[0].metric("Planejados", f"{planned_minutes} min", border=True)

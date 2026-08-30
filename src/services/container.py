@@ -27,8 +27,9 @@ class ApplicationServices:
 @st.cache_resource
 def get_application_services() -> ApplicationServices:
     database = get_database()
+    subject_repository = MongoSubjectRepository(database)
     return ApplicationServices(
         users=UserService(MongoUserRepository(database)),
-        subjects=SubjectService(MongoSubjectRepository(database)),
-        sessions=SessionService(MongoStudySessionRepository(database)),
+        subjects=SubjectService(subject_repository),
+        sessions=SessionService(MongoStudySessionRepository(database), subject_repository),
     )
