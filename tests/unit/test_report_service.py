@@ -33,3 +33,17 @@ def test_week_summary_always_has_seven_days_and_marks_overdue():
     assert result[0]["concluídos"] == 60
     assert result[1]["pendentes"] == 1
     assert result[6]["data"] == "2026-08-30"
+
+
+def test_subject_summary_can_be_limited_to_the_selected_week():
+    sessions = [
+        {"study_date": "2026-08-24", "duration": 60, "status": "Pendente", "subject_id": "ihc"},
+        {"study_date": "2026-09-01", "duration": 45, "status": "Pendente", "subject_id": "ihc"},
+    ]
+
+    selected_week = [session for session in sessions if "2026-08-24" <= session["study_date"] <= "2026-08-30"]
+
+    result = build_subject_summary(selected_week, SUBJECTS)
+
+    assert result[0]["planejados"] == 60
+    assert result[0]["atrasadas"] == 1

@@ -5,11 +5,16 @@ from datetime import date, time
 import streamlit as st
 
 from src.ui.context import load_page_context
+from src.ui.feedback import show_action_error
 from src.ui.sidebar import render_account_sidebar
 
 
 services, user, subjects = load_page_context()
 render_account_sidebar(services, user)
+
+if not subjects:
+    st.info("Cadastre uma disciplina antes de criar uma sessão.")
+    st.stop()
 
 st.caption("PLANEJAMENTO")
 st.title("Nova sessão")
@@ -34,5 +39,7 @@ if submitted:
         )
     except (ValueError, StopIteration) as error:
         st.error(str(error) if isinstance(error, ValueError) else "Selecione uma disciplina válida.")
+    except Exception as error:
+        show_action_error("adicionar a sessão", error)
     else:
         st.success("Sessão adicionada ao seu plano.")

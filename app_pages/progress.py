@@ -4,9 +4,8 @@ from datetime import date, timedelta
 
 import streamlit as st
 
-from src.domain.session_rules import effective_status
 from src.services.report_service import build_subject_summary, build_week_summary
-from src.ui.context import load_page_context
+from src.ui.context import load_page_context, load_page_sessions
 from src.ui.sidebar import render_account_sidebar
 
 
@@ -16,16 +15,23 @@ render_account_sidebar(services, user)
 st.caption("ACOMPANHAMENTO")
 st.title("Seu progresso")
 st.write("Entenda sua carga de estudos e o que já foi concluído.")
-progress_sessions = services.sessions.list_for_user(user["_id"], subjects)
-week_start = st.date_input(
-    "Início da semana",
+progress_sessions = load_page_sessions(services, user, subjects)
+selected_week_day = st.date_input(
+    "Escolha um dia da semana",
     value=date.today() - timedelta(days=date.today().weekday()),
     format="DD/MM/YYYY",
     key="progress_week_start",
 )
-week_start -= timedelta(days=week_start.weekday())
+week_start = selected_week_day - timedelta(days=selected_week_day.weekday())
+week_end = week_start + timedelta(days=6)
+if selected_week_day != week_start:
+    st.caption(f"A semana exibida começa na segunda-feira, {week_start:%d/%m/%Y}.")
 week_summary = build_week_summary(progress_sessions, week_start)
-subject_summary = build_subject_summary(progress_sessions, subjects)
+week_sessions = [
+    session for session in progress_sessions
+    if week_start.isoformat() <= session["study_date"] <= week_end.isoformat()
+]
+subject_summary = build_subject_summary(week_sessions, subjects)
 planned_minutes = sum(row["planejados"] for row in week_summary)
 completed_minutes = sum(row["concluídos"] for row in week_summary)
 pending_count = sum(row["pendentes"] for row in week_summary)
@@ -51,6 +57,22 @@ else:
             st.subheader("Ritmo ao longo da semana")
             st.caption("Compare a carga planejada com o que foi concluído em cada dia.")
             st.line_chart(week_summary, x="dia", y=["planejados", "concluídos"])
+
+    with st.expander("Ver dados da semana em tabela"):
+        st.dataframe(
+            [
+                {
+                    "Dia": row["dia"],
+                    "Planejados (min)": row["planejados"],
+                    "Concluídos (min)": row["concluídos"],
+                    "Pendências": row["pendentes"],
+                    "Atrasadas": row["atrasadas"],
+                }
+                for row in week_summary
+            ],
+            hide_index=True,
+            use_container_width=True,
+        )
 
     st.subheader("Detalhamento por disciplina")
     for row in subject_summary:

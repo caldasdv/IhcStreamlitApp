@@ -5,17 +5,15 @@ from __future__ import annotations
 import streamlit as st
 
 from src.services.container import ApplicationServices
+from src.ui.feedback import show_action_error
 
 
 def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
     st.sidebar.markdown("## Plano")
     st.sidebar.caption("Seu espaço de estudos")
     st.sidebar.divider()
-    st.sidebar.caption("Usuário de teste")
     st.sidebar.write(user["name"])
     st.sidebar.caption(user["email"])
-    st.sidebar.divider()
-    st.sidebar.caption("MongoDB Atlas · plano_estudos")
     st.sidebar.divider()
     st.sidebar.caption("Meta semanal")
     goal_hours = st.sidebar.number_input(
@@ -28,6 +26,10 @@ def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
         key="weekly_goal_hours",
     )
     if st.sidebar.button("Salvar meta", width="stretch"):
-        services.users.update_weekly_goal(user["_id"], goal_hours)
-        st.sidebar.success("Meta atualizada.")
-        st.rerun()
+        try:
+            services.users.update_weekly_goal(user["_id"], goal_hours)
+        except Exception as error:
+            show_action_error("atualizar sua meta", error)
+        else:
+            st.sidebar.success("Meta atualizada.")
+            st.rerun()

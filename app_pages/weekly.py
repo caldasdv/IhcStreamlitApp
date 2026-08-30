@@ -5,7 +5,8 @@ from datetime import date, timedelta
 import streamlit as st
 
 from src.domain.session_rules import effective_status
-from src.ui.context import load_page_context
+from src.ui.context import load_page_context, load_page_sessions
+from src.ui.feedback import show_action_error
 from src.ui.sidebar import render_account_sidebar
 
 
@@ -16,7 +17,7 @@ st.caption("PLANEJAMENTO")
 st.title("Visão semanal")
 st.write("Revise sua carga de estudos e conclua sessões rapidamente.")
 
-sessions = services.sessions.list_for_user(user["_id"], subjects)
+sessions = load_page_sessions(services, user, subjects)
 week_start = date.today() - timedelta(days=date.today().weekday())
 weekdays = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"]
 
@@ -35,5 +36,10 @@ for day_offset, weekday in enumerate(weekdays):
             row_col.write(f"**{session['study_time']} · {session['topic']}**")
             row_col.caption(f"{subject} · {session['duration']} min · {status}")
             if status != "Concluída" and action_col.button("Concluir", key=f"complete_{session['_id']}", width="stretch"):
-                services.sessions.complete(session["_id"], user["_id"])
-                st.rerun()
+                try:
+                    services.sessions.complete(session["_id"], user["_id"])
+                except Exception as error:
+                    show_action_error("concluir a sessão", error)
+                else:
+                    st.success("Sessão concluída.")
+                    st.rerun()
