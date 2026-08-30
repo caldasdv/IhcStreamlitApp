@@ -6,3 +6,6 @@ __pycache__/
 *.py[cod]
 estudos.db
 .streamlit/secrets.toml
+.pytest_cache/
+.coverage
+htmlcov/

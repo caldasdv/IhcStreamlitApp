@@ -21,7 +21,7 @@ def get_database():
         raise RuntimeError("MONGODB_URI não foi configurada nos Secrets ou no ambiente.")
     client = MongoClient(uri, server_api=ServerApi("1"), serverSelectionTimeoutMS=5000)
     client.admin.command("ping")
-    db = client["plano_estudos"]
+    db = client[get_database_name()]
     db.users.create_index("email", unique=True)
     db.subjects.create_index([("user_id", 1), ("name", 1)])
     db.study_sessions.create_index([("user_id", 1), ("study_date", 1), ("study_time", 1)])
@@ -30,12 +30,23 @@ def get_database():
 
 def get_mongodb_uri() -> str | None:
     try:
+        if "mongodb" in st.secrets and "uri" in st.secrets["mongodb"]:
+            return st.secrets["mongodb"]["uri"]
         if "MONGODB_URI" in st.secrets:
             return st.secrets["MONGODB_URI"]
     except Exception:
         # Localmente, st.secrets pode não existir; nesse caso usamos .env.
         pass
     return os.getenv("MONGODB_URI")
+
+
+def get_database_name() -> str:
+    try:
+        if "mongodb" in st.secrets and st.secrets["mongodb"].get("database"):
+            return st.secrets["mongodb"]["database"]
+    except Exception:
+        pass
+    return os.getenv("MONGODB_DATABASE", "plano_estudos")
 
 
 def seed_database(db) -> None:

@@ -1,6 +1,20 @@
 # Plano — planejador de estudos
 
-Protótipo de um planejador de estudos feito com Streamlit e MongoDB Atlas. O banco é preparado automaticamente na primeira execução e recebe um usuário de teste com disciplinas e sessões de exemplo.
+## Objetivo
+
+Permitir que estudantes planejem, executem e acompanhem sessões de estudo com clareza e baixo atrito.
+
+Este repositório está na Sprint 0: a aplicação existente é um protótipo funcional e a base de arquitetura, segurança e planejamento foi documentada antes da próxima refatoração.
+
+## Stack
+
+Python, Streamlit, PyMongo, MongoDB Atlas e pytest. Pandas/Plotly só serão adicionados quando uma necessidade real justificar o impacto no deploy.
+
+## Arquitetura
+
+O alvo é um monólito modular: Presentation (Streamlit) → Services → Domain → Repositories → MongoDB Atlas. O protótipo atual ainda concentra essas responsabilidades em `src/app.py`; a extração ocorrerá por fatias na Sprint 1.
+
+Veja [docs/architecture.md](docs/architecture.md), [docs/database.md](docs/database.md) e [docs/backlog.md](docs/backlog.md).
 
 ## Regras atuais
 
@@ -15,21 +29,34 @@ Protótipo de um planejador de estudos feito com Streamlit e MongoDB Atlas. O ba
 
 ```bash
 pip install -r requirements.txt
-streamlit run src/app.py
+streamlit run app.py
 ```
 
-## Variáveis de ambiente
+Para desenvolvimento e testes, instale também `requirements-dev.txt`.
 
-As credenciais locais ficam no arquivo `.env`, que não é versionado. Para configurar:
+## Configuração local e Secrets
+
+As credenciais locais ficam em `.env`, que não é versionado, com:
+
+```dotenv
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER/
+```
+
+No Streamlit Community Cloud, configure o Secret `MONGODB_URI` ou use o formato documentado em [.streamlit/secrets.toml.example](.streamlit/secrets.toml.example). Nunca commite `.env` ou `.streamlit/secrets.toml`.
+
+O banco padrão do protótipo é `plano_estudos`; a configuração de nome de banco será consolidada junto com a conexão na Sprint 1.
+
+## Execução e testes
 
 ```bash
-cp .env.example .env
+streamlit run app.py
+pytest -q
 ```
 
-Depois substitua `<db_password>` pela senha do usuário criado no MongoDB Atlas. A URI está disponível para a próxima etapa de migração do SQLite para o Atlas.
+No estado atual não há testes automatizados. As regras ainda estão acopladas ao módulo Streamlit e serão extraídas antes da cobertura unitária da Sprint 1.
 
 ## Rodar em uma VPS ou no Community Cloud
 
-Configure `MONGODB_URI` nas variáveis de ambiente da VPS ou nos Secrets do Community Cloud. O app não depende mais de SQLite ou Google Drive.
+Configure `MONGODB_URI` nas variáveis de ambiente ou nos Secrets do Community Cloud. O app não depende de SQLite, Google Drive ou armazenamento local persistente.
 
-O entrypoint da raiz (`app.py`) encaminha para `src/app.py`, então a aplicação funciona tanto com a configuração padrão do Community Cloud quanto apontando diretamente para `src/app.py`.
+O entrypoint da raiz (`app.py`) encaminha para `src/app.py`, portanto é o entrypoint recomendado no Community Cloud. Selecione o arquivo `app.py` na raiz e confirme que `requirements.txt` está sendo lido.
