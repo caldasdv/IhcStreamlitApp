@@ -7,6 +7,7 @@ import streamlit as st
 from src.domain.session_rules import effective_status
 from src.ui.context import load_page_context, load_page_sessions
 from src.ui.feedback import show_action_error
+from src.ui.feedback import set_success_flash
 from src.ui.sidebar import render_account_sidebar
 
 
@@ -41,5 +42,5 @@ for day_offset, weekday in enumerate(weekdays):
                 except Exception as error:
                     show_action_error("concluir a sessão", error)
                 else:
-                    st.success("Sessão concluída.")
+                    set_success_flash("Sessão concluída.")
                     st.rerun()

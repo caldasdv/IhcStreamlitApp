@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from src.ui.styles import apply_styles
 from src.ui.auth import require_login
+from src.ui.feedback import render_flash
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
@@ -20,6 +21,7 @@ def run_app() -> None:
     st.set_page_config(page_title="Plano", page_icon="◷", layout="wide")
     apply_styles()
     require_login()
+    render_flash()
     page = st.navigation(
         [
             st.Page("app_pages/overview.py", title="Visão geral", icon=":material/home:"),
