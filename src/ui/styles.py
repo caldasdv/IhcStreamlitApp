@@ -26,6 +26,7 @@ def apply_styles() -> None:
         .block-container { max-width: 1080px; padding-top: 2.25rem; padding-bottom: 5rem; }
         h1, h2, h3 { color: var(--plan-text); font-weight: 700; letter-spacing: -0.025em; overflow: visible; white-space: normal; overflow-wrap: break-word; }
         h1 { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.15; margin-bottom: .55rem; }
+        .plan-page-title { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.15; margin: 0 0 .55rem; }
         h2 { font-size: 1.55rem; line-height: 1.25; margin-top: 1.8rem; }
         h3 { font-size: 1.1rem; line-height: 1.3; }
         .plan-eyebrow { color: var(--plan-accent); display: block; font-size: .76rem; font-weight: 750; letter-spacing: .08em; line-height: 1.35; margin-bottom: .7rem; overflow: visible; white-space: normal; overflow-wrap: break-word; }
