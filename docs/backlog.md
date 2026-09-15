@@ -137,6 +137,18 @@ Como estudante quero associar uma disciplina antiga a um período para organizar
 - Complexidade: S
 - Status: DONE (integrada à `main` pela PR #24).
 
+### US-020
+
+Como estudante quero editar o nome e a cor de uma disciplina para manter meu plano atualizado.
+
+- Prioridade: P1
+- Critérios de aceitação: somente disciplina do usuário e do período atual pode ser editada; nome e cor
+  são validados; duplicidade é rejeitada; sessões existentes permanecem vinculadas; feedback de sucesso
+  e erro é apresentado.
+- Dependências: US-017 e repository de disciplinas.
+- Complexidade: M
+- Status: DONE (integrada à `main`).
+
 ## Ciclo de entrega
 
 As histórias abaixo fazem parte de um único ciclo consolidado de evolução do produto. A divisão histórica

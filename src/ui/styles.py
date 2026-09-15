@@ -48,6 +48,7 @@ def apply_styles() -> None:
         input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { outline: 3px solid var(--plan-attention); outline-offset: 2px; }
         button, input, textarea, select { min-height: 2.5rem; }
         .subject-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .35rem; vertical-align: .05rem; }
+        .plan-subject-swatch { width: 1rem; height: 1rem; border-radius: 50%; margin-bottom: .7rem; }
         @media (max-width: 640px) {
             .block-container { padding-top: 2.75rem; padding-left: 1rem; padding-right: 1rem; }
             h1 { font-size: 2rem; }

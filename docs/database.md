@@ -64,6 +64,9 @@ Finalidade: disciplinas pertencentes a um usuário.
 
 Relacionamento por referência a `users` e `academic_periods`; embedding não é adequado porque disciplinas são alteradas e consultadas separadamente. O índice `{user_id: 1, academic_period_id: 1, name: 1}` apoia a listagem do período. O índice parcial unique `{user_id: 1, academic_period_id: 1, name_normalized: 1}` permite repetir uma disciplina em semestres diferentes e impede duplicatas dentro do mesmo período. Documentos legados sem `academic_period_id` ficam fora do índice parcial e são listados explicitamente como “Sem período”; podem receber um período ativo por update manual filtrado por `_id + user_id + ausência de academic_period_id`.
 
+Escritas: criar e editar nome/cor de disciplina com filtro por `_id + user_id + academic_period_id`, ou
+associar disciplina legada por update manual filtrado por `_id + user_id + ausência de academic_period_id`.
+
 ### `study_sessions`
 
 Finalidade: planejamento e acompanhamento de sessões.

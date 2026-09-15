@@ -103,34 +103,48 @@ st.subheader("Sua semana")
 if not meetings:
     st.info("Sua grade ainda está vazia. Adicione o primeiro horário acima.")
 
-for weekday, weekday_name in enumerate(WEEKDAYS):
-    day_meetings = [meeting for meeting in meetings if meeting["weekday"] == weekday]
-    if not day_meetings:
-        continue
-    st.write(f"**{weekday_name}**")
-    for meeting in day_meetings:
-        with st.container(border=True):
-            st.write(
-                f"**{meeting['start_time']}–{meeting['end_time']} · "
-                f"{meeting['subject_name']}**"
-            )
-            if meeting.get("location"):
-                st.caption(f"Local: {meeting['location']}")
-            confirm_key = f"confirm_delete_class_{meeting['_id']}"
-            if st.button(
-                "Remover",
-                key=f"delete_class_{meeting['_id']}",
-                icon=":material/delete:",
-            ):
-                st.session_state[confirm_key] = True
-                st.rerun()
-            if st.session_state.get(confirm_key):
-                st.warning("Remover este horário da grade?")
-                with st.container(horizontal=True):
-                    if st.button(
+day_meetings_by_weekday = {
+    weekday: [meeting for meeting in meetings if meeting["weekday"] == weekday]
+    for weekday in range(len(WEEKDAYS))
+}
+day_tabs = st.tabs(
+    [
+        f"{weekday_name[:3]} ({len(day_meetings_by_weekday[weekday])})"
+        for weekday, weekday_name in enumerate(WEEKDAYS)
+    ]
+)
+for weekday, (weekday_name, day_tab) in enumerate(zip(WEEKDAYS, day_tabs)):
+    with day_tab:
+        day_meetings = day_meetings_by_weekday[weekday]
+        if not day_meetings:
+            st.caption("Nenhuma aula cadastrada neste dia.")
+            continue
+        for meeting in day_meetings:
+            with st.container(border=True):
+                info_col, action_col = st.columns([5, 1])
+                info_col.markdown(
+                    f"**{meeting['start_time']}–{meeting['end_time']}**  "
+                    f"\n\n{meeting['subject_name']}"
+                )
+                if meeting.get("location"):
+                    info_col.caption(f"Local: {meeting['location']}")
+                confirm_key = f"confirm_delete_class_{meeting['_id']}"
+                if action_col.button(
+                    "Remover",
+                    key=f"delete_class_{meeting['_id']}",
+                    icon=":material/delete:",
+                    width="stretch",
+                ):
+                    st.session_state[confirm_key] = True
+                    st.rerun()
+                if st.session_state.get(confirm_key):
+                    st.warning("Remover este horário da grade?")
+                    confirm_col, cancel_col = st.columns(2)
+                    if confirm_col.button(
                         "Confirmar remoção",
                         key=f"confirm_class_{meeting['_id']}",
                         type="primary",
+                        width="stretch",
                     ):
                         try:
                             services.class_meetings.delete(
@@ -142,8 +156,8 @@ for weekday, weekday_name in enumerate(WEEKDAYS):
                             st.session_state.pop(confirm_key, None)
                             set_success_flash("Horário removido da grade.")
                             st.rerun()
-                    if st.button(
-                        "Cancelar", key=f"cancel_class_{meeting['_id']}"
+                    if cancel_col.button(
+                        "Cancelar", key=f"cancel_class_{meeting['_id']}", width="stretch"
                     ):
                         st.session_state.pop(confirm_key, None)
                         st.rerun()

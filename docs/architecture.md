@@ -54,7 +54,7 @@ Presentation pode depender de Services e modelos de saída. Services podem depen
 
 - Documentos legados sem identidade não são associados automaticamente a uma conta autenticada; o seed demonstrativo não é executado pelo container da aplicação.
 - Documentos legados de disciplina ainda podem não possuir `name_normalized`; o service cobre duplicidade, mas uma migração controlada continua pendente.
-- Disciplinas ainda não estão vinculadas a períodos; essa associação requer fluxo explícito e tratamento dos dados legados.
+- Disciplinas novas pertencem ao período atual; registros legados podem ser associados manualmente por um fluxo explícito.
 - A configuração aceita o schema de Secrets (`mongodb.uri`/`mongodb.database`) e mantém fallback local por ambiente.
 - Falhas de rede, limites do plano do Atlas e reruns podem causar latência ou operações repetidas.
 - Há testes unitários, mas ainda faltam testes automatizados de UI, integração Atlas e validação de acessibilidade em navegador real.

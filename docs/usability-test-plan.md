@@ -44,7 +44,7 @@ se aplicável, gravação. Não ensinar o caminho antes da tarefa.
 1. Entre com sua conta e explique o que você entende da tela inicial.
 2. Crie uma sessão de 45 minutos para uma disciplina.
 3. Tente criar outra sessão em horário conflitante e explique o que faria após a mensagem.
-4. Encontre a sessão na visão semanal e selecione-a na agenda visual.
+4. Encontre a sessão na visão semanal, navegue até o dia correspondente e conclua-a no próprio card.
 5. Conclua a sessão e diga como sabe que a ação funcionou.
 6. Abra o progresso, escolha outra semana e uma disciplina; explique os gráficos e a tabela.
 7. Repita as tarefas 4 e 6 em viewport estreito e, quando possível, navegue por teclado.

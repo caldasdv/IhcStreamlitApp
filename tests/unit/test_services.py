@@ -66,6 +66,8 @@ class FakeSubjectRepository:
         self.normalized_names = set()
         self.created = []
         self.assigned = []
+        self.updated = []
+        self.period_subjects = []
 
     def belongs_to_user_period(self, user_id, subject_id, academic_period_id):
         return subject_id in self.valid_subject_ids and academic_period_id == "period-id"
@@ -74,7 +76,7 @@ class FakeSubjectRepository:
         return [
             {"_id": index, "name": name}
             for index, name in enumerate(getattr(self, "legacy_names", []))
-        ]
+        ] + self.period_subjects
 
     def list_by_period(self, user_id, academic_period_id):
         return [
@@ -113,6 +115,13 @@ class FakeSubjectRepository:
     ):
         self.assigned.append(
             (user_id, subject_id, academic_period_id, normalized_name)
+        )
+
+    def update(
+        self, user_id, subject_id, academic_period_id, name, normalized_name, color
+    ):
+        self.updated.append(
+            (user_id, subject_id, academic_period_id, name, normalized_name, color)
         )
 
 
@@ -220,6 +229,28 @@ def test_subject_service_does_not_assign_or_block_legacy_name_implicitly():
 def test_subject_service_rejects_invalid_color():
     with pytest.raises(ValueError, match="cor válida"):
         build_subject_service().create("user-id", "period-id", "IHC", "red")
+
+
+def test_subject_service_updates_owned_subject():
+    repository = FakeSubjectRepository()
+    repository.period_subjects = [
+        {"_id": "subject-id", "name": "IHC", "academic_period_id": "period-id"}
+    ]
+
+    build_subject_service(repository).update(
+        "user-id", "subject-id", "period-id", "Interação Humano-Computador", "#176B5D"
+    )
+
+    assert repository.updated == [
+        (
+            "user-id",
+            "subject-id",
+            "period-id",
+            "Interação Humano-Computador",
+            "interação humano-computador",
+            "#176B5D",
+        )
+    ]
 
 
 def test_subject_service_requires_active_owned_period():

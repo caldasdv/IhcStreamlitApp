@@ -185,6 +185,36 @@ class MongoSubjectRepository:
         except DuplicateKeyError as error:
             raise DuplicateSubjectError("Você já possui uma disciplina com esse nome.") from error
 
+    def update(
+        self,
+        user_id: Any,
+        subject_id: Any,
+        academic_period_id: Any,
+        name: str,
+        normalized_name: str,
+        color: str,
+    ) -> None:
+        try:
+            result = self.collection.update_one(
+                {
+                    "_id": subject_id,
+                    "user_id": user_id,
+                    "academic_period_id": academic_period_id,
+                },
+                {
+                    "$set": {
+                        "name": name,
+                        "name_normalized": normalized_name,
+                        "color": color,
+                        "updated_at": datetime.now(UTC),
+                    }
+                },
+            )
+        except DuplicateKeyError as error:
+            raise DuplicateSubjectError("Você já possui uma disciplina com esse nome.") from error
+        if result.matched_count == 0:
+            raise EntityNotFoundError("A disciplina não foi encontrada ou não pertence ao período atual.")
+
     def assign_legacy_to_period(
         self,
         user_id: Any,

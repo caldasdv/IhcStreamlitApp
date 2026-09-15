@@ -61,6 +61,16 @@ class SubjectRepository(Protocol):
         color: str,
     ) -> Any: ...
 
+    def update(
+        self,
+        user_id: Any,
+        subject_id: Any,
+        academic_period_id: Any,
+        name: str,
+        normalized_name: str,
+        color: str,
+    ) -> None: ...
+
     def assign_legacy_to_period(
         self,
         user_id: Any,

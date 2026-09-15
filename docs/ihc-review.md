@@ -53,6 +53,8 @@ precisam ser confirmados com uso real.
 | IHC-016 | Alto | A visão semanal empilhava sete blocos de dias, dificultando comparação e aumentando o deslocamento vertical. | Corrigido tecnicamente; validar compreensão da semana e localização do dia atual. |
 | IHC-017 | Alto | Usuários sem período ou disciplina encontravam bloqueios sem orientação sequencial na tela Hoje e em Nova sessão. | Corrigido tecnicamente; validar o primeiro uso completo sem instrução externa. |
 | IHC-018 | Médio | A visão semanal não permitia consultar semanas anteriores ou futuras. | Corrigido tecnicamente; validar se a navegação preserva o contexto esperado. |
+| IHC-019 | Alto | Disciplinas eram exibidas como uma lista simples e não podiam ser editadas. | Corrigido tecnicamente; validar compreensão da edição e prevenção de duplicidade. |
+| IHC-020 | Alto | A grade de aulas empilhava horários por dia, com pouca visão de conjunto e muito deslocamento vertical. | Corrigido tecnicamente; validar localização de aulas e remoção no celular. |
 
 ## Plano de avaliação seguinte
 

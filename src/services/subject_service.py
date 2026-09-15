@@ -56,6 +56,44 @@ class SubjectService:
             user_id, academic_period_id, cleaned_name, normalized_name, color
         )
 
+    def update(
+        self,
+        user_id: Any,
+        subject_id: Any,
+        academic_period_id: Any | None,
+        name: str,
+        color: str,
+    ) -> None:
+        if academic_period_id is None or not self.academic_period_repository.is_active_owned_by(
+            user_id, academic_period_id
+        ):
+            raise ValueError("Escolha um período acadêmico ativo antes de editar disciplinas.")
+        if not self.repository.belongs_to_user_period(
+            user_id, subject_id, academic_period_id
+        ):
+            raise ValueError("A disciplina não pertence ao período atual.")
+        cleaned_name = " ".join(name.split())
+        if not cleaned_name:
+            raise ValueError("Informe o nome da disciplina.")
+        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
+            raise ValueError("Selecione uma cor válida para a disciplina.")
+        normalized_name = normalize_subject_name(cleaned_name)
+        duplicate = any(
+            subject["_id"] != subject_id
+            and normalize_subject_name(str(subject.get("name", ""))) == normalized_name
+            for subject in self.repository.list_by_period(user_id, academic_period_id)
+        )
+        if duplicate:
+            raise DuplicateSubjectError("Você já possui uma disciplina com esse nome.")
+        self.repository.update(
+            user_id,
+            subject_id,
+            academic_period_id,
+            cleaned_name,
+            normalized_name,
+            color,
+        )
+
     def assign_legacy_to_period(
         self,
         user_id: Any,

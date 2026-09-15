@@ -178,9 +178,10 @@ planejada para a Sprint 12.
 
 **Status:** SPIKE CONCLUÍDO
 
-Foi implementada uma agenda semanal visual com Custom Component v2. Ela agrupa sessões por dia,
-permite selecionar uma sessão, usa tokens de tema e possui fallback para a lista nativa. A decisão
-e os limites estão registrados em `docs/decisions/ADR-004-custom-component-v2.md`.
+Foi implementada uma agenda semanal visual com Custom Component v2. Ela agrupava sessões por dia,
+permitia selecionar uma sessão, usava tokens de tema e possuía fallback para a lista nativa. A decisão
+e os limites estão registrados em `docs/decisions/ADR-004-custom-component-v2.md`. Atualmente, a lista
+nativa por abas é o fluxo principal por oferecer ações contextuais mais claras e melhor previsibilidade.
 
 **Limitação:** ainda é necessário validar a interação no Community Cloud e com estudantes antes de
 considerá-la uma substituição definitiva da visão semanal.

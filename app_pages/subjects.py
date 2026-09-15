@@ -44,18 +44,71 @@ if current_period_id is None:
             st.write(f"- {subject['name']}")
     st.stop()
 
+st.subheader("Disciplinas do período atual")
 if not subjects:
     st.info("Nenhuma disciplina cadastrada no período atual. Adicione a primeira abaixo.")
-for subject in subjects:
-    color = subject.get("color", "#787774")
-    safe_color = color if re.fullmatch(r"#[0-9A-Fa-f]{6}", color) else "#787774"
-    st.markdown(
-        f'<span style="display:inline-block;width:0.8rem;height:0.8rem;'
-        f'background:{safe_color};border-radius:50%;margin-right:0.45rem;" '
-        f'aria-label="Cor {escape(safe_color)}"></span> **{escape(subject["name"])}** '
-        f'<span style="color:#5f5e5b">({escape(safe_color)})</span>',
-        unsafe_allow_html=True,
-    )
+else:
+    subject_columns = st.columns(2)
+    for index, subject in enumerate(subjects):
+        color = subject.get("color", "#787774")
+        safe_color = color if re.fullmatch(r"#[0-9A-Fa-f]{6}", color) else "#787774"
+        with subject_columns[index % 2]:
+            with st.container(border=True):
+                st.markdown(
+                    f'<div class="plan-subject-swatch" style="background:{safe_color}" '
+                    f'aria-label="Cor da disciplina {escape(safe_color)}"></div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(f"**{escape(subject['name'])}**")
+                st.caption(f"Cor {safe_color}")
+                if st.button(
+                    "Editar disciplina",
+                    key=f"edit_subject_{subject['_id']}",
+                    icon=":material/edit:",
+                    width="stretch",
+                ):
+                    st.session_state["editing_subject_id"] = subject["_id"]
+                    st.rerun()
+
+editing_subject_id = st.session_state.get("editing_subject_id")
+editing_subject = next(
+    (subject for subject in subjects if subject["_id"] == editing_subject_id), None
+)
+if editing_subject:
+    st.divider()
+    with st.container(border=True):
+        st.subheader(f"Editar {editing_subject['name']}")
+        with st.form(f"edit_subject_{editing_subject['_id']}"):
+            edited_name = st.text_input("Nome da disciplina", value=editing_subject["name"])
+            edited_color = st.color_picker(
+                "Cor da disciplina", editing_subject.get("color", "#787774")
+            )
+            save_col, cancel_col = st.columns(2)
+            save_edit = save_col.form_submit_button(
+                "Salvar alterações", type="primary", width="stretch"
+            )
+            cancel_edit = cancel_col.form_submit_button("Cancelar", width="stretch")
+        if cancel_edit:
+            st.session_state.pop("editing_subject_id", None)
+            st.rerun()
+        if save_edit:
+            try:
+                services.subjects.update(
+                    user["_id"],
+                    editing_subject["_id"],
+                    current_period_id,
+                    edited_name,
+                    edited_color,
+                )
+            except ValueError as error:
+                st.error(str(error))
+            except Exception as error:
+                show_action_error("salvar a disciplina", error)
+            else:
+                st.session_state.pop("editing_subject_id", None)
+                set_success_flash("Disciplina atualizada.")
+                st.rerun()
+
 st.divider()
 with st.form("new_subject"):
     subject_name = st.text_input("Nome da nova disciplina")
