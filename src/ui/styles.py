@@ -11,7 +11,8 @@ def apply_styles() -> None:
         <style>
         :root {
             --plan-bg: #f5f6f1;
-            --plan-surface: #ffffff;
+            --plan-surface: #fbfcf8;
+            --plan-input: #eef3ed;
             --plan-text: #1e2d31;
             --plan-muted: #627174;
             --plan-border: #dfe6df;
@@ -31,10 +32,16 @@ def apply_styles() -> None:
         .plan-page-description { color: var(--plan-muted); font-size: 1.05rem; line-height: 1.55; max-width: 48rem; }
         [data-testid="stCaptionContainer"] p { color: var(--plan-muted); }
         [data-testid="stVerticalBlockBorderWrapper"] { background: var(--plan-surface); border-color: var(--plan-border); border-radius: 14px; box-shadow: 0 4px 18px rgba(30, 45, 49, .045); }
+        [data-baseweb="input"], [data-baseweb="textarea"], [data-baseweb="select"] > div { background: var(--plan-input); border-color: var(--plan-border); }
+        [data-baseweb="input"] input, [data-baseweb="textarea"] textarea { color: var(--plan-text); }
+        [data-testid="stMetric"] { background: var(--plan-surface); border: 1px solid var(--plan-border); border-radius: 14px; padding: 1rem; }
+        .plan-session-meta { color: var(--plan-muted); font-size: .82rem; margin-bottom: .3rem; }
+        .plan-session-topic { color: var(--plan-text); font-size: 1.2rem; font-weight: 700; line-height: 1.25; }
+        .plan-session-goal { color: var(--plan-muted); line-height: 1.45; margin-top: .45rem; }
         [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p { color: var(--plan-muted); }
         [data-testid="stSidebar"] h2 { color: var(--plan-accent-dark); letter-spacing: -.04em; }
         .stButton button, .stFormSubmitButton button { border-radius: 9px; border-width: 1px; box-shadow: none; font-weight: 650; min-height: 2.7rem; }
-        .stButton button[kind="primary"], .stFormSubmitButton button[kind="primary"] { background: var(--plan-accent); border-color: var(--plan-accent); }
+        .stButton button[kind="primary"], .stFormSubmitButton button[kind="primary"] { background: var(--plan-accent); border-color: var(--plan-accent); color: #ffffff; }
         .stButton button[kind="primary"]:hover, .stFormSubmitButton button[kind="primary"]:hover { background: var(--plan-accent-dark); border-color: var(--plan-accent-dark); }
         .stButton button:focus-visible, .stFormSubmitButton button:focus-visible,
         input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { outline: 3px solid var(--plan-attention); outline-offset: 2px; }

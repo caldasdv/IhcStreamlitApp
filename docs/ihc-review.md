@@ -29,6 +29,9 @@ precisam ser confirmados com uso real.
   necessidade de selecionar novamente o item em um controle separado.
 - A fundação visual foi alinhada a uma identidade de estudo com hierarquia de tipografia, contraste,
   superfícies e ação primária consistentes entre as telas.
+- O fundo do tema, os cards, os inputs e as métricas passaram a usar uma escala coerente de superfícies,
+  reduzindo os blocos brancos desconectados.
+- Os cards de sessão passaram a separar visualmente horário, disciplina, assunto e objetivo.
 
 ## Achados ainda pendentes
 
@@ -41,6 +44,7 @@ precisam ser confirmados com uso real.
 | IHC-012 | Médio | O formulário de nova sessão distribuía campos em três colunas sem evidência de comportamento adequado em celular. | Corrigido tecnicamente; verificar em viewport estreito e teclado. |
 | IHC-013 | Alto | A ação de concluir ficava separada do card e exigia uma segunda seleção da sessão. | Corrigido tecnicamente; validar tempo e erros na tarefa de registrar estudo. |
 | IHC-014 | Médio | A interface usava a aparência padrão do Streamlit com pouca diferenciação entre hierarquia e ações. | Corrigido tecnicamente; validar legibilidade, contraste e compreensão visual no navegador. |
+| IHC-015 | Médio | O tema e o CSS usavam fundos diferentes, criando áreas brancas visualmente desconectadas. | Corrigido tecnicamente; validar em todas as páginas e temas do Community Cloud. |
 
 ## Plano de avaliação seguinte
 

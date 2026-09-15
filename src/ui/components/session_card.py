@@ -15,7 +15,11 @@ def render_session_card(row: dict, *, key: str) -> str | None:
     """Renderiza uma sessão e retorna a ação solicitada pelo usuário."""
     with st.container(border=True):
         info_col, status_col = st.columns([5, 1])
-        info_col.caption(f"{row['study_time']} · {row['duration']} minutos")
+        info_col.markdown(
+            f'<div class="plan-session-meta">{escape(str(row["study_time"]))} · '
+            f'{escape(str(row["duration"]))} minutos</div>',
+            unsafe_allow_html=True,
+        )
         subject_color = row.get("subject_color", "#787774")
         if isinstance(subject_color, str) and re.fullmatch(r"#[0-9A-Fa-f]{6}", subject_color):
             safe_subject_name = escape(str(row["subject_name"]))
@@ -26,9 +30,15 @@ def render_session_card(row: dict, *, key: str) -> str | None:
             )
         else:
             info_col.write(f"**{row['subject_name']}**")
-        info_col.subheader(row["topic"])
+        info_col.markdown(
+            f'<div class="plan-session-topic">{escape(str(row["topic"]))}</div>',
+            unsafe_allow_html=True,
+        )
         if row["goal"]:
-            info_col.write(row["goal"])
+            info_col.markdown(
+                f'<div class="plan-session-goal">{escape(str(row["goal"]))}</div>',
+                unsafe_allow_html=True,
+            )
         status = effective_status(row)
         with status_col:
             render_status(status)
