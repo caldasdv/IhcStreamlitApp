@@ -5,12 +5,9 @@ Este diretório concentra as fontes de verdade do Plano. Documentos históricos 
 ## Estado atual
 
 - MVP operacional: autenticação Google OIDC, isolamento por usuário, disciplinas, sessões de estudo, agenda semanal, progresso e meta semanal.
-- Sprint 13: hardening concluído e incorporado à `main` pelo PR #20.
-- Sprint 14: períodos acadêmicos integrados à `main` pelo PR #21.
-- Sprint 15: associação de disciplinas ao período atual integrada à `main` pela PR #22.
-- Sprint 16: grade semanal de aulas integrada à `main` pela PR #23.
-- Sprint 17: associação manual de disciplinas legadas integrada à `main` pela PR #24.
-- Sprint 12: protocolo de avaliação preparado, ainda pendente de participantes e evidência real.
+- Entregas funcionais integradas à `main`: hardening, períodos acadêmicos, disciplinas por período,
+  grade semanal e associação manual de disciplinas legadas.
+- Protocolo de avaliação de usabilidade preparado, ainda pendente de participantes e evidência real.
 - Próxima decisão: integração da grade com o planejamento de sessões e política para mover disciplinas já associadas.
 
 ## Fontes de verdade
@@ -20,7 +17,7 @@ Este diretório concentra as fontes de verdade do Plano. Documentos históricos 
 | [architecture.md](architecture.md) | arquitetura, dependências, fluxo e riscos |
 | [domain.md](domain.md) | conceitos, entidades, estados e invariantes |
 | [database.md](database.md) | collections, campos, índices e padrões de acesso |
-| [backlog.md](backlog.md) | Product Goal, histórias, prioridades e sprints |
+| [backlog.md](backlog.md) | Product Goal, histórias, prioridades e status das entregas |
 | [frontend-roadmap.md](frontend-roadmap.md) | decisões e evolução de frontend/IHC |
 | [usability-test-plan.md](usability-test-plan.md) | protocolo ainda não executado de avaliação com usuários |
 | [ihc-review.md](ihc-review.md) | inspeção estática de IHC já realizada e suas limitações |

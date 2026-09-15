@@ -137,7 +137,11 @@ Como estudante quero associar uma disciplina antiga a um período para organizar
 - Complexidade: S
 - Status: DONE (integrada à `main` pela PR #24).
 
-## Sprints
+## Ciclo de entrega
+
+As histórias abaixo fazem parte de um único ciclo consolidado de evolução do produto. A divisão histórica
+em etapas permanece somente como contexto de implementação; o status vigente é determinado pela integração
+na `main` e pelos critérios de aceitação.
 
 ### Sprint 0 — Arquitetura e setup
 
@@ -330,9 +334,9 @@ A integração entre aulas e bloqueio de sessões de estudo não pertence a esta
 **Definition of Done:** critérios da US-018 atendidos; regras testadas sem Atlas; queries filtram usuário e
 período; página possui estados recuperáveis; documentação e smoke test atualizados.
 
-### Sprint 17 — Associação manual de disciplinas legadas
+### Entrega consolidada — Associação manual de disciplinas legadas
 
-**Status:** DONE (integrada à `main` pela PR #24).
+**Status:** DONE (integrada à `main`).
 
 **Objetivo:** permitir que o usuário atribua conscientemente disciplinas antigas sem período a um período ativo.
 

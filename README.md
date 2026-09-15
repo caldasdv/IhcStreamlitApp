@@ -6,7 +6,7 @@ Aplicação publicada: [planejadordeestudos.streamlit.app](https://planejadordee
 
 ## Estado atual
 
-O MVP está operacional e as entregas funcionais até a Sprint 17 foram integradas. A avaliação de usabilidade da Sprint 12 possui protocolo pronto, mas ainda depende de participantes e não deve ser considerada concluída.
+O MVP está operacional e as entregas funcionais estão integradas à `main`. O protocolo de avaliação de usabilidade está pronto, mas ainda depende de participantes e não deve ser considerado concluído.
 
 Principais fluxos:
 

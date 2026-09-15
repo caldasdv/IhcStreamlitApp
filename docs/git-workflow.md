@@ -2,9 +2,10 @@
 
 ## Estado observado
 
-O histórico preserva todas as entregas e PRs, mas branches antigas receberam merges intermediários de `main` e algumas histórias aparecem em mais de uma linha de integração. Isso aumenta o ruído visual, porém não justifica reescrever commits já publicados.
+O histórico preserva todas as entregas e PRs. As branches temporárias antigas foram removidas após a integração;
+`main` é a única branch persistente do projeto.
 
-Decisão: preservar o histórico existente e aplicar um fluxo mais simples a partir das próximas sprints.
+Decisão: preservar o histórico existente e consolidar o trabalho na `main`.
 
 ## Fluxo obrigatório
 
@@ -15,19 +16,21 @@ git switch main
 git pull --ff-only origin main
 ```
 
-### 2. Criar uma branch por entrega
+### 2. Trabalhar na branch consolidada
 
 ```bash
-git switch -c feat/sprint-XX-descricao
+git switch main
 ```
 
-Prefixos usuais:
+Para uma alteração que precise de Pull Request, uma branch temporária pode ser criada a partir da `main`,
+mas deve ser removida local e remotamente depois da integração. Não manter branches de sprint ou branches
+históricas no repositório remoto.
+
+Prefixos opcionais para branches temporárias:
 
 ```text
 feat/  fix/  docs/  test/  chore/
 ```
-
-Não reutilizar branch mesclada e não misturar duas sprints independentes.
 
 ### 3. Commits coesos
 
@@ -48,9 +51,10 @@ O PR deve conter objetivo, escopo, riscos, migração de dados, validações exe
 
 Se a branch tiver um único commit coeso, merge commit ou squash produzem resultado aceitável. Se houver vários commits de correção intermediária, prefira squash no GitHub. Depois do merge, remova a branch remota quando não houver trabalho dependente.
 
-### 5. Próxima sprint
+### 5. Continuidade
 
-Não crie a próxima branch a partir de uma feature ainda aberta. Espere o merge, atualize `main` e crie a nova branch. Exceções exigem uma estratégia explícita de PRs empilhados.
+Após cada entrega, atualize a `main` e continue nela. O backlog organiza histórias e prioridades, não uma
+coleção de branches permanentes.
 
 ## Verificações antes do push
 
