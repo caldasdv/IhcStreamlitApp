@@ -23,7 +23,7 @@ def apply_styles() -> None:
         .stApp { background: var(--plan-bg); color: var(--plan-text); }
         [data-testid="stSidebar"] { background: #eaf0e9; border-right: 1px solid var(--plan-border); }
         [data-testid="stSidebar"] section { padding-top: 1.25rem; }
-        .block-container { max-width: 1080px; padding-top: 2.25rem; padding-bottom: 5rem; }
+        .block-container { max-width: 1080px; padding-top: 4rem; padding-bottom: 5rem; }
         h1, h2, h3 { color: var(--plan-text); font-weight: 700; letter-spacing: -0.025em; overflow: visible; white-space: normal; overflow-wrap: break-word; }
         h1 { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.15; margin-bottom: .55rem; }
         .plan-page-title { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.15; margin: 0 0 .55rem; }
@@ -49,7 +49,7 @@ def apply_styles() -> None:
         button, input, textarea, select { min-height: 2.5rem; }
         .subject-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .35rem; vertical-align: .05rem; }
         @media (max-width: 640px) {
-            .block-container { padding-top: 1.5rem; padding-left: 1rem; padding-right: 1rem; }
+            .block-container { padding-top: 2.75rem; padding-left: 1rem; padding-right: 1rem; }
             h1 { font-size: 2rem; }
             [data-testid="stHorizontalBlock"] { gap: .5rem; }
         }
