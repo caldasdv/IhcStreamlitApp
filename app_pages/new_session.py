@@ -20,9 +20,13 @@ current_subjects = load_current_period_subjects(
 
 if current_period_id is None:
     st.info("Defina um período acadêmico atual antes de criar uma sessão.")
+    if st.button("Criar período acadêmico", type="primary", icon=":material/date_range:"):
+        st.switch_page("app_pages/academic_periods.py")
     st.stop()
 if not current_subjects:
     st.info("Cadastre uma disciplina no período atual antes de criar uma sessão.")
+    if st.button("Adicionar disciplina", type="primary", icon=":material/menu_book:"):
+        st.switch_page("app_pages/subjects.py")
     st.stop()
 
 render_page_header("PLANEJAMENTO", "Nova sessão", "Defina uma sessão pequena e objetiva para facilitar o início do estudo.")

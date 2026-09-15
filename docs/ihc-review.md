@@ -34,6 +34,9 @@ precisam ser confirmados com uso real.
 - Os cards de sessão passaram a separar visualmente horário, disciplina, assunto e objetivo.
 - A visão semanal passou a resumir a carga no topo e organizar os dias em abas, reduzindo a coluna
   vertical de sete blocos e mantendo a conclusão no card da sessão.
+- A tela Hoje passou a orientar o primeiro uso com ações sequenciais para criar período e disciplina;
+  bloqueios da tela Nova sessão também oferecem a ação de recuperação correspondente.
+- A visão semanal passou a permitir navegar para a semana anterior, atual ou seguinte.
 
 ## Achados ainda pendentes
 
@@ -48,6 +51,8 @@ precisam ser confirmados com uso real.
 | IHC-014 | Médio | A interface usava a aparência padrão do Streamlit com pouca diferenciação entre hierarquia e ações. | Corrigido tecnicamente; validar legibilidade, contraste e compreensão visual no navegador. |
 | IHC-015 | Médio | O tema e o CSS usavam fundos diferentes, criando áreas brancas visualmente desconectadas. | Corrigido tecnicamente; validar em todas as páginas e temas do Community Cloud. |
 | IHC-016 | Alto | A visão semanal empilhava sete blocos de dias, dificultando comparação e aumentando o deslocamento vertical. | Corrigido tecnicamente; validar compreensão da semana e localização do dia atual. |
+| IHC-017 | Alto | Usuários sem período ou disciplina encontravam bloqueios sem orientação sequencial na tela Hoje e em Nova sessão. | Corrigido tecnicamente; validar o primeiro uso completo sem instrução externa. |
+| IHC-018 | Médio | A visão semanal não permitia consultar semanas anteriores ou futuras. | Corrigido tecnicamente; validar se a navegação preserva o contexto esperado. |
 
 ## Plano de avaliação seguinte
 

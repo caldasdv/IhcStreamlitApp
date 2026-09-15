@@ -18,7 +18,22 @@ render_account_sidebar(services, user)
 
 render_page_header("PLANEJAMENTO", "Visão semanal", "Revise sua carga de estudos e conclua sessões rapidamente.")
 
-week_start = date.today() - timedelta(days=date.today().weekday())
+if "weekly_week_offset" not in st.session_state:
+    st.session_state["weekly_week_offset"] = 0
+navigation_columns = st.columns(3)
+if navigation_columns[0].button("Semana anterior", icon=":material/chevron_left:", width="stretch"):
+    st.session_state["weekly_week_offset"] -= 1
+    st.rerun()
+if navigation_columns[1].button("Semana atual", width="stretch"):
+    st.session_state["weekly_week_offset"] = 0
+    st.rerun()
+if navigation_columns[2].button("Próxima semana", icon=":material/chevron_right:", width="stretch"):
+    st.session_state["weekly_week_offset"] += 1
+    st.rerun()
+
+week_start = date.today() - timedelta(days=date.today().weekday()) + timedelta(
+    weeks=st.session_state["weekly_week_offset"]
+)
 week_end = week_start + timedelta(days=6)
 sessions = load_page_sessions(
     services,

@@ -20,15 +20,39 @@ from src.ui.sidebar import render_account_sidebar
 services, user, subjects = load_page_context()
 render_account_sidebar(services, user)
 current_period_id = user.get("current_academic_period_id")
-current_subjects = load_current_period_subjects(
-    services, user, retry_key="retry_overview_subjects"
-)
 
 render_page_header(
     "SEMANA DE ESTUDOS",
     f"Olá, {user['name'].split()[0]}",
     "Aqui está o que você planejou para os próximos dias.",
 )
+if current_period_id is None:
+    with st.container(border=True):
+        st.subheader("Vamos preparar seu plano")
+        st.write("Crie um período acadêmico para depois adicionar disciplinas e sessões de estudo.")
+        if st.button(
+            "Criar período acadêmico",
+            type="primary",
+            icon=":material/date_range:",
+        ):
+            st.switch_page("app_pages/academic_periods.py")
+    st.stop()
+
+current_subjects = load_current_period_subjects(
+    services, user, retry_key="retry_overview_subjects"
+)
+if not current_subjects:
+    with st.container(border=True):
+        st.subheader("Seu período está pronto")
+        st.write("Adicione sua primeira disciplina para começar a planejar sessões de estudo.")
+        if st.button(
+            "Adicionar disciplina",
+            type="primary",
+            icon=":material/menu_book:",
+        ):
+            st.switch_page("app_pages/subjects.py")
+    st.stop()
+
 week_start = date.today() - timedelta(days=date.today().weekday())
 week_end = week_start + timedelta(days=6)
 selected_date = st.date_input("Ver dia", value=date.today(), format="DD/MM/YYYY", key="overview_date")
