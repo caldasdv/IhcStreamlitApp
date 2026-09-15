@@ -11,7 +11,8 @@ from src.domain.session_rules import effective_status
 from src.ui.components.status_badge import render_status
 
 
-def render_session_card(row: dict) -> None:
+def render_session_card(row: dict, *, key: str) -> str | None:
+    """Renderiza uma sessão e retorna a ação solicitada pelo usuário."""
     with st.container(border=True):
         info_col, status_col = st.columns([5, 1])
         info_col.caption(f"{row['study_time']} · {row['duration']} minutos")
@@ -31,3 +32,11 @@ def render_session_card(row: dict) -> None:
         status = effective_status(row)
         with status_col:
             render_status(status)
+        if status != "Concluída" and st.button(
+            "Marcar como concluída",
+            key=f"{key}_complete",
+            type="primary",
+            width="stretch",
+        ):
+            return "complete"
+    return None

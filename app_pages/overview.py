@@ -80,7 +80,15 @@ st.subheader(f"{weekdays[selected_date.weekday()]}, {selected_date.day:02d}/{sel
 if not day_sessions:
     st.info("Nenhuma sessão planejada para este dia.")
 for row in day_sessions:
-    render_session_card(row)
+    action = render_session_card(row, key=f"overview_session_{row['_id']}")
+    if action == "complete":
+        try:
+            services.sessions.complete(row["_id"], user["_id"])
+        except Exception as error:
+            show_action_error("concluir a sessão", error)
+        else:
+            set_success_flash("Sessão concluída.")
+            st.rerun()
 if day_sessions:
     st.subheader("Atualizar sessão")
     sessions_by_id = {item["_id"]: item for item in day_sessions}
@@ -93,16 +101,7 @@ if day_sessions:
         key="overview_session",
     )
     chosen = next(item for item in day_sessions if item["_id"] == chosen_id)
-    action_col1, action_col2 = st.columns([1, 1])
-    if effective_status(chosen) != "Concluída" and action_col1.button("Marcar como concluída", width="stretch"):
-        try:
-            services.sessions.complete(chosen["_id"], user["_id"])
-        except Exception as error:
-            show_action_error("concluir a sessão", error)
-        else:
-            set_success_flash("Sessão concluída.")
-            st.rerun()
-    if action_col2.button("Excluir sessão", width="stretch"):
+    if st.button("Excluir sessão", width="stretch"):
         st.session_state["confirm_delete_session_id"] = chosen["_id"]
         st.rerun()
 
