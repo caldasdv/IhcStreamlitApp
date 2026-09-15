@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import streamlit as st
 
 from src.domain.session_rules import effective_status
+from src.ui.components.session_card import render_session_card
 from src.ui.context import load_page_context, load_page_sessions
 from src.ui.components.page_header import render_page_header
 from src.ui.feedback import show_action_error
@@ -37,26 +38,38 @@ weekdays = [
     "domingo",
 ]
 
+planned_minutes = sum(session["duration"] for session in sessions)
+pending_sessions = [
+    session for session in sessions if effective_status(session) != "Concluída"
+]
+st.caption(f"{week_start:%d/%m} a {week_end:%d/%m/%Y}")
+summary_columns = st.columns(3)
+summary_columns[0].metric("Sessões", len(sessions))
+summary_columns[1].metric("Tempo planejado", f"{planned_minutes} min")
+summary_columns[2].metric("Pendentes", len(pending_sessions))
+
 if not sessions:
     st.info("Sua semana ainda está vazia. Crie uma sessão para começar a organizar seus estudos.")
     if st.button("Criar nova sessão", type="primary", icon=":material/add_circle:"):
         st.switch_page("app_pages/new_session.py")
 
-for day_offset, weekday in enumerate(weekdays):
+day_tabs = st.tabs(
+    [
+        f"{weekday[:3].title()} {week_start + timedelta(days=day_offset):%d/%m}"
+        for day_offset, weekday in enumerate(weekdays)
+    ]
+)
+for day_offset, (weekday, day_tab) in enumerate(zip(weekdays, day_tabs)):
     current_day = week_start + timedelta(days=day_offset)
     day_sessions = [session for session in sessions if session["study_date"] == current_day.isoformat()]
-    with st.container(border=True):
+    with day_tab:
         st.subheader(f"{weekday}, {current_day:%d/%m/%Y}")
         if not day_sessions:
             st.caption("Nenhuma sessão planejada.")
             continue
         for session in day_sessions:
-            subject = session.get("subject_name", "Sem disciplina")
-            status = effective_status(session)
-            row_col, action_col = st.columns([5, 1])
-            row_col.write(f"**{session['study_time']} · {session['topic']}**")
-            row_col.caption(f"{subject} · {session['duration']} min · {status}")
-            if status != "Concluída" and action_col.button("Concluir", key=f"complete_{session['_id']}", width="stretch"):
+            action = render_session_card(session, key=f"weekly_session_{session['_id']}")
+            if action == "complete":
                 try:
                     services.sessions.complete(session["_id"], user["_id"])
                 except Exception as error:

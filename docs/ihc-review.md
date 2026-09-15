@@ -32,6 +32,8 @@ precisam ser confirmados com uso real.
 - O fundo do tema, os cards, os inputs e as métricas passaram a usar uma escala coerente de superfícies,
   reduzindo os blocos brancos desconectados.
 - Os cards de sessão passaram a separar visualmente horário, disciplina, assunto e objetivo.
+- A visão semanal passou a resumir a carga no topo e organizar os dias em abas, reduzindo a coluna
+  vertical de sete blocos e mantendo a conclusão no card da sessão.
 
 ## Achados ainda pendentes
 
@@ -45,6 +47,7 @@ precisam ser confirmados com uso real.
 | IHC-013 | Alto | A ação de concluir ficava separada do card e exigia uma segunda seleção da sessão. | Corrigido tecnicamente; validar tempo e erros na tarefa de registrar estudo. |
 | IHC-014 | Médio | A interface usava a aparência padrão do Streamlit com pouca diferenciação entre hierarquia e ações. | Corrigido tecnicamente; validar legibilidade, contraste e compreensão visual no navegador. |
 | IHC-015 | Médio | O tema e o CSS usavam fundos diferentes, criando áreas brancas visualmente desconectadas. | Corrigido tecnicamente; validar em todas as páginas e temas do Community Cloud. |
+| IHC-016 | Alto | A visão semanal empilhava sete blocos de dias, dificultando comparação e aumentando o deslocamento vertical. | Corrigido tecnicamente; validar compreensão da semana e localização do dia atual. |
 
 ## Plano de avaliação seguinte
 
