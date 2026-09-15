@@ -27,6 +27,8 @@ precisam ser confirmados com uso real.
   telas estreitas.
 - A conclusão de uma sessão passou a ficar no próprio card da sessão na tela Hoje, reduzindo a
   necessidade de selecionar novamente o item em um controle separado.
+- A fundação visual foi alinhada a uma identidade de estudo com hierarquia de tipografia, contraste,
+  superfícies e ação primária consistentes entre as telas.
 
 ## Achados ainda pendentes
 
@@ -38,6 +40,7 @@ precisam ser confirmados com uso real.
 | IHC-011 | Alto | A visão semanal duplicava a agenda visual e a lista, dificultando identificar a representação principal. | Corrigido tecnicamente; validar a compreensão da semana em teste com usuários. |
 | IHC-012 | Médio | O formulário de nova sessão distribuía campos em três colunas sem evidência de comportamento adequado em celular. | Corrigido tecnicamente; verificar em viewport estreito e teclado. |
 | IHC-013 | Alto | A ação de concluir ficava separada do card e exigia uma segunda seleção da sessão. | Corrigido tecnicamente; validar tempo e erros na tarefa de registrar estudo. |
+| IHC-014 | Médio | A interface usava a aparência padrão do Streamlit com pouca diferenciação entre hierarquia e ações. | Corrigido tecnicamente; validar legibilidade, contraste e compreensão visual no navegador. |
 
 ## Plano de avaliação seguinte
 
