@@ -23,23 +23,37 @@ def run_app() -> None:
     require_login()
     render_flash()
     page = st.navigation(
-        [
-            st.Page("app_pages/overview.py", title="Visão geral", icon=":material/home:"),
-            st.Page("app_pages/new_session.py", title="Nova sessão", icon=":material/add_circle:"),
-            st.Page("app_pages/weekly.py", title="Visão semanal", icon=":material/calendar_view_week:"),
-            st.Page("app_pages/progress.py", title="Progresso", icon=":material/analytics:"),
-            st.Page("app_pages/subjects.py", title="Disciplinas", icon=":material/menu_book:"),
-            st.Page(
-                "app_pages/class_schedule.py",
-                title="Grade de aulas",
-                icon=":material/calendar_view_week:",
-            ),
-            st.Page(
-                "app_pages/academic_periods.py",
-                title="Períodos acadêmicos",
-                icon=":material/date_range:",
-            ),
-        ],
+        {
+            "Plano": [
+                st.Page("app_pages/overview.py", title="Hoje", icon=":material/home:"),
+                st.Page(
+                    "app_pages/new_session.py",
+                    title="Nova sessão",
+                    icon=":material/add_circle:",
+                ),
+                st.Page(
+                    "app_pages/weekly.py",
+                    title="Semana",
+                    icon=":material/calendar_view_week:",
+                ),
+            ],
+            "Acompanhar": [
+                st.Page("app_pages/progress.py", title="Progresso", icon=":material/analytics:")
+            ],
+            "Organizar": [
+                st.Page("app_pages/subjects.py", title="Disciplinas", icon=":material/menu_book:"),
+                st.Page(
+                    "app_pages/class_schedule.py",
+                    title="Grade de aulas",
+                    icon=":material/calendar_view_week:",
+                ),
+                st.Page(
+                    "app_pages/academic_periods.py",
+                    title="Períodos acadêmicos",
+                    icon=":material/date_range:",
+                ),
+            ],
+        },
         position="sidebar",
     )
     page.run()

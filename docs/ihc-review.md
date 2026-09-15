@@ -20,6 +20,11 @@ precisam ser confirmados com uso real.
 - Indicadores de status continuam acompanhados por texto, e o contraste de captions foi reforçado.
 - Foi adicionada indicação visual da cor da disciplina com o valor hexadecimal legível.
 - Foi preservada a confirmação antes da exclusão.
+- A navegação foi agrupada por atividade e a área principal passou a ser chamada de “Hoje”.
+- A visão semanal deixou de duplicar a mesma informação em agenda customizada e lista nativa; a lista
+  acionável é agora a representação principal.
+- O formulário de nova sessão deixou de usar três colunas, reduzindo risco de corte e compressão em
+  telas estreitas.
 
 ## Achados ainda pendentes
 
@@ -28,6 +33,8 @@ precisam ser confirmados com uso real.
 | IHC-002 | Resolvido tecnicamente / validar | Google OIDC e isolamento por `provider + subject` foram implementados. | Confirmar login, logout e isolamento com duas contas no Community Cloud. |
 | IHC-007 | Médio | Editar/excluir está disponível na visão geral, mas não na visão semanal. | Observar a tarefa de correção do plano e decidir se ações rápidas são necessárias. |
 | IHC-010 | Médio / hipótese | CSS usa seletores internos do Streamlit e pode variar após atualização. | Verificar visualmente no Community Cloud após cada atualização relevante. |
+| IHC-011 | Alto | A visão semanal duplicava a agenda visual e a lista, dificultando identificar a representação principal. | Corrigido tecnicamente; validar a compreensão da semana em teste com usuários. |
+| IHC-012 | Médio | O formulário de nova sessão distribuía campos em três colunas sem evidência de comportamento adequado em celular. | Corrigido tecnicamente; verificar em viewport estreito e teclado. |
 
 ## Plano de avaliação seguinte
 

@@ -35,10 +35,11 @@ with st.form("new_session"):
     )
     topic = st.text_input("O que você vai estudar?", placeholder="Ex.: Heurísticas de Nielsen")
     goal = st.text_area("Objetivo da sessão", placeholder="Ex.: revisar as heurísticas e anotar exemplos")
-    col1, col2, col3 = st.columns(3)
-    study_date = col1.date_input("Data", value=date.today(), format="DD/MM/YYYY")
-    study_time = col2.time_input("Horário", value=time(14, 0), step=900)
-    duration = col3.selectbox("Duração", [25, 45, 60, 90, 120], index=2, format_func=lambda x: f"{x} minutos")
+    study_date = st.date_input("Data", value=date.today(), format="DD/MM/YYYY")
+    study_time = st.time_input("Horário", value=time(14, 0), step=900)
+    duration = st.selectbox(
+        "Duração", [25, 45, 60, 90, 120], index=2, format_func=lambda x: f"{x} minutos"
+    )
     priority = st.selectbox("Prioridade", ["Baixa", "Média", "Alta"], index=1)
     submitted = st.form_submit_button("Adicionar sessão", type="primary", width="stretch")
 if submitted:
