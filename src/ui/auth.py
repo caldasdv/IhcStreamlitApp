@@ -12,7 +12,13 @@ def _auth_is_configured() -> bool:
         auth = st.secrets.get("auth", {})
     except StreamlitSecretNotFoundError:
         return False
-    required_keys = ("redirect_uri", "cookie_secret", "client_id", "client_secret")
+    required_keys = (
+        "redirect_uri",
+        "cookie_secret",
+        "client_id",
+        "client_secret",
+        "server_metadata_url",
+    )
     return all(str(auth.get(key, "")).strip() for key in required_keys)
 
 
