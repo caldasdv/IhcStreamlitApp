@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from datetime import date, timedelta
+import re
 from typing import Any
 
 import streamlit as st
@@ -13,20 +14,21 @@ from src.domain.session_rules import effective_status
 
 _AGENDA = st.components.v2.component(
     "study_agenda",
-    html='''<div class="agenda" id="agenda-root" role="list" aria-label="Agenda semanal"></div>''',
+    html='''<p class="agenda-hint">Deslize para ver a semana completa.</p><div class="agenda-scroll"><div class="agenda" id="agenda-root" role="list" aria-label="Agenda semanal"></div></div>''',
     css='''
-    .agenda { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .5rem; }
-    .day { min-height: 8rem; padding: .7rem; border: 1px solid var(--st-border-color); border-radius: var(--st-base-radius); background: var(--st-secondary-background-color); }
-    .day h3 { margin: 0 0 .7rem; color: var(--st-heading-color); font: 600 .85rem var(--st-heading-font); }
-    .empty { color: var(--st-gray-text-color); font: .8rem var(--st-font); }
-    .session { display: block; width: 100%; margin: .35rem 0; padding: .55rem; border: 1px solid var(--st-widget-border-color); border-radius: var(--st-button-radius); background: var(--st-background-color); color: var(--st-text-color); text-align: left; cursor: pointer; }
+    .agenda-hint { display: none; margin: 0 0 .5rem; color: var(--st-gray-text-color); font: .8rem var(--st-font); }
+    .agenda-scroll { max-width: 100%; overflow-x: auto; padding: .15rem .15rem .75rem; scrollbar-color: var(--st-primary-color) var(--st-secondary-background-color); scrollbar-width: thin; }
+    .agenda { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .8rem; min-width: 0; }
+    .day { min-height: 16rem; padding: 1rem; border: 1px solid var(--st-border-color); border-radius: var(--st-base-radius); background: var(--st-secondary-background-color); }
+    .day h3 { margin: 0 0 .9rem; padding-bottom: .7rem; border-bottom: 1px solid var(--st-border-color); color: var(--st-heading-color); font: 600 .95rem var(--st-heading-font); letter-spacing: .04em; text-transform: uppercase; }
+    .empty { margin-top: 3.8rem; color: var(--st-gray-text-color); font: .85rem var(--st-font); text-align: center; }
+    .session { display: block; width: 100%; margin: .45rem 0; padding: .8rem; border: 1px solid var(--st-widget-border-color); border-left: 5px solid var(--session-color, var(--st-primary-color)); border-radius: var(--st-button-radius); background: var(--st-background-color); color: var(--st-text-color); text-align: left; cursor: pointer; }
     .session:hover, .session:focus-visible { border-color: var(--st-primary-color); }
     .session:focus-visible { outline: 3px solid var(--st-primary-color); outline-offset: 2px; }
     .session strong, .session span { display: block; }
-    .session strong { font: 600 .8rem var(--st-font); }
-    .session span { margin-top: .2rem; font: .75rem var(--st-font); }
-    @media (max-width: 900px) { .agenda { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-    @media (max-width: 600px) { .agenda { grid-template-columns: 1fr; } .day { min-height: auto; } }
+    .session strong { font: 600 .95rem var(--st-font); }
+    .session span { margin-top: .3rem; font: .85rem var(--st-font); line-height: 1.3; }
+    @media (max-width: 768px) { .agenda-hint { display: block; } .agenda-scroll { -webkit-overflow-scrolling: touch; } .agenda { grid-template-columns: repeat(7, minmax(155px, 1fr)); min-width: 1140px; } }
     ''',
     js='''
     export default function (component) {
@@ -51,6 +53,7 @@ _AGENDA = st.components.v2.component(
           const button = document.createElement("button")
           button.className = "session"
           button.type = "button"
+          if (session.color) button.style.setProperty("--session-color", session.color)
           button.setAttribute("aria-label", `${session.time}, ${session.topic}, ${session.status}`)
           const time = document.createElement("strong")
           time.textContent = session.time
@@ -82,6 +85,10 @@ def render_study_agenda(
                 "topic": str(session["topic"]),
                 "duration": str(session["duration"]),
                 "status": effective_status(session),
+                "color": str(session.get("subject_color", "#176B5D"))
+                if isinstance(session.get("subject_color"), str)
+                and re.fullmatch(r"#[0-9A-Fa-f]{6}", session["subject_color"])
+                else "#176B5D",
             }
         )
     weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
