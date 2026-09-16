@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from src.services.report_service import build_subject_summary, build_week_summary
+from src.services.report_service import build_subject_summary, build_topic_summary, build_week_summary
 
 
 SUBJECTS = [{"_id": "ihc", "name": "IHC"}, {"_id": "bd", "name": "Banco de Dados"}]
@@ -48,3 +48,19 @@ def test_subject_summary_can_be_limited_to_the_selected_week():
 
     assert result[0]["planejados"] == 60
     assert result[0]["atrasadas"] == 1
+
+
+def test_topic_summary_calculates_completed_minutes():
+    result = build_topic_summary(
+        [
+            {"topic_id": "topic-1", "duration": 60, "status": "Concluída", "study_date": "2026-09-15"},
+            {"topic_id": "topic-1", "duration": 30, "status": "Pendente", "study_date": "2026-09-16"},
+        ],
+        [{"_id": "topic-1", "title": "Funções"}, {"_id": "topic-2", "title": "Listas"}],
+        today=date(2026, 9, 15),
+    )
+
+    assert result[0]["completed_minutes"] == 60
+    assert result[0]["planned_minutes"] == 90
+    assert result[0]["progress"] == 60 / 90
+    assert result[1]["session_count"] == 0

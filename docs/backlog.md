@@ -159,6 +159,16 @@ Como estudante quero organizar uma disciplina em tópicos e subtópicos para vis
 - Complexidade: M
 - Status: DONE.
 
+### US-022
+
+Como estudante quero vincular uma sessão de estudo a um tópico para acompanhar o progresso real de cada conteúdo.
+
+- Prioridade: P1
+- Critérios de aceitação: vínculo opcional e compatível com a disciplina/período; sessões legadas continuam funcionando; progresso por conteúdo considera minutos concluídos sobre minutos planejados; conteúdo sem sessões aparece sem progresso; edição permite trocar ou remover o vínculo.
+- Dependências: US-021 e sessões de estudo.
+- Complexidade: M
+- Status: DONE.
+
 ## Ciclo de entrega
 
 As histórias abaixo fazem parte de um único ciclo consolidado de evolução do produto. A divisão histórica
