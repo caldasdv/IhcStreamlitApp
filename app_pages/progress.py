@@ -7,6 +7,7 @@ import streamlit as st
 from src.services.report_service import build_subject_summary, build_week_summary
 from src.ui.components.page_header import render_page_header
 from src.ui.components.progress_charts import subject_progress_figure, weekly_progress_figure
+from src.ui.components.progress_summary import render_subject_progress_summary
 from src.ui.context import load_page_context, load_page_sessions
 from src.ui.sidebar import render_account_sidebar
 
@@ -116,10 +117,4 @@ else:
         )
 
     st.subheader("Detalhamento por disciplina")
-    for row in subject_summary:
-        planned = row["planejados"]
-        done = row["concluídos"]
-        with st.container(border=True):
-            st.write(f"**{row['disciplina']}**")
-            st.progress(done / planned if planned else 0, text=f"{done} de {planned} minutos concluídos")
-            st.caption(f"{row['pendentes']} pendentes · {row['atrasadas']} atrasadas")
+    render_subject_progress_summary(subject_summary)

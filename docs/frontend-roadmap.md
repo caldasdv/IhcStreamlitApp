@@ -8,6 +8,7 @@
 - Existe CSS global em `src/ui/styles.py`, com alguns seletores baseados em `data-testid` interno do Streamlit.
 - Não há framework frontend paralelo; o componente de agenda mantém HTML, CSS e JavaScript locais e restritos à apresentação.
 - O dashboard usa Plotly quando há ganho de interação e oferece tabela equivalente.
+- O dashboard também usa cards HTML/CSS reutilizáveis para resumir progresso por disciplina com texto equivalente às barras.
 - A aplicação possui estados vazios, loading e feedback de ação, mas ainda não há avaliação com usuários.
 
 ### Inferências
@@ -100,6 +101,9 @@ introduzir frontend paralelo.
 **Execução:** o dashboard passou a usar Plotly para comparação por disciplina e evolução diária,
 com filtro temporal e de disciplina aplicado antes das agregações, tooltips em minutos e tabela
 alternativa. A dependência foi adicionada como `plotly>=5.0`.
+
+O detalhamento por disciplina passou a usar um componente visual leve com barras semânticas,
+percentuais e minutos concluídos, mantendo os dados preparados no service e sem dependência de React.
 
 ### Sprint 11 — Responsividade e acessibilidade aplicada
 

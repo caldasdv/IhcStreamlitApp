@@ -59,6 +59,15 @@ def apply_styles() -> None:
         .plan-meeting span { color: var(--plan-text); font-size: .9rem; line-height: 1.3; }
         .plan-meeting-location { color: var(--plan-muted) !important; font-size: .8rem !important; }
         .plan-timetable-empty { color: var(--plan-muted); font-size: .85rem; margin: 3.8rem 0 0; text-align: center; }
+        .plan-progress-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+        .plan-progress-card { background: var(--plan-surface); border: 1px solid var(--plan-border); border-radius: 14px; padding: 1rem; }
+        .plan-progress-card-heading { align-items: baseline; display: flex; justify-content: space-between; gap: 1rem; }
+        .plan-progress-card-heading strong { color: var(--plan-text); font-size: 1rem; }
+        .plan-progress-card-heading span { color: var(--plan-accent-dark); font-size: .95rem; font-weight: 750; }
+        .plan-progress-track { background: var(--plan-input); border-radius: 999px; height: .6rem; margin: .8rem 0 .55rem; overflow: hidden; }
+        .plan-progress-track span { background: var(--plan-accent); border-radius: inherit; display: block; height: 100%; }
+        .plan-progress-card-meta, .plan-progress-card-status { color: var(--plan-muted); font-size: .82rem; line-height: 1.4; }
+        .plan-progress-card-status { margin-top: .2rem; }
         @media (max-width: 640px) {
             .block-container { padding-top: 2.75rem; padding-left: 1rem; padding-right: 1rem; }
             h1 { font-size: 2rem; }
@@ -68,6 +77,9 @@ def apply_styles() -> None:
             .plan-timetable-hint { display: block; }
             .plan-timetable-scroll { -webkit-overflow-scrolling: touch; }
             .plan-timetable { grid-template-columns: repeat(7, minmax(155px, 1fr)); min-width: 1140px; }
+        }
+        @media (max-width: 640px) {
+            .plan-progress-grid { grid-template-columns: 1fr; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
