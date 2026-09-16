@@ -123,3 +123,66 @@ def build_evaluation_summary(
             }
         )
     return summary
+
+
+def build_adaptive_goal_plan(
+    subjects: Iterable[dict[str, Any]],
+    topics_by_subject: dict[Any, list[dict[str, Any]]],
+    evaluations: Iterable[dict[str, Any]],
+    sessions: Iterable[dict[str, Any]],
+    total_minutes: int,
+    strategy: str = "Equilibrada",
+) -> list[dict[str, Any]]:
+    """Distribui a meta entre disciplinas usando sinais explicáveis do próprio usuário."""
+    strategies = {
+        "Equilibrada": (0.4, 0.3, 0.3),
+        "Priorizar notas": (0.6, 0.2, 0.2),
+        "Priorizar dificuldade": (0.2, 0.6, 0.2),
+        "Priorizar pendências": (0.2, 0.2, 0.6),
+    }
+    note_weight, difficulty_weight, pending_weight = strategies.get(strategy, strategies["Equilibrada"])
+    subject_list = list(subjects)
+    if not subject_list or total_minutes <= 0:
+        return []
+    evaluations_by_subject: dict[Any, list[dict[str, Any]]] = {}
+    for evaluation in evaluations:
+        if evaluation.get("score") is not None and evaluation.get("max_score"):
+            evaluations_by_subject.setdefault(evaluation["subject_id"], []).append(evaluation)
+    pending_by_subject: dict[Any, int] = {}
+    for session in sessions:
+        if session.get("status") != "Concluída":
+            pending_by_subject[session["subject_id"]] = pending_by_subject.get(session["subject_id"], 0) + int(session["duration"])
+    max_pending = max(pending_by_subject.values(), default=1)
+    raw_rows = []
+    for subject in subject_list:
+        subject_id = subject["_id"]
+        subject_evaluations = evaluations_by_subject.get(subject_id, [])
+        note_factor = (
+            1 - sum(row["score"] / row["max_score"] for row in subject_evaluations) / len(subject_evaluations)
+            if subject_evaluations else 0.5
+        )
+        topic_difficulties = topics_by_subject.get(subject_id, [])
+        difficulty_values = {"LOW": 0.25, "MEDIUM": 0.6, "HIGH": 1.0}
+        difficulty_factor = (
+            sum(difficulty_values.get(topic.get("difficulty"), 0.5) for topic in topic_difficulties) / len(topic_difficulties)
+            if topic_difficulties else 0.25
+        )
+        pending_factor = pending_by_subject.get(subject_id, 0) / max_pending
+        score = note_factor * note_weight + difficulty_factor * difficulty_weight + pending_factor * pending_weight
+        raw_rows.append((subject, score, note_factor, difficulty_factor, pending_factor))
+    total_score = sum(row[1] for row in raw_rows) or 1
+    allocations = [int(total_minutes * row[1] / total_score) for row in raw_rows]
+    remainder = total_minutes - sum(allocations)
+    order = sorted(range(len(raw_rows)), key=lambda index: raw_rows[index][1], reverse=True)
+    for index in order[:remainder]:
+        allocations[index] += 1
+    result = []
+    for allocation, (subject, score, note_factor, difficulty_factor, pending_factor) in zip(allocations, raw_rows):
+        signals = [
+            (note_factor, "notas abaixo do esperado"),
+            (difficulty_factor, "conteúdos difíceis"),
+            (pending_factor, "mais tempo pendente"),
+        ]
+        reason = max(signals, key=lambda signal: signal[0])[1]
+        result.append({"disciplina": subject["name"], "minutos": allocation, "score": score, "motivo": reason})
+    return result

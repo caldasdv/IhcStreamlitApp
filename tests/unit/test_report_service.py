@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from src.services.report_service import (
+    build_adaptive_goal_plan,
     build_evaluation_summary,
     build_subject_summary,
     build_topic_summary,
@@ -25,6 +26,23 @@ def test_evaluation_summary_calculates_average_by_subject():
         {"disciplina": "IHC", "avaliacoes": 2, "media": 7.0, "aproveitamento": 0.7},
         {"disciplina": "Banco de Dados", "avaliacoes": 1, "media": 7.5, "aproveitamento": 0.75},
     ]
+
+
+def test_adaptive_goal_plan_prioritizes_low_scores():
+    result = build_adaptive_goal_plan(
+        SUBJECTS,
+        {"ihc": [{"difficulty": "LOW"}], "bd": [{"difficulty": "HIGH"}]},
+        [
+            {"subject_id": "ihc", "score": 4, "max_score": 10},
+            {"subject_id": "bd", "score": 9, "max_score": 10},
+        ],
+        [],
+        100,
+        "Priorizar notas",
+    )
+
+    assert result[0]["disciplina"] == "IHC"
+    assert result[0]["minutos"] > result[1]["minutos"]
 
 
 def test_subject_summary_separates_planned_and_completed_minutes():

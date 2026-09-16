@@ -4,6 +4,7 @@ from datetime import date, timedelta
 
 import streamlit as st
 
+from src.services.report_service import build_adaptive_goal_plan
 from src.ui.components.page_header import render_flow_actions, render_page_header
 from src.ui.context import load_page_context, load_page_sessions
 from src.ui.feedback import set_success_flash, show_action_error
@@ -38,6 +39,38 @@ metric_columns[0].metric("Meta semanal", f"{goal_minutes // 60}h {goal_minutes %
 metric_columns[1].metric("Concluído", f"{completed_minutes} min", border=True)
 metric_columns[2].metric("Progresso", f"{progress * 100:.0f}%", border=True)
 st.progress(progress, text=f"{completed_minutes} de {goal_minutes} minutos planejados")
+
+try:
+    evaluations = services.evaluations.list_for_period(user["_id"], user.get("current_academic_period_id"), subjects)
+    topics_by_subject = {
+        subject["_id"]: services.topics.list_for_subject(
+            user["_id"], user.get("current_academic_period_id"), subject["_id"]
+        )
+        for subject in subjects
+    }
+except Exception as error:
+    show_action_error("calcular suas prioridades", error)
+    evaluations = []
+    topics_by_subject = {}
+
+st.subheader("Plano de foco")
+st.caption("Uma sugestão de distribuição da sua meta com base em notas, dificuldade e pendências.")
+strategy = st.selectbox(
+    "O que deve pesar mais?",
+    ["Equilibrada", "Priorizar notas", "Priorizar dificuldade", "Priorizar pendências"],
+)
+adaptive_plan = build_adaptive_goal_plan(
+    subjects, topics_by_subject, evaluations, sessions, goal_minutes, strategy
+)
+if adaptive_plan:
+    st.dataframe(
+        [
+            {"Disciplina": row["disciplina"], "Foco sugerido": f"{row['minutos']} min", "Por quê": row["motivo"]}
+            for row in adaptive_plan
+        ],
+        hide_index=True,
+        width="stretch",
+    )
 
 with st.container(border=True):
     st.subheader("Ajustar meta semanal")

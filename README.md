@@ -97,10 +97,12 @@ python -m pip install -r requirements.txt -r requirements-dev.txt
 Para desenvolver telas e fluxos sem configurar credenciais, use a branch `local-demo` e ative o modo local:
 
 ```bash
-PLANO_LOCAL_MODE=true mise exec -- python -m streamlit run app.py
+PLANO_LOCAL_MODE=true python -m streamlit run app.py
 ```
 
 Esse modo usa `mongomock` em memória e cria uma conta de demonstração com um período e disciplinas iniciais. Os dados são descartados quando o processo termina. Ele é exclusivo para desenvolvimento local; o modo normal continua exigindo Google OIDC e MongoDB Atlas.
+
+Se o projeto estiver sendo executado com `mise`, o mesmo comando pode ser usado como `PLANO_LOCAL_MODE=true mise exec -- python -m streamlit run app.py`, mas o `mise` não é obrigatório.
 
 No Windows PowerShell, a ativação equivalente é:
 
