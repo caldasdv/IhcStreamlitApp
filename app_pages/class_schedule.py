@@ -137,24 +137,26 @@ if editing_meeting:
                 st.rerun()
 
 st.divider()
-st.subheader("Adicionar aula recorrente")
-with st.form("new_class_meeting"):
-    subject_id = st.selectbox(
-        "Disciplina",
-        list(subjects_by_id),
-        format_func=lambda value: subjects_by_id[value]["name"],
-        key="class_schedule_subject",
-    )
-    weekday_name = st.selectbox("Dia da semana", WEEKDAYS, key="class_schedule_weekday")
-    time_columns = st.columns(2)
-    start_time = time_columns[0].time_input(
-        "Início", value=time(8, 0), step=900, key="class_schedule_start"
-    )
-    end_time = time_columns[1].time_input(
-        "Fim", value=time(9, 30), step=900, key="class_schedule_end"
-    )
-    location = st.text_input("Local (opcional)", placeholder="Ex.: Bloco B, sala 204")
-    submitted = st.form_submit_button("Adicionar à grade", type="primary", width="stretch")
+with st.expander("Adicionar aula recorrente", expanded=not meetings):
+    with st.form("new_class_meeting"):
+        subject_id = st.selectbox(
+            "Disciplina",
+            list(subjects_by_id),
+            format_func=lambda value: subjects_by_id[value]["name"],
+            key="class_schedule_subject",
+        )
+        weekday_name = st.selectbox("Dia da semana", WEEKDAYS, key="class_schedule_weekday")
+        time_columns = st.columns(2)
+        start_time = time_columns[0].time_input(
+            "Início", value=time(8, 0), step=900, key="class_schedule_start"
+        )
+        end_time = time_columns[1].time_input(
+            "Fim", value=time(9, 30), step=900, key="class_schedule_end"
+        )
+        location = st.text_input("Local (opcional)", placeholder="Ex.: Bloco B, sala 204")
+        submitted = st.form_submit_button(
+            "Adicionar à grade", type="primary", width="stretch"
+        )
 
 if submitted:
     try:
