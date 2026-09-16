@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from html import escape
-from pathlib import Path
 
 import streamlit as st
 
@@ -13,13 +12,6 @@ from src.ui.feedback import show_action_error
 
 
 def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
-    logo_path = Path(__file__).resolve().parents[2] / "assets" / "plan-logo.svg"
-    st.sidebar.image(str(logo_path), width=48)
-    st.sidebar.markdown(
-        '<div class="plan-sidebar-brand"><div><strong>Plano</strong>'
-        '<small>Seu espaço de estudos</small></div></div>',
-        unsafe_allow_html=True,
-    )
     st.sidebar.markdown(
         f'<div class="plan-sidebar-user"><strong>{escape(str(user["name"]))}</strong>'
         f'<span>{escape(str(user["email"]))}</span></div>',

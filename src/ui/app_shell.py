@@ -24,6 +24,7 @@ def run_app() -> None:
         layout="wide",
     )
     apply_styles()
+    st.logo(str(PROJECT_DIR / "assets" / "plan-wordmark.svg"), size="large")
     require_login()
     render_flash()
     page = st.navigation(
