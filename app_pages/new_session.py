@@ -5,7 +5,7 @@ from datetime import date, time
 import streamlit as st
 
 from src.ui.context import load_current_period_subjects, load_page_context
-from src.ui.components.page_header import render_page_header
+from src.ui.components.page_header import render_flow_actions, render_page_header
 from src.ui.feedback import set_success_flash, show_action_error
 from src.ui.sidebar import render_account_sidebar
 
@@ -30,6 +30,7 @@ if not current_subjects:
     st.stop()
 
 render_page_header("PLANEJAMENTO", "Nova sessão", "Defina uma sessão pequena e objetiva para facilitar o início do estudo.")
+render_flow_actions("Nova sessão")
 subjects_by_id = {subject["_id"]: subject for subject in current_subjects}
 subject_id = st.selectbox(
     "Disciplina",
