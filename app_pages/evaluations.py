@@ -34,7 +34,10 @@ except Exception as error:
     show_action_error("carregar suas avaliações", error)
     st.stop()
 
-graded = [item for item in evaluations if item.get("score") is not None]
+graded = [
+    item for item in evaluations
+    if item.get("score") is not None and item.get("max_score")
+]
 average = sum(item["score"] / item["max_score"] for item in graded) / len(graded) * 10 if graded else 0
 metric_cols = st.columns(3)
 metric_cols[0].metric("Avaliações", len(evaluations), border=True)
@@ -44,13 +47,24 @@ metric_cols[2].metric("Média proporcional", f"{average:.1f}/10" if graded else 
 if evaluations:
     st.subheader("Seu histórico")
     for item in evaluations:
-        percentage = item["score"] / item["max_score"] * 100
         with st.container(border=True):
             heading, detail = st.columns([2, 1])
             heading.markdown(f"### {item['title']}")
             heading.caption(f"{item['type']} · {item['subject_name']}")
-            detail.metric("Nota", f"{item['score']:g}/{item['max_score']:g}")
-            st.progress(min(percentage / 100, 1.0), text=f"{item['evaluation_date']} · {percentage:.0f}%")
+            if item.get("score") is None or not item.get("max_score"):
+                detail.metric("Nota", "Pendente")
+                st.caption(f"{item['evaluation_date']} · nota ainda não registrada")
+            else:
+                percentage = item["score"] / item["max_score"] * 100
+                detail.metric("Nota", f"{item['score']:g}/{item['max_score']:g}")
+                st.progress(min(percentage / 100, 1.0), text=f"{item['evaluation_date']} · {percentage:.0f}%")
+    if len(graded) > 1:
+        st.subheader("Evolução das notas")
+        chart_data = {
+            item["evaluation_date"]: round(item["score"] / item["max_score"] * 10, 2)
+            for item in graded
+        }
+        st.line_chart(chart_data, height=260)
 else:
     st.info("Você ainda não registrou avaliações. Adicione a primeira para acompanhar sua evolução.")
 
