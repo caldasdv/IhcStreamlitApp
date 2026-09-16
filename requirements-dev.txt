@@ -1,2 +1,0 @@
-# Dependências usadas no desenvolvimento e na validação local.
-pytest>=8.0,<10

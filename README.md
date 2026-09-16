@@ -46,7 +46,7 @@ git clone -b local-demo git@github.com:caldasdv/IhcStreamlitApp.git
 cd IhcStreamlitApp
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m pip install -r requirements.txt
 PLANO_LOCAL_MODE=true python -m streamlit run app.py
 ```
 
@@ -65,7 +65,7 @@ O `mise` é opcional: `PLANO_LOCAL_MODE=true mise exec -- python -m streamlit ru
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
