@@ -279,6 +279,20 @@ class MongoClassMeetingRepository:
         document = {**data, "created_at": now, "updated_at": now}
         return self.collection.insert_one(document).inserted_id
 
+    def update(
+        self, user_id: Any, academic_period_id: Any, meeting_id: Any, data: dict[str, Any]
+    ) -> None:
+        result = self.collection.update_one(
+            {
+                "_id": meeting_id,
+                "user_id": user_id,
+                "academic_period_id": academic_period_id,
+            },
+            {"$set": {**data, "updated_at": datetime.now(UTC)}},
+        )
+        if result.matched_count == 0:
+            raise EntityNotFoundError("A aula não foi encontrada ou não está mais disponível.")
+
     def delete(
         self, user_id: Any, academic_period_id: Any, meeting_id: Any
     ) -> None:

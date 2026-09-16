@@ -91,6 +91,10 @@ class ClassMeetingRepository(Protocol):
 
     def create(self, data: dict[str, Any]) -> Any: ...
 
+    def update(
+        self, user_id: Any, academic_period_id: Any, meeting_id: Any, data: dict[str, Any]
+    ) -> None: ...
+
     def delete(
         self, user_id: Any, academic_period_id: Any, meeting_id: Any
     ) -> None: ...

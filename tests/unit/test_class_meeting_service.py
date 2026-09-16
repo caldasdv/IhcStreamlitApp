@@ -9,6 +9,7 @@ class FakeClassMeetingRepository:
     def __init__(self) -> None:
         self.meetings = []
         self.created = []
+        self.updated = []
         self.deleted = []
 
     def list_by_period(self, user_id, academic_period_id):
@@ -32,6 +33,9 @@ class FakeClassMeetingRepository:
 
     def delete(self, user_id, academic_period_id, meeting_id):
         self.deleted.append((user_id, academic_period_id, meeting_id))
+
+    def update(self, user_id, academic_period_id, meeting_id, data):
+        self.updated.append((user_id, academic_period_id, meeting_id, data))
 
 
 class FakeSubjectRepository:
@@ -174,3 +178,33 @@ def test_delete_forwards_complete_ownership_scope() -> None:
     build_service(repository).delete("user-id", "period-id", "meeting-id")
 
     assert repository.deleted == [("user-id", "period-id", "meeting-id")]
+
+
+def test_update_class_meeting_revalidates_and_normalizes_data() -> None:
+    repository = FakeClassMeetingRepository()
+
+    build_service(repository).update(
+        user_id="user-id",
+        academic_period_id="period-id",
+        meeting_id="meeting-id",
+        subject_id="subject-id",
+        weekday=2,
+        start_time=time(10, 0),
+        end_time=time(11, 30),
+        location="  Sala 12  ",
+    )
+
+    assert repository.updated == [
+        (
+            "user-id",
+            "period-id",
+            "meeting-id",
+            {
+                "subject_id": "subject-id",
+                "weekday": 2,
+                "start_time": "10:00",
+                "end_time": "11:30",
+                "location": "Sala 12",
+            },
+        )
+    ]

@@ -104,7 +104,7 @@ st.subheader("Sua semana")
 if not meetings:
     st.info("Sua grade ainda está vazia. Adicione o primeiro horário acima.")
 
-deleted_meeting_id = render_class_timetable(
+deleted_meeting_id, edited_meeting_id = render_class_timetable(
     meetings, WEEKDAYS, key=f"class_timetable_{current_period_id}"
 )
 if deleted_meeting_id:
@@ -117,6 +117,66 @@ if deleted_meeting_id:
     else:
         set_success_flash("Horário removido da grade.")
         st.rerun()
+
+if edited_meeting_id:
+    st.session_state["editing_class_meeting_id"] = edited_meeting_id
+
+editing_meeting_id = st.session_state.get("editing_class_meeting_id")
+editing_meeting = next(
+    (meeting for meeting in meetings if str(meeting["_id"]) == editing_meeting_id),
+    None,
+)
+if editing_meeting:
+    st.subheader("Editar horário")
+    with st.container(border=True):
+        with st.form(f"edit_class_meeting_{editing_meeting_id}"):
+            edit_subject_id = st.selectbox(
+                "Disciplina",
+                list(subjects_by_id),
+                index=list(subjects_by_id).index(editing_meeting["subject_id"]),
+                format_func=lambda value: subjects_by_id[value]["name"],
+            )
+            edit_weekday = st.selectbox(
+                "Dia da semana", WEEKDAYS, index=editing_meeting["weekday"]
+            )
+            edit_time_columns = st.columns(2)
+            edit_start_time = edit_time_columns[0].time_input(
+                "Início", value=time.fromisoformat(editing_meeting["start_time"]), step=900
+            )
+            edit_end_time = edit_time_columns[1].time_input(
+                "Fim", value=time.fromisoformat(editing_meeting["end_time"]), step=900
+            )
+            edit_location = st.text_input(
+                "Local (opcional)", value=editing_meeting.get("location", "")
+            )
+            save_col, cancel_col = st.columns(2)
+            save_edit = save_col.form_submit_button(
+                "Salvar horário", type="primary", width="stretch"
+            )
+            cancel_edit = cancel_col.form_submit_button("Cancelar", width="stretch")
+        if cancel_edit:
+            st.session_state.pop("editing_class_meeting_id", None)
+            st.rerun()
+        if save_edit:
+            try:
+                services.class_meetings.update(
+                    user_id=user["_id"],
+                    academic_period_id=current_period_id,
+                    meeting_id=editing_meeting["_id"],
+                    subject_id=edit_subject_id,
+                    weekday=WEEKDAYS.index(edit_weekday),
+                    start_time=edit_start_time,
+                    end_time=edit_end_time,
+                    location=edit_location,
+                )
+            except ValueError as error:
+                st.error(str(error))
+            except Exception as error:
+                show_action_error("salvar o horário", error)
+            else:
+                st.session_state.pop("editing_class_meeting_id", None)
+                set_success_flash("Horário atualizado na grade.")
+                st.rerun()
 
 st.subheader("Editar horários")
 day_meetings_by_weekday = {

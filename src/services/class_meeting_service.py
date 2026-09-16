@@ -81,3 +81,46 @@ class ClassMeetingService:
         self, user_id: Any, academic_period_id: Any, meeting_id: Any
     ) -> None:
         self.repository.delete(user_id, academic_period_id, meeting_id)
+
+    def update(
+        self,
+        *,
+        user_id: Any,
+        academic_period_id: Any | None,
+        meeting_id: Any,
+        subject_id: Any,
+        weekday: int,
+        start_time: time,
+        end_time: time,
+        location: str,
+    ) -> None:
+        validate_class_meeting(weekday, start_time, end_time)
+        if academic_period_id is None or not self.academic_period_repository.is_active_owned_by(
+            user_id, academic_period_id
+        ):
+            raise ValueError("Defina um período acadêmico ativo para editar aulas.")
+        if not self.subject_repository.belongs_to_user_period(
+            user_id, subject_id, academic_period_id
+        ):
+            raise ValueError("Selecione uma disciplina válida do período atual.")
+        existing = [
+            meeting
+            for meeting in self.repository.list_by_weekday(
+                user_id, academic_period_id, weekday
+            )
+            if meeting.get("_id") != meeting_id
+        ]
+        if class_meetings_conflict(start_time, end_time, existing):
+            raise ValueError("Esse horário conflita com outra aula da sua grade.")
+        self.repository.update(
+            user_id,
+            academic_period_id,
+            meeting_id,
+            {
+                "subject_id": subject_id,
+                "weekday": weekday,
+                "start_time": start_time.strftime("%H:%M"),
+                "end_time": end_time.strftime("%H:%M"),
+                "location": " ".join(location.split()),
+            },
+        )

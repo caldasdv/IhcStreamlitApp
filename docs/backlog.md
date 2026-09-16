@@ -125,7 +125,7 @@ Como estudante quero cadastrar minha grade semanal para visualizar quando tenho 
 - Critérios de aceitação: somente disciplinas do período atual podem ser usadas; início deve ser anterior ao fim; aulas no mesmo dia não podem se sobrepor; grade ordenada por dia e horário; local é opcional; exclusão valida usuário e período; estados vazio, erro e sucesso são tratados.
 - Dependências: US-016 e US-017 integradas à `main`.
 - Complexidade: M
-- Status: DONE (integrada à `main` pela PR #23).
+- Status: DONE (integrada à `main` pela PR #23; edição contextual adicionada posteriormente).
 
 ### US-019
 
