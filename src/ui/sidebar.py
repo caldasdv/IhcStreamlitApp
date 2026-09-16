@@ -7,7 +7,7 @@ from html import escape
 import streamlit as st
 
 from src.services.container import ApplicationServices
-from src.ui.feedback import set_success_flash, show_action_error
+from src.ui.feedback import show_action_error
 
 
 def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
@@ -48,25 +48,3 @@ def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
             '<span class="plan-dark-mode-marker" aria-hidden="true"></span>',
             unsafe_allow_html=True,
         )
-    st.sidebar.divider()
-    with st.sidebar.expander("Metas", expanded=True):
-        st.markdown(
-            '<div class="plan-sidebar-section-label">Meta semanal</div>',
-            unsafe_allow_html=True,
-        )
-        goal_hours = st.number_input(
-            "Horas por semana",
-            min_value=1.0,
-            max_value=80.0,
-            value=user.get("weekly_goal_minutes", 300) / 60,
-            step=0.5,
-            key="weekly_goal_hours",
-        )
-        if st.button("Salvar meta", width="stretch"):
-            try:
-                services.users.update_weekly_goal(user["_id"], goal_hours)
-            except Exception as error:
-                show_action_error("atualizar sua meta", error)
-            else:
-                set_success_flash("Meta atualizada.")
-                st.rerun()
