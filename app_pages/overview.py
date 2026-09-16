@@ -92,6 +92,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 render_study_rhythm(week_sessions, week_start)
+goal_progress = min(completed_minutes / goal_minutes, 1.0) if goal_minutes else 0.0
+with st.container(border=True):
+    goal_heading, goal_value = st.columns([2, 1])
+    goal_heading.markdown("#### Meta da semana")
+    goal_heading.caption("Seu ritmo de estudo em relação ao objetivo definido.")
+    goal_value.metric("Progresso", f"{completed_minutes} / {goal_minutes} min")
+    st.progress(goal_progress, text=f"{goal_progress * 100:.0f}% da meta semanal")
+    st.caption("Para alterar a meta, abra a seção Metas na barra lateral.")
 st.markdown(
     '<section class="plan-quick-actions" aria-label="Ações rápidas">'
     '<span>O que você quer fazer agora?</span></section>',
