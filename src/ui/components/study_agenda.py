@@ -19,15 +19,16 @@ _AGENDA = st.components.v2.component(
     .agenda-hint { display: none; margin: 0 0 .5rem; color: var(--st-gray-text-color); font: .8rem var(--st-font); }
     .agenda-scroll { max-width: 100%; overflow-x: auto; padding: .15rem .15rem .75rem; scrollbar-color: var(--st-primary-color) var(--st-secondary-background-color); scrollbar-width: thin; }
     .agenda { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .8rem; min-width: 0; }
-    .day { min-height: 16rem; padding: 1rem; border: 1px solid var(--st-border-color); border-radius: var(--st-base-radius); background: var(--st-secondary-background-color); }
+    .day { padding: .8rem; border: 1px solid var(--st-border-color); border-radius: var(--st-base-radius); background: var(--st-secondary-background-color); }
     .day h3 { margin: 0 0 .9rem; padding-bottom: .7rem; border-bottom: 1px solid var(--st-border-color); color: var(--st-heading-color); font: 600 .95rem var(--st-heading-font); letter-spacing: .04em; text-transform: uppercase; }
-    .empty { margin-top: 3.8rem; color: var(--st-gray-text-color); font: .85rem var(--st-font); text-align: center; }
-    .session { display: block; width: 100%; margin: .45rem 0; padding: .8rem; border: 1px solid var(--st-widget-border-color); border-left: 5px solid var(--session-color, var(--st-primary-color)); border-radius: var(--st-button-radius); background: var(--st-background-color); color: var(--st-text-color); text-align: left; cursor: pointer; }
+    .day-body { position: relative; min-height: 720px; border-radius: var(--st-base-radius); background: repeating-linear-gradient(to bottom, transparent 0, transparent 29px, var(--st-border-color) 30px); }
+    .empty { margin: 0; padding-top: 2rem; color: var(--st-gray-text-color); font: .75rem var(--st-font); text-align: center; }
+    .session { position: absolute; top: calc(var(--session-top) * 1px); left: 0; width: 100%; min-height: 2.2rem; height: max(36px, calc(var(--session-height) * 1px)); margin: 0; padding: .45rem .55rem; overflow: hidden; border: 1px solid var(--st-widget-border-color); border-left: 4px solid var(--session-color, var(--st-primary-color)); border-radius: var(--st-button-radius); background: var(--st-background-color); color: var(--st-text-color); text-align: left; cursor: pointer; }
     .session:hover, .session:focus-visible { border-color: var(--st-primary-color); }
     .session:focus-visible { outline: 3px solid var(--st-primary-color); outline-offset: 2px; }
     .session strong, .session span { display: block; }
-    .session strong { font: 600 .95rem var(--st-font); }
-    .session span { margin-top: .3rem; font: .85rem var(--st-font); line-height: 1.3; }
+    .session strong { font: 600 .82rem var(--st-font); }
+    .session span { margin-top: .2rem; font: .75rem var(--st-font); line-height: 1.2; }
     @media (max-width: 768px) { .agenda-hint { display: block; } .agenda-scroll { -webkit-overflow-scrolling: touch; } .agenda { grid-template-columns: repeat(7, minmax(155px, 1fr)); min-width: 1140px; } }
     ''',
     js='''
@@ -43,17 +44,21 @@ _AGENDA = st.components.v2.component(
         const heading = document.createElement("h3")
         heading.textContent = day.label
         section.appendChild(heading)
+        const body = document.createElement("div")
+        body.className = "day-body"
         if (!day.sessions.length) {
           const empty = document.createElement("p")
           empty.className = "empty"
           empty.textContent = "Sem sessões"
-          section.appendChild(empty)
+          body.appendChild(empty)
         }
         for (const session of day.sessions) {
           const button = document.createElement("button")
           button.className = "session"
           button.type = "button"
           if (session.color) button.style.setProperty("--session-color", session.color)
+          button.style.setProperty("--session-top", Math.max(0, session.start_minute - 360))
+          button.style.setProperty("--session-height", Math.max(36, session.duration))
           button.setAttribute("aria-label", `${session.time}, ${session.topic}, ${session.status}`)
           const time = document.createElement("strong")
           time.textContent = session.time
@@ -63,8 +68,9 @@ _AGENDA = st.components.v2.component(
           status.textContent = session.status
           button.append(time, topic, status)
           button.onclick = () => setTriggerValue("selected", session.id)
-          section.appendChild(button)
+          body.appendChild(button)
         }
+        section.appendChild(body)
         root.appendChild(section)
       }
     }
@@ -76,7 +82,7 @@ def render_study_agenda(
     sessions: Iterable[dict[str, Any]], week_start: date, *, key: str
 ) -> str | None:
     """Renderiza a agenda e retorna o ID selecionado nesta execução."""
-    sessions_by_date: dict[str, list[dict[str, str]]] = {}
+    sessions_by_date: dict[str, list[dict[str, Any]]] = {}
     for session in sessions:
         sessions_by_date.setdefault(session["study_date"], []).append(
             {
@@ -84,6 +90,7 @@ def render_study_agenda(
                 "time": str(session["study_time"]),
                 "topic": str(session["topic"]),
                 "duration": str(session["duration"]),
+                "start_minute": int(session["study_time"][:2]) * 60 + int(session["study_time"][3:]),
                 "status": effective_status(session),
                 "color": str(session.get("subject_color", "#176B5D"))
                 if isinstance(session.get("subject_color"), str)

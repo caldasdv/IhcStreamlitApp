@@ -76,6 +76,20 @@ st.progress(
     min(completed_minutes / goal_minutes, 1.0) if goal_minutes else 0.0,
     text=f"{completed_minutes / goal_minutes * 100:.0f}% da meta semanal" if goal_minutes else "Sem meta",
 )
+if pending:
+    next_session = min(pending, key=lambda session: (session["study_date"], session["study_time"]))
+    next_session_date = date.fromisoformat(next_session["study_date"])
+    with st.container(border=True):
+        st.caption("PRÓXIMO PASSO")
+        st.subheader(next_session["topic"])
+        st.write(
+            f"{next_session['subject_name']} · {next_session_date:%d/%m/%Y} às "
+            f"{next_session['study_time']} · {next_session['duration']} minutos"
+        )
+        if st.button("Abrir semana", icon=":material/calendar_view_week:", key="overview_open_week"):
+            st.switch_page("app_pages/weekly.py")
+else:
+    st.success("Tudo em dia por aqui. Você pode planejar a próxima sessão.")
 st.divider()
 if week_start <= selected_date <= week_end:
     day_sessions = [s for s in week_sessions if s["study_date"] == selected_date.isoformat()]

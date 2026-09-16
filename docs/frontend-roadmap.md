@@ -12,6 +12,7 @@
 - O dashboard também usa cards HTML/CSS reutilizáveis para resumir progresso por disciplina com texto equivalente às barras.
 - A fundação visual usa tokens compartilhados, métricas consistentes, badges compactos e superfícies sem caixas brancas desconectadas.
 - A barra lateral usa marca, conta, navegação ativa, foco visível e meta semanal em blocos distintos.
+- A tela Hoje apresenta o próximo passo pendente e a agenda semanal posiciona sessões por horário e duração.
 - A aplicação possui estados vazios, loading e feedback de ação, mas ainda não há avaliação com usuários.
 
 ### Inferências
@@ -115,6 +116,9 @@ em navegador real continua pendente.
 A grade de aulas passou a ter ações de edição e remoção no card, confirmação local e lista textual
 nativa como fallback. IDs recebidos pelo componente são resolvidos contra os dados carregados antes
 da operação persistente.
+
+A agenda de sessões passou a usar uma escala temporal visual e a tela Hoje ganhou um cartão de próxima
+ação com acesso direto à Semana, usando somente dados já persistidos.
 
 ### Sprint 11 — Responsividade e acessibilidade aplicada
 

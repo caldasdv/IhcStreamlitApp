@@ -63,6 +63,7 @@ precisam ser confirmados com uso real.
 | IHC-026 | Médio | Métricas, status e gráficos usavam superfícies e escalas diferentes, reduzindo a coerência visual entre telas. | Corrigido tecnicamente; validar contraste, leitura rápida e responsividade no navegador. |
 | IHC-027 | Alto | A grade visual dependia de ID textual do componente e não possuía leitura nativa equivalente em caso de falha. | Corrigido tecnicamente; validar exclusão real no Atlas e uso do fallback em navegador sem JavaScript. |
 | IHC-028 | Médio | O menu lateral misturava marca, conta, meta e navegação sem agrupamento visual suficiente. | Corrigido tecnicamente; validar localização da página atual, logout e edição da meta. |
+| IHC-029 | Alto | A tela inicial não orientava o próximo estudo e a agenda semanal não comunicava duração nem posição temporal. | Corrigido tecnicamente; validar descoberta da próxima ação, escala horária e uso em telas estreitas. |
 
 ## Plano de avaliação seguinte
 
