@@ -79,9 +79,20 @@ st.subheader("Sua semana")
 if not meetings:
     st.info("Sua grade ainda está vazia. Adicione o primeiro horário abaixo.")
 
-deleted_meeting_id, edited_meeting_id = render_class_timetable(
-    meetings, WEEKDAYS, key=f"class_timetable_{current_period_id}"
+timetable_result = render_class_timetable(
+    meetings,
+    WEEKDAYS,
+    key=(
+        f"class_timetable_{current_period_id}_"
+        f"{st.session_state.get('selected_class_meeting_id', 'none')}_"
+        f"{st.session_state.get('class_timetable_reset', 0)}"
+    ),
+    selected_id=st.session_state.get("selected_class_meeting_id"),
+    dark_mode=st.session_state.get("plan_dark_mode", False),
 )
+deleted_meeting_id = timetable_result[0] if len(timetable_result) > 0 else None
+edited_meeting_id = timetable_result[1] if len(timetable_result) > 1 else None
+selected_meeting_id = timetable_result[2] if len(timetable_result) > 2 else None
 if deleted_meeting_id:
     meeting_by_id = {str(meeting["_id"]): meeting for meeting in meetings}
     deleted_meeting = meeting_by_id.get(str(deleted_meeting_id))
@@ -100,6 +111,65 @@ if deleted_meeting_id:
 
 if edited_meeting_id:
     st.session_state["editing_class_meeting_id"] = edited_meeting_id
+
+if selected_meeting_id is not None:
+    if selected_meeting_id:
+        st.session_state["selected_class_meeting_id"] = str(selected_meeting_id)
+    else:
+        st.session_state.pop("selected_class_meeting_id", None)
+        st.session_state.pop("confirm_delete_class_meeting_id", None)
+
+selected_class_meeting_id = st.session_state.get("selected_class_meeting_id")
+selected_meeting = next(
+    (meeting for meeting in meetings if str(meeting["_id"]) == str(selected_class_meeting_id)),
+    None,
+)
+if selected_meeting:
+    st.subheader("Aula selecionada")
+    with st.container(border=True):
+        st.markdown(f"### {selected_meeting['subject_name']}")
+        detail_columns = st.columns(3)
+        detail_columns[0].caption("Dia")
+        detail_columns[0].write(WEEKDAYS[selected_meeting["weekday"]])
+        detail_columns[1].caption("Horário")
+        detail_columns[1].write(
+            f"{selected_meeting['start_time']}–{selected_meeting['end_time']}"
+        )
+        detail_columns[2].caption("Local")
+        detail_columns[2].write(selected_meeting.get("location") or "Não informado")
+        action_columns = st.columns(2)
+        if action_columns[0].button(
+            "Editar aula", icon=":material/edit:", width="stretch", key="selected_edit_class"
+        ):
+            st.session_state["editing_class_meeting_id"] = str(selected_meeting["_id"])
+            st.rerun()
+        if action_columns[1].button(
+            "Excluir aula", icon=":material/delete:", width="stretch", key="selected_delete_class"
+        ):
+            st.session_state["confirm_delete_class_meeting_id"] = str(selected_meeting["_id"])
+            st.rerun()
+        if st.session_state.get("confirm_delete_class_meeting_id") == str(selected_meeting["_id"]):
+            st.warning("Excluir este horário recorrente? A ação não pode ser desfeita.")
+            confirm_columns = st.columns(2)
+            if confirm_columns[0].button(
+                "Confirmar exclusão", type="primary", width="stretch", key="confirm_selected_delete"
+            ):
+                try:
+                    services.class_meetings.delete(
+                        user["_id"], current_period_id, selected_meeting["_id"]
+                    )
+                except Exception as error:
+                    show_action_error("remover a aula", error)
+                else:
+                    st.session_state.pop("selected_class_meeting_id", None)
+                    st.session_state.pop("confirm_delete_class_meeting_id", None)
+                    set_success_flash("Horário removido da grade.")
+                    st.rerun()
+            if confirm_columns[1].button(
+                "Cancelar", width="stretch", key="cancel_selected_delete"
+            ):
+                st.session_state.pop("confirm_delete_class_meeting_id", None)
+                st.rerun()
 
 editing_meeting_id = st.session_state.get("editing_class_meeting_id")
 editing_meeting = next(
@@ -155,8 +225,8 @@ if editing_meeting:
                 show_action_error("salvar o horário", error)
             else:
                 st.session_state.pop("editing_class_meeting_id", None)
-        set_success_flash("Horário atualizado na grade.")
-        st.rerun()
+                set_success_flash("Horário atualizado na grade.")
+                st.rerun()
 
 render_class_timetable_fallback(meetings, WEEKDAYS)
 

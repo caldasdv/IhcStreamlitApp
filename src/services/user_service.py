@@ -20,3 +20,9 @@ class UserService:
 
     def update_current_academic_period(self, user_id: Any, period_id: Any) -> None:
         self.repository.update_current_academic_period(user_id, period_id)
+
+    def update_dark_mode(self, user_id: Any, enabled: bool) -> None:
+        """Persiste a preferência visual do usuário."""
+        if not isinstance(enabled, bool):
+            raise ValueError("A preferência de modo escuro deve ser booleana.")
+        self.repository.update_dark_mode(user_id, enabled)

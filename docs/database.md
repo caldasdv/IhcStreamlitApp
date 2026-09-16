@@ -2,7 +2,7 @@
 
 ## Escopo atual
 
-O MVP utiliza `users`, `subjects`, `study_sessions` e `topics`. O schema abaixo descreve a persistência vigente e as decisões de isolamento aplicadas pelos repositories.
+O MVP utiliza `users`, `subjects`, `study_sessions`, `topics` e `evaluations`. O schema abaixo descreve a persistência vigente e as decisões de isolamento aplicadas pelos repositories.
 
 ## Collections
 
@@ -18,6 +18,7 @@ Finalidade: identidade mínima do usuário e meta semanal.
 | `identity.provider` | string | sim para usuários autenticados |
 | `identity.subject` | string | sim para usuários autenticados |
 | `weekly_goal_minutes` | integer | sim |
+| `dark_mode` | boolean | não, padrão `false` |
 | `current_academic_period_id` | ObjectId | não |
 
 Identidade única: `{identity.provider: 1, identity.subject: 1}` unique e parcial. O e-mail é atributo de perfil, não chave de identidade, e não possui unicidade global. Crescimento: um documento por usuário.
@@ -130,6 +131,24 @@ Finalidade: organizar o conteúdo de uma disciplina em tópicos e subtópicos.
 
 Cada tópico pertence ao usuário, período e disciplina; um subtópico referencia apenas um tópico da mesma disciplina. A árvore é consultada por `user_id + academic_period_id + subject_id` e ordenada por título. A unicidade de título é validada pelo service dentro do mesmo pai, disciplina e período.
 
+### `evaluations`
+
+Finalidade: registrar provas, trabalhos e exercícios com nota para acompanhar o desempenho no período.
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `_id` | ObjectId | sim |
+| `user_id` | ObjectId | sim |
+| `academic_period_id` | ObjectId | sim |
+| `subject_id` | ObjectId | sim |
+| `title` | string | sim |
+| `type` | enum `Prova`/`Trabalho`/`Exercício` | sim |
+| `evaluation_date` | string ISO `YYYY-MM-DD` | sim |
+| `score` | number | sim |
+| `max_score` | number positivo | sim |
+
+Cada avaliação referencia usuário, período e disciplina; o service valida a posse dessas referências antes da escrita. A listagem filtra por usuário e período, ordena pela data e enriquece o nome da disciplina na camada de apresentação. O índice `{user_id: 1, academic_period_id: 1, evaluation_date: 1}` apoia a consulta histórica sem embutir uma lista de tamanho indefinido no período.
+
 ## Consultas esperadas
 
 - Buscar o usuário ativo por `identity.provider + identity.subject`.
@@ -140,10 +159,11 @@ Cada tópico pertence ao usuário, período e disciplina; um subtópico referenc
 - Listar sessões de um usuário por intervalo de datas e horário.
 - Buscar sessões pendentes de uma data para validar sobreposição.
 - Agregar minutos concluídos por semana e disciplina.
+- Listar avaliações do usuário por período, ordenadas pela data.
 
 ## Escritas esperadas
 
-Criar/arquivar período e selecionar o atual; criar/editar/excluir disciplina; associar disciplina legada a período ativo; criar/excluir horário de aula; criar/editar/reagendar/concluir/excluir sessão; atualizar a meta semanal. Todas devem filtrar pelo usuário autorizado e validar referências.
+Criar/arquivar período e selecionar o atual; criar/editar/excluir disciplina; associar disciplina legada a período ativo; criar/excluir horário de aula; criar/editar/reagendar/concluir/excluir sessão; registrar avaliação; atualizar a meta semanal. Todas devem filtrar pelo usuário autorizado e validar referências.
 
 ## Pendências
 

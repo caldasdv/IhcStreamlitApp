@@ -35,6 +35,7 @@ def test_indexes_replace_email_identity_and_scope_subjects_by_period() -> None:
         academic_periods=academic_periods,
         class_meetings=class_meetings,
         topics=topics,
+        evaluations=FakeCollection(),
     )
 
     ensure_indexes(database)

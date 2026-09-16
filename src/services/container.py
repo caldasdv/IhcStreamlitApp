@@ -12,6 +12,7 @@ from src.repositories.mongodb.repositories import (
     MongoSubjectRepository,
     MongoTopicRepository,
     MongoUserRepository,
+    MongoEvaluationRepository,
 )
 from src.services.academic_period_service import AcademicPeriodService
 from src.services.class_meeting_service import ClassMeetingService
@@ -19,6 +20,7 @@ from src.services.session_service import SessionService
 from src.services.subject_service import SubjectService
 from src.services.user_service import UserService
 from src.services.topic_service import TopicService
+from src.services.evaluation_service import EvaluationService
 
 
 @dataclass(frozen=True)
@@ -29,6 +31,7 @@ class ApplicationServices:
     class_meetings: ClassMeetingService
     sessions: SessionService
     topics: TopicService
+    evaluations: EvaluationService
 
 
 def get_application_services() -> ApplicationServices:
@@ -53,4 +56,7 @@ def get_application_services() -> ApplicationServices:
             MongoStudySessionRepository(database), subject_repository, topic_repository
         ),
         topics=TopicService(topic_repository, subject_repository, academic_period_repository),
+        evaluations=EvaluationService(
+            MongoEvaluationRepository(database), subject_repository, academic_period_repository
+        ),
     )

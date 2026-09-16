@@ -51,3 +51,4 @@ def ensure_indexes(database) -> None:
     )
     database.study_sessions.create_index([("user_id", 1), ("study_date", 1), ("study_time", 1)])
     database.topics.create_index([("user_id", 1), ("academic_period_id", 1), ("subject_id", 1), ("parent_id", 1), ("title", 1)])
+    database.evaluations.create_index([("user_id", 1), ("academic_period_id", 1), ("evaluation_date", 1)])

@@ -1,4 +1,4 @@
-"""Grade semanal visual de aulas com ações rápidas."""
+"""Grade semanal visual de aulas com seleção contextual."""
 
 from __future__ import annotations
 
@@ -15,32 +15,37 @@ _TIMETABLE = st.components.v2.component(
     html='''<p class="timetable-hint">Deslize para ver a semana completa.</p><div class="timetable-scroll"><div class="timetable" id="timetable-root" role="list" aria-label="Grade semanal de aulas"></div></div>''',
     css='''
     .timetable-hint { display: none; margin: 0 0 .5rem; color: var(--st-gray-text-color); font: .8rem var(--st-font); }
-    .timetable-scroll { max-width: 100%; overflow-x: auto; padding: .15rem .15rem .75rem; scrollbar-color: var(--st-primary-color) var(--st-secondary-background-color); scrollbar-width: thin; }
-    .timetable { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .8rem; min-width: 0; }
-    .day { min-height: 14rem; padding: .85rem; border: 1px solid var(--st-border-color); border-radius: var(--st-base-radius); background: var(--st-secondary-background-color); }
+    .timetable-scroll { box-sizing: border-box; max-width: 100%; overflow-x: auto; padding: .15rem .15rem .75rem; scrollbar-color: var(--st-primary-color) var(--st-secondary-background-color); scrollbar-width: thin; }
+    .timetable { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .8rem; min-width: 0; width: 100%; }
+    .day { min-width: 0; min-height: 14rem; overflow: hidden; padding: .85rem; border: 1px solid #dce5de; border-radius: 14px; background: #edf2ed; }
     .day h3 { margin: 0 0 .7rem; padding-bottom: .6rem; border-bottom: 1px solid var(--st-border-color); color: var(--st-heading-color); font: 600 .85rem var(--st-heading-font); letter-spacing: .04em; text-transform: uppercase; }
     .empty { margin-top: 2.6rem; color: var(--st-gray-text-color); font: .75rem var(--st-font); text-align: center; }
-    .meeting { position: relative; margin: .3rem 0; padding: .55rem 3.5rem .55rem .55rem; border: 1px solid var(--st-widget-border-color); border-left: 3px solid var(--meeting-color, var(--st-primary-color)); border-radius: var(--st-button-radius); background: var(--st-background-color); color: var(--st-text-color); }
+    .meeting { display: block; width: 100%; min-height: 5.2rem; margin: .3rem 0; padding: .65rem; border: 1px solid #dce5de; border-left: 3px solid var(--meeting-color, #176b5d); border-radius: 9px; background: #fcfdf9; color: #172529; cursor: pointer; text-align: left; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+    .meeting:hover { border-color: var(--st-primary-color); box-shadow: 0 4px 12px rgba(23, 107, 93, .12); transform: translateY(-1px); }
+    .meeting.selected { border-color: var(--st-primary-color); background: #e6f2e9; box-shadow: 0 0 0 2px rgba(23, 107, 93, .16), 0 8px 18px rgba(23, 107, 93, .12); transform: translateY(-1px); }
+    .meeting:focus-visible { outline: 3px solid var(--st-primary-color); outline-offset: 2px; }
+    .meeting-head { display: flex; align-items: center; justify-content: space-between; gap: .4rem; min-width: 0; }
+    .meeting-head strong { flex: 0 0 auto; min-width: 0; line-height: 1.15; white-space: nowrap; }
     .meeting strong, .meeting span { display: block; }
     .meeting strong { font: 600 .78rem var(--st-font); }
-    .meeting span { margin-top: .2rem; font: .75rem var(--st-font); line-height: 1.2; }
+    .meeting span { margin-top: .35rem; overflow-wrap: anywhere; font: .78rem var(--st-font); line-height: 1.3; }
     .meeting-location { color: var(--st-gray-text-color); font-size: .68rem !important; }
-    .meeting-actions { position: absolute; top: .3rem; right: .25rem; display: flex; gap: .1rem; }
-    .action { width: 1.55rem; min-height: 1.55rem; padding: 0; border: 0; border-radius: var(--st-button-radius); background: transparent; color: var(--st-gray-text-color); font: .72rem var(--st-font); cursor: pointer; }
-    .action:hover, .action:focus-visible { background: var(--st-secondary-background-color); color: var(--st-primary-color); }
-    .action:focus-visible, .confirm button:focus-visible { outline: 3px solid var(--st-primary-color); outline-offset: 2px; }
-    .confirm { display: flex; align-items: center; gap: .3rem; margin-top: .45rem; padding-top: .45rem; border-top: 1px solid var(--st-border-color); }
-    .confirm span { flex: 1; margin: 0; color: var(--st-gray-text-color); font-size: .68rem; }
-    .confirm button { min-height: 1.7rem; padding: .2rem .35rem; border: 1px solid var(--st-widget-border-color); border-radius: var(--st-button-radius); background: var(--st-background-color); color: var(--st-text-color); font: 600 .65rem var(--st-font); cursor: pointer; }
-    .confirm .confirm-delete { border-color: var(--st-primary-color); background: var(--st-primary-color); color: white; }
-    @media (max-width: 768px) { .timetable-hint { display: block; } .timetable-scroll { -webkit-overflow-scrolling: touch; } .timetable { grid-template-columns: repeat(7, minmax(130px, 1fr)); min-width: 950px; } }
+    .timetable.dark .day { border-color: #304840; background: #20332e; }
+    .timetable.dark .day h3 { color: #9ce3c5; }
+    .timetable.dark .empty { color: #a7b9b1; }
+    .timetable.dark .meeting { border-color: #304840; background: #182522; color: #edf7f1; }
+    .timetable.dark .meeting-location { color: #a7b9b1 !important; }
+    .timetable.dark .meeting.selected { background: #1e493d; }
+    @media (max-width: 640px) and (hover: none) { .timetable-hint { display: block; } .timetable-scroll { -webkit-overflow-scrolling: touch; } .timetable { grid-template-columns: repeat(7, minmax(130px, 1fr)); min-width: 950px; } }
     ''',
     js='''
     export default function (component) {
-      const { data, parentElement, setTriggerValue } = component
+      const { data, parentElement, setStateValue } = component
       const root = parentElement.querySelector("#timetable-root")
       if (!root) return
+      root.classList.toggle("dark", Boolean(data?.dark))
       root.replaceChildren()
+      let currentSelected = data?.selected ?? ""
       for (const day of (data?.days ?? [])) {
         const section = document.createElement("section")
         section.className = "day"
@@ -55,55 +60,33 @@ _TIMETABLE = st.components.v2.component(
           section.appendChild(empty)
         }
         for (const meeting of day.meetings) {
-          const card = document.createElement("article")
+          const card = document.createElement("button")
           card.className = "meeting"
+          card.type = "button"
+          card.setAttribute("aria-label", `Ver detalhes de ${meeting.subject}`)
+          if (meeting.id === data?.selected) card.classList.add("selected")
+          card.onclick = () => {
+            currentSelected = currentSelected === meeting.id ? "" : meeting.id
+            root.querySelectorAll(".meeting.selected").forEach((item) => item.classList.remove("selected"))
+            if (currentSelected === meeting.id) card.classList.add("selected")
+            setStateValue("selected", currentSelected)
+          }
           if (meeting.color) card.style.setProperty("--meeting-color", meeting.color)
           const time = document.createElement("strong")
           time.textContent = `${meeting.start}–${meeting.end}`
+          const header = document.createElement("div")
+          header.className = "meeting-head"
+          header.appendChild(time)
+          card.appendChild(header)
           const subject = document.createElement("span")
           subject.textContent = meeting.subject
-          card.append(time, subject)
+          card.appendChild(subject)
           if (meeting.location) {
             const location = document.createElement("span")
             location.className = "meeting-location"
             location.textContent = meeting.location
             card.appendChild(location)
           }
-          const actions = document.createElement("div")
-          actions.className = "meeting-actions"
-          const editButton = document.createElement("button")
-          editButton.className = "action"
-          editButton.type = "button"
-          editButton.title = "Editar horário"
-          editButton.setAttribute("aria-label", `Editar ${meeting.subject}`)
-          editButton.textContent = "✎"
-          editButton.onclick = () => setTriggerValue("edited", meeting.id)
-          const deleteButton = document.createElement("button")
-          deleteButton.className = "action"
-          deleteButton.type = "button"
-          deleteButton.title = "Remover horário"
-          deleteButton.setAttribute("aria-label", `Remover ${meeting.subject}`)
-          deleteButton.textContent = "🗑"
-          deleteButton.onclick = () => {
-            deleteButton.remove()
-            const confirmation = document.createElement("div")
-            confirmation.className = "confirm"
-            const message = document.createElement("span")
-            message.textContent = "Remover este horário?"
-            const cancel = document.createElement("button")
-            cancel.type = "button"
-            cancel.textContent = "Cancelar"
-            cancel.onclick = () => { confirmation.remove(); card.appendChild(deleteButton) }
-            const confirm = document.createElement("button")
-            confirm.className = "confirm-delete"
-            confirm.type = "button"
-            confirm.textContent = "Remover"
-            confirm.onclick = () => setTriggerValue("deleted", meeting.id)
-            confirmation.append(message, cancel, confirm)
-            card.appendChild(confirmation)
-          }
-          actions.append(editButton, deleteButton)
-          card.appendChild(actions)
           section.appendChild(card)
         }
         root.appendChild(section)
@@ -122,9 +105,14 @@ def _safe_color(value: Any) -> str:
 
 
 def render_class_timetable(
-    meetings: Iterable[dict[str, Any]], weekdays: Sequence[str], *, key: str
-) -> tuple[str | None, str | None]:
-    """Renderiza a grade e retorna IDs de aula removida e editada."""
+    meetings: Iterable[dict[str, Any]],
+    weekdays: Sequence[str],
+    *,
+    key: str,
+    selected_id: str | None = None,
+    dark_mode: bool = False,
+) -> tuple[str | None, str | None, str | None]:
+    """Renderiza a grade e retorna IDs removida, editada e selecionada."""
     meetings_by_day: dict[int, list[dict[str, str]]] = {
         weekday: [] for weekday in range(len(weekdays))
     }
@@ -147,11 +135,17 @@ def render_class_timetable(
     ]
     result = _TIMETABLE(
         key=key,
-        data={"days": days},
+        data={"days": days, "selected": selected_id, "dark": dark_mode},
+        default={"selected": selected_id or ""},
         on_deleted_change=lambda: None,
         on_edited_change=lambda: None,
+        on_selected_change=lambda: None,
     )
-    return getattr(result, "deleted", None), getattr(result, "edited", None)
+    return (
+        getattr(result, "deleted", None),
+        getattr(result, "edited", None),
+        getattr(result, "selected", None),
+    )
 
 
 def render_class_timetable_fallback(

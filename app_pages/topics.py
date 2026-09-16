@@ -1,5 +1,7 @@
 """Tela de organização de tópicos e subtópicos."""
 
+from html import escape
+
 import streamlit as st
 
 from src.ui.components.page_header import render_page_header
@@ -53,16 +55,30 @@ if not topics:
 else:
     for root in roots:
         with st.container(border=True):
-            st.markdown(f"### {root['title']}")
+            st.markdown(f"### {escape(root['title'])}")
             st.caption(f"{STATUS_LABELS.get(root['status'], root['status'])} · Dificuldade {DIFFICULTY_LABELS.get(root['difficulty'], root['difficulty'])}")
             root_progress = next((item for item in topic_summary if item["topic_id"] == root["_id"]), None)
             if root_progress and root_progress["planned_minutes"]:
                 st.progress(root_progress["progress"], text=f"{root_progress['completed_minutes']} de {root_progress['planned_minutes']} min em sessões")
+            path_items = []
             for child in children[root["_id"]]:
-                st.markdown(f"↳ **{child['title']}** · {STATUS_LABELS.get(child['status'], child['status'])} · {DIFFICULTY_LABELS.get(child['difficulty'], child['difficulty'])}")
                 child_progress = next((item for item in topic_summary if item["topic_id"] == child["_id"]), None)
+                is_done = child["status"] in {"REVIEWED", "MASTERED"}
+                detail = STATUS_LABELS.get(child["status"], child["status"])
                 if child_progress and child_progress["planned_minutes"]:
-                    st.progress(child_progress["progress"], text=f"{child_progress['completed_minutes']} de {child_progress['planned_minutes']} min")
+                    detail = f"{detail} · {child_progress['completed_minutes']}/{child_progress['planned_minutes']} min"
+                path_items.append(
+                    f'<div class="plan-topic-path-item {"is-done" if is_done else ""}" '
+                    'style="align-items:center;display:flex;gap:.65rem;min-height:1.8rem;">'
+                    '<i aria-hidden="true" style="display:block;flex:0 0 auto;"></i>'
+                    f'<strong style="color:var(--plan-text);font-size:.88rem;">{escape(child["title"])}</strong>'
+                    f'<small style="color:var(--plan-muted);margin-left:auto;white-space:nowrap;">{escape(detail)}</small></div>'
+                )
+            if path_items:
+                st.markdown(
+                    '<div class="plan-topic-path">' + "".join(path_items) + "</div>",
+                    unsafe_allow_html=True,
+                )
 
 with st.expander("Adicionar tópico ou subtópico", expanded=not topics):
     with st.form("new_topic"):

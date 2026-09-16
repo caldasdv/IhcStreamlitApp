@@ -1,9 +1,30 @@
 from datetime import date, timedelta
 
-from src.services.report_service import build_subject_summary, build_topic_summary, build_week_summary
+from src.services.report_service import (
+    build_evaluation_summary,
+    build_subject_summary,
+    build_topic_summary,
+    build_week_summary,
+)
 
 
 SUBJECTS = [{"_id": "ihc", "name": "IHC"}, {"_id": "bd", "name": "Banco de Dados"}]
+
+
+def test_evaluation_summary_calculates_average_by_subject():
+    result = build_evaluation_summary(
+        [
+            {"subject_id": "ihc", "score": 8, "max_score": 10},
+            {"subject_id": "ihc", "score": 6, "max_score": 10},
+            {"subject_id": "bd", "score": 15, "max_score": 20},
+        ],
+        SUBJECTS,
+    )
+
+    assert result == [
+        {"disciplina": "IHC", "avaliacoes": 2, "media": 7.0, "aproveitamento": 0.7},
+        {"disciplina": "Banco de Dados", "avaliacoes": 1, "media": 7.5, "aproveitamento": 0.75},
+    ]
 
 
 def test_subject_summary_separates_planned_and_completed_minutes():

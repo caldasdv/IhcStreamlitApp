@@ -6,7 +6,8 @@ import streamlit as st
 
 from src.domain.session_rules import effective_status
 from src.ui.components.session_card import render_session_card
-from src.ui.components.page_header import render_page_header
+from src.ui.components.study_rhythm import render_study_rhythm
+from src.ui.components.page_header import render_flow_actions, render_page_header
 from src.ui.context import (
     load_current_period_subjects,
     load_page_context,
@@ -26,6 +27,7 @@ render_page_header(
     f"Olá, {user['name'].split()[0]}",
     "Aqui está o que você planejou para os próximos dias.",
 )
+render_flow_actions("Hoje")
 if current_period_id is None:
     with st.container(border=True):
         st.subheader("Vamos preparar seu plano")
@@ -68,14 +70,40 @@ pending = [s for s in week_sessions if effective_status(s) in ("Pendente", "Atra
 completed = [s for s in week_sessions if effective_status(s) == "Concluída"]
 completed_minutes = sum(s["duration"] for s in week_sessions if effective_status(s) == "Concluída")
 goal_minutes = user.get("weekly_goal_minutes", 300)
-col1, col2, col3 = st.columns(3)
-col1.metric("Pendências", len(pending), border=True)
-col2.metric("Progresso da semana", f"{completed_minutes / 60:.1f} / {goal_minutes / 60:.1f}h", border=True)
-col3.metric("Sessões concluídas", len(completed), border=True)
-st.progress(
-    min(completed_minutes / goal_minutes, 1.0) if goal_minutes else 0.0,
-    text=f"{completed_minutes / goal_minutes * 100:.0f}% da meta semanal" if goal_minutes else "Sem meta",
+st.markdown(
+    f"""
+    <section class="plan-overview-hero" aria-label="Resumo da semana">
+        <div class="plan-overview-hero-copy">
+            <span class="plan-overview-hero-kicker">SEU RITMO, SUA SEMANA</span>
+            <h2>Pequenos blocos.<br><em>Um semestre inteiro.</em></h2>
+            <p>Você já tem um mapa. Agora é só escolher o próximo passo.</p>
+        </div>
+        <div class="plan-overview-orbit plan-overview-orbit-a"></div>
+        <div class="plan-overview-orbit plan-overview-orbit-b"></div>
+        <div class="plan-overview-hero-stat">
+            <span>pulso da semana</span>
+            <strong>{completed_minutes}<small> min</small></strong>
+            <div class="plan-overview-hero-track"><i style="width:{min(completed_minutes / goal_minutes * 100, 100) if goal_minutes else 0:.0f}%"></i></div>
+            <small>{len(completed)} sessões concluídas</small>
+        </div>
+        <div class="plan-overview-spark spark-one"></div><div class="plan-overview-spark spark-two"></div><div class="plan-overview-spark spark-three"></div>
+    </section>
+    """,
+    unsafe_allow_html=True,
 )
+render_study_rhythm(week_sessions, week_start)
+st.markdown(
+    '<section class="plan-quick-actions" aria-label="Ações rápidas">'
+    '<span>O que você quer fazer agora?</span></section>',
+    unsafe_allow_html=True,
+)
+quick_columns = st.columns(3)
+if quick_columns[0].button("Começar uma sessão", icon=":material/play_arrow:", width="stretch", key="overview_quick_session"):
+    st.switch_page("app_pages/new_session.py")
+if quick_columns[1].button("Revisar a semana", icon=":material/calendar_view_week:", width="stretch", key="overview_quick_week"):
+    st.switch_page("app_pages/weekly.py")
+if quick_columns[2].button("Organizar conteúdos", icon=":material/account_tree:", width="stretch", key="overview_quick_topics"):
+    st.switch_page("app_pages/topics.py")
 if pending:
     next_session = min(pending, key=lambda session: (session["study_date"], session["study_time"]))
     next_session_date = date.fromisoformat(next_session["study_date"])
@@ -90,7 +118,7 @@ if pending:
             st.switch_page("app_pages/weekly.py")
 else:
     st.success("Tudo em dia por aqui. Você pode planejar a próxima sessão.")
-st.divider()
+st.markdown('<div class="plan-overview-divider"></div>', unsafe_allow_html=True)
 if week_start <= selected_date <= week_end:
     day_sessions = [s for s in week_sessions if s["study_date"] == selected_date.isoformat()]
 else:
@@ -111,7 +139,11 @@ weekdays = [
     "sábado",
     "domingo",
 ]
-st.subheader(f"{weekdays[selected_date.weekday()]}, {selected_date.day:02d}/{selected_date.month:02d}")
+st.markdown(
+    f'<h2 class="plan-overview-day-title">{weekdays[selected_date.weekday()]}, '
+    f'{selected_date.day:02d}/{selected_date.month:02d}</h2>',
+    unsafe_allow_html=True,
+)
 if not day_sessions:
     st.info("Nenhuma sessão planejada para este dia.")
 for row in day_sessions:

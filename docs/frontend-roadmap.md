@@ -204,3 +204,20 @@ nativa por abas é o fluxo principal por oferecer ações contextuais mais clara
 
 **Limitação:** ainda é necessário validar a interação no Community Cloud e com estudantes antes de
 considerá-la uma substituição definitiva da visão semanal.
+
+## Refinamento visual posterior
+
+Foi aplicada uma extensão da fundação visual nas telas existentes: home com hero editorial e pulso
+semanal, paleta compartilhada nos gráficos Plotly, superfícies e formulários, labels compactos na
+navegação lateral, e acabamento coerente nos componentes de agenda e grade. A decisão mantém
+Streamlit e Custom Components v2; não houve necessidade concreta de introduzir React no produto.
+Essa alteração é uma decisão de design implementada, não uma validação com usuários. A avaliação
+em navegador real e com estudantes continua pendente na Sprint 12.
+
+Também foi adicionada uma faixa de ritmo semanal reutilizável na Home e na Semana, com leitura
+visual de minutos concluídos/planejados por dia. Ela complementa a agenda, não substitui seus
+dados detalhados, e não introduz uma nova regra de negócio ou coleção.
+
+Na Home, foram adicionados atalhos para iniciar sessão, revisar a semana e organizar conteúdos.
+A tela de conteúdos passou a apresentar subtópicos como uma trilha visual de estados, reutilizando
+o progresso já persistido e sem criar nova collection.

@@ -38,7 +38,8 @@ def run_app() -> None:
                 ),
             ],
             "Acompanhar": [
-                st.Page("app_pages/progress.py", title="Progresso", icon=":material/analytics:")
+                st.Page("app_pages/progress.py", title="Progresso", icon=":material/analytics:"),
+                st.Page("app_pages/evaluations.py", title="Avaliações", icon=":material/assignment:"),
             ],
             "Organizar": [
                 st.Page("app_pages/subjects.py", title="Disciplinas", icon=":material/menu_book:"),

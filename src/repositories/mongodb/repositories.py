@@ -50,6 +50,13 @@ class MongoUserRepository:
         if result.matched_count == 0:
             raise EntityNotFoundError("O usuário autenticado não foi encontrado.")
 
+    def update_dark_mode(self, user_id: Any, enabled: bool) -> None:
+        result = self.collection.update_one(
+            {"_id": user_id}, {"$set": {"dark_mode": bool(enabled)}}
+        )
+        if result.matched_count == 0:
+            raise EntityNotFoundError("O usuário autenticado não foi encontrado.")
+
 
 class MongoAcademicPeriodRepository:
     def __init__(self, database) -> None:
@@ -373,3 +380,18 @@ class MongoStudySessionRepository:
         result = self.collection.delete_one({"_id": session_id, "user_id": user_id})
         if result.deleted_count == 0:
             raise EntityNotFoundError("A sessão não foi encontrada ou não está mais disponível.")
+
+
+class MongoEvaluationRepository:
+    def __init__(self, database) -> None:
+        self.collection = database.evaluations
+
+    def list_by_period(self, user_id: Any, academic_period_id: Any, subjects: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        names = {subject["_id"]: subject["name"] for subject in subjects}
+        rows = list(self.collection.find({"user_id": user_id, "academic_period_id": academic_period_id}).sort("evaluation_date", 1))
+        for row in rows:
+            row["subject_name"] = names.get(row["subject_id"], "Disciplina indisponível")
+        return rows
+
+    def create(self, data: dict[str, Any]) -> Any:
+        return self.collection.insert_one(data).inserted_id

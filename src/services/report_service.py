@@ -96,3 +96,30 @@ def build_topic_summary(
             }
         )
     return summary
+
+
+def build_evaluation_summary(
+    evaluations: Iterable[dict[str, Any]], subjects: Iterable[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Resume média proporcional e aproveitamento por disciplina."""
+    evaluations_by_subject: dict[Any, list[dict[str, Any]]] = {}
+    for evaluation in evaluations:
+        if evaluation.get("score") is None or not evaluation.get("max_score"):
+            continue
+        evaluations_by_subject.setdefault(evaluation["subject_id"], []).append(evaluation)
+
+    summary = []
+    for subject in subjects:
+        rows = evaluations_by_subject.get(subject["_id"], [])
+        if not rows:
+            continue
+        average = sum(row["score"] / row["max_score"] for row in rows) / len(rows)
+        summary.append(
+            {
+                "disciplina": subject["name"],
+                "avaliacoes": len(rows),
+                "media": average * 10,
+                "aproveitamento": average,
+            }
+        )
+    return summary

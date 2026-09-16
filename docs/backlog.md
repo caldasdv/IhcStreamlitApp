@@ -169,6 +169,16 @@ Como estudante quero vincular uma sessão de estudo a um tópico para acompanhar
 - Complexidade: M
 - Status: DONE.
 
+### US-023
+
+Como estudante quero registrar provas, trabalhos e exercícios para acompanhar minhas notas e identificar meu desempenho por disciplina.
+
+- Prioridade: P1
+- Critérios de aceitação: tipo, título, data, disciplina e notas válidos; referências pertencem ao usuário e ao período atual; histórico ordenado por data; análise proporcional por disciplina; estado vazio informado.
+- Dependências: US-016, US-017 e página de Progresso.
+- Complexidade: M
+- Status: DONE (integrada à `main`).
+
 ## Ciclo de entrega
 
 As histórias abaixo fazem parte de um único ciclo consolidado de evolução do produto. A divisão histórica
