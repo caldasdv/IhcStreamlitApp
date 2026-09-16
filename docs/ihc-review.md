@@ -58,6 +58,7 @@ precisam ser confirmados com uso real.
 | IHC-021 | Alto | A primeira reorganização em abas ainda não oferecia uma leitura visual simultânea dos sete dias. | Corrigido tecnicamente; validar leitura da grade e rolagem horizontal em telas estreitas. |
 | IHC-022 | Alto | A visão semanal de sessões ainda escondia cada dia em abas, dificultando a comparação da carga planejada. | Corrigido tecnicamente; validar seleção da sessão, leitura dos sete dias e rolagem no celular. |
 | IHC-023 | Médio | O detalhamento de progresso usava barras nativas repetidas, com pouca hierarquia entre disciplinas e estados. | Corrigido tecnicamente; validar leitura dos percentuais e compreensão dos estados sem depender da cor. |
+| IHC-024 | Alto | A remoção de uma aula acontecia em uma lista separada da localização visual na grade. | Corrigido tecnicamente; validar descoberta da lixeira, confirmação no card e cancelamento no celular. |
 
 ## Plano de avaliação seguinte
 

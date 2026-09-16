@@ -104,7 +104,19 @@ st.subheader("Sua semana")
 if not meetings:
     st.info("Sua grade ainda está vazia. Adicione o primeiro horário acima.")
 
-render_class_timetable(meetings, WEEKDAYS)
+deleted_meeting_id = render_class_timetable(
+    meetings, WEEKDAYS, key=f"class_timetable_{current_period_id}"
+)
+if deleted_meeting_id:
+    try:
+        services.class_meetings.delete(
+            user["_id"], current_period_id, deleted_meeting_id
+        )
+    except Exception as error:
+        show_action_error("remover a aula", error)
+    else:
+        set_success_flash("Horário removido da grade.")
+        st.rerun()
 
 st.subheader("Editar horários")
 day_meetings_by_weekday = {

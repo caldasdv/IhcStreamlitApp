@@ -7,6 +7,7 @@
 - O frontend é composto por `st.navigation`, páginas Streamlit, formulários, containers, Plotly e um Custom Component v2 com fallback nativo.
 - Existe CSS global em `src/ui/styles.py`, com alguns seletores baseados em `data-testid` interno do Streamlit.
 - Não há framework frontend paralelo; o componente de agenda mantém HTML, CSS e JavaScript locais e restritos à apresentação.
+- A grade semanal de aulas usa Custom Component v2 para manter a ação de remoção junto ao cartão, com confirmação local e retorno de evento ao service Python.
 - O dashboard usa Plotly quando há ganho de interação e oferece tabela equivalente.
 - O dashboard também usa cards HTML/CSS reutilizáveis para resumir progresso por disciplina com texto equivalente às barras.
 - A aplicação possui estados vazios, loading e feedback de ação, mas ainda não há avaliação com usuários.
