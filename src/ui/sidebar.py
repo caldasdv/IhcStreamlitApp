@@ -13,7 +13,9 @@ from src.ui.feedback import show_action_error
 
 def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
     st.sidebar.markdown(
-        '<div class="plan-sidebar-brand"><span class="plan-sidebar-mark">P</span>'
+        '<div class="plan-sidebar-brand"><span class="plan-sidebar-mark" aria-label="Plano">'
+        '<svg viewBox="0 0 96 96" aria-hidden="true"><path d="M29 67V28h18.5c11.3 0 18.5 5.7 18.5 15.5S58.8 59 47.5 59H38" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/><circle cx="68" cy="67" r="5" fill="#B9E2C8"/></svg>'
+        '</span>'
         '<div><strong>Plano</strong><small>Seu espaço de estudos</small></div></div>',
         unsafe_allow_html=True,
     )

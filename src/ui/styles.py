@@ -40,7 +40,8 @@ def apply_styles() -> None:
         .plan-sidebar-brand strong, .plan-sidebar-brand small { display: block; }
         .plan-sidebar-brand strong { color: var(--plan-accent-dark); font-size: 1.15rem; letter-spacing: -.04em; }
         .plan-sidebar-brand small { color: var(--plan-muted); font-size: .72rem; margin-top: .1rem; }
-        .plan-sidebar-mark { align-items: center; background: var(--plan-accent); border-radius: 10px; color: white; display: inline-flex; font-size: .9rem; font-weight: 800; height: 2rem; justify-content: center; width: 2rem; }
+        .plan-sidebar-mark { align-items: center; background: var(--plan-accent); border-radius: 10px; color: white; display: inline-flex; flex: 0 0 auto; height: 2rem; justify-content: center; width: 2rem; }
+        .plan-sidebar-mark svg { height: 1.45rem; width: 1.45rem; }
         .plan-sidebar-user { background: rgba(252, 253, 249, .66); border: 1px solid var(--plan-border); border-radius: 12px; margin: .4rem 0 .65rem; padding: .7rem .75rem; text-align: left; }
         .plan-sidebar-user strong, .plan-sidebar-user span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .plan-sidebar-user strong { color: var(--plan-text); font-size: .82rem; }

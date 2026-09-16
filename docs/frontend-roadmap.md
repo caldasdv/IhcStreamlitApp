@@ -12,6 +12,8 @@
 - O dashboard também usa cards HTML/CSS reutilizáveis para resumir progresso por disciplina com texto equivalente às barras.
 - A fundação visual usa tokens compartilhados, métricas consistentes, badges compactos e superfícies sem caixas brancas desconectadas.
 - A barra lateral usa marca, conta, navegação ativa, foco visível e meta semanal em blocos distintos.
+- A marca usa o SVG `assets/plan-logo.svg`, reutilizado no favicon e no símbolo da sidebar para manter reconhecimento consistente.
+- A tela Metas distribui a meta semanal por disciplina com estratégias explicáveis: equilibrada, notas, dificuldade ou pendências.
 - A tela Hoje apresenta o próximo passo pendente e a agenda semanal posiciona sessões por horário e duração.
 - A aplicação possui estados vazios, loading e feedback de ação, mas ainda não há avaliação com usuários.
 

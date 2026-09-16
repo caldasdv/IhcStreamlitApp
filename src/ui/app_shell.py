@@ -18,7 +18,11 @@ PROJECT_DIR = Path(__file__).resolve().parents[2]
 def run_app() -> None:
     """Configura e executa a navegação principal do produto."""
     load_dotenv(PROJECT_DIR / ".env")
-    st.set_page_config(page_title="Plano", page_icon="◷", layout="wide")
+    st.set_page_config(
+        page_title="Plano",
+        page_icon=str(PROJECT_DIR / "assets" / "plan-logo.svg"),
+        layout="wide",
+    )
     apply_styles()
     require_login()
     render_flash()

@@ -4,6 +4,8 @@
 
 O Plano é um planejador de estudos web para estudantes. O MVP Streamlit possui autenticação Google OIDC, períodos acadêmicos, disciplinas, tópicos/subtópicos, grade de aulas, sessões, meta semanal, agenda e visão de progresso, com isolamento por usuário. A arquitetura é um monólito modular adequado ao tamanho atual e ao deploy no Streamlit Community Cloud.
 
+Há dois modos de execução: produção usa OIDC e MongoDB Atlas; a branch `local-demo`, ativada somente por `PLANO_LOCAL_MODE=true`, usa identidade fixa de demonstração e `mongomock` em memória. O modo local compartilha os mesmos services e repositories Mongo, permitindo testar o fluxo sem criar uma arquitetura paralela.
+
 ## Componentes
 
 ```text
@@ -42,10 +44,10 @@ Presentation pode depender de Services e modelos de saída. Services podem depen
 ## Decisões
 
 - Monólito modular, sem serviços distribuídos nesta fase.
-- MongoDB Atlas como persistência externa.
+- MongoDB Atlas como persistência externa; `mongomock` em memória somente no modo local-demo.
 - Streamlit como presentation e Community Cloud como alvo de deploy.
 - Segredos fora do Git; `st.secrets` no Cloud e ambiente local para desenvolvimento.
-- O shell exige autenticação OIDC antes da navegação; o service resolve o usuário por `identity.provider` e `identity.subject`, e os repositories continuam filtrando por `user_id`.
+- O shell exige autenticação OIDC no modo normal; no modo local-demo a identidade é fixa e explicitamente marcada como local. Em ambos, o service resolve o usuário por `identity.provider` e `identity.subject`, e os repositories continuam filtrando por `user_id`.
 - O período acadêmico atual é uma referência no usuário; períodos possuem repository/service próprios e não são embutidos nem inferidos a partir de datas.
 - Disciplinas novas referenciam um período ativo. Registros legados sem período são preservados e apresentados explicitamente, sem migração automática.
 - A associação de uma disciplina legada é uma ação explícita e atômica; nenhuma sessão é reescrita e o repository impede associação cruzada entre usuários.

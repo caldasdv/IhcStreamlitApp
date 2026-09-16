@@ -179,6 +179,16 @@ Como estudante quero registrar provas, trabalhos e exercícios para acompanhar m
 - Complexidade: M
 - Status: DONE (integrada à `main`).
 
+### US-024
+
+Como estudante quero receber uma sugestão de distribuição da minha meta por disciplina para priorizar conteúdos difíceis, notas baixas ou pendências.
+
+- Prioridade: P2
+- Critérios de aceitação: cálculo determinístico e explicável; estratégias equilibrada, notas, dificuldade e pendências; distribuição não ultrapassa a meta; disciplinas sem dados continuam recebendo uma recomendação; regras testadas sem Streamlit ou banco real.
+- Dependências: US-021, US-022 e US-023.
+- Complexidade: M
+- Status: REVIEW.
+
 ## Ciclo de entrega
 
 As histórias abaixo fazem parte de um único ciclo consolidado de evolução do produto. A divisão histórica

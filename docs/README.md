@@ -5,6 +5,8 @@ Este diretório concentra as fontes de verdade do Plano. Documentos históricos 
 ## Estado atual
 
 - MVP operacional: autenticação Google OIDC, isolamento por usuário, disciplinas, sessões de estudo, agenda semanal, progresso e meta semanal.
+- Execução local reproduzível disponível na branch `local-demo`: modo `PLANO_LOCAL_MODE=true`, autenticação simulada e `mongomock` em memória, sem Secrets ou Atlas.
+- Metas adaptativas disponíveis na branch `feature/smart-goals`, calculando foco por notas, dificuldade e pendências.
 - Entregas funcionais integradas à `main`: hardening, períodos acadêmicos, disciplinas por período,
   grade semanal e associação manual de disciplinas legadas.
 - Protocolo de avaliação de usabilidade preparado, ainda pendente de participantes e evidência real.
