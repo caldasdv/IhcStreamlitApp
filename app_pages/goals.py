@@ -1,0 +1,63 @@
+"""Tela de metas de estudo."""
+
+from datetime import date, timedelta
+
+import streamlit as st
+
+from src.ui.components.page_header import render_flow_actions, render_page_header
+from src.ui.context import load_page_context, load_page_sessions
+from src.ui.feedback import set_success_flash, show_action_error
+from src.ui.sidebar import render_account_sidebar
+
+
+services, user, subjects = load_page_context()
+render_account_sidebar(services, user)
+render_page_header("PLANEJAR", "Metas", "Defina um ritmo possível e acompanhe sua evolução sem perder o foco.")
+render_flow_actions("Metas")
+
+week_start = date.today() - timedelta(days=date.today().weekday())
+week_end = week_start + timedelta(days=6)
+sessions = load_page_sessions(
+    services,
+    user,
+    subjects,
+    start_date=week_start,
+    end_date=week_end,
+    retry_key="retry_goals_sessions",
+)
+completed_minutes = sum(
+    int(session["duration"])
+    for session in sessions
+    if session.get("status") == "Concluída"
+)
+goal_minutes = int(user.get("weekly_goal_minutes", 300))
+progress = min(completed_minutes / goal_minutes, 1.0) if goal_minutes else 0.0
+
+metric_columns = st.columns(3)
+metric_columns[0].metric("Meta semanal", f"{goal_minutes // 60}h {goal_minutes % 60:02d}", border=True)
+metric_columns[1].metric("Concluído", f"{completed_minutes} min", border=True)
+metric_columns[2].metric("Progresso", f"{progress * 100:.0f}%", border=True)
+st.progress(progress, text=f"{completed_minutes} de {goal_minutes} minutos planejados")
+
+with st.container(border=True):
+    st.subheader("Ajustar meta semanal")
+    st.caption("Escolha quantas horas você quer estudar por semana. A alteração fica salva na sua conta.")
+    with st.form("weekly_goal_form"):
+        goal_hours = st.number_input(
+            "Horas por semana",
+            min_value=1.0,
+            max_value=80.0,
+            value=goal_minutes / 60,
+            step=0.5,
+        )
+        submitted = st.form_submit_button("Salvar meta", type="primary", width="stretch")
+    if submitted:
+        try:
+            services.users.update_weekly_goal(user["_id"], goal_hours)
+        except ValueError as error:
+            st.error(str(error))
+        except Exception as error:
+            show_action_error("atualizar sua meta", error)
+        else:
+            set_success_flash("Meta semanal atualizada.")
+            st.rerun()

@@ -26,6 +26,7 @@ def run_app() -> None:
         {
             "Plano": [
                 st.Page("app_pages/overview.py", title="Hoje", icon=":material/home:"),
+                st.Page("app_pages/goals.py", title="Metas", icon=":material/track_changes:"),
                 st.Page(
                     "app_pages/new_session.py",
                     title="Nova sessão",

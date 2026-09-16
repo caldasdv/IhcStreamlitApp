@@ -34,6 +34,7 @@ def render_flow_actions(current: str) -> None:
     """Oferece navegação contextual para o fluxo principal sem depender da sidebar."""
     pages = {
         "Hoje": ("app_pages/overview.py", ":material/home:", "flow_today"),
+        "Metas": ("app_pages/goals.py", ":material/track_changes:", "flow_goals"),
         "Nova sessão": ("app_pages/new_session.py", ":material/add_circle:", "flow_session"),
         "Semana": ("app_pages/weekly.py", ":material/calendar_view_week:", "flow_week"),
         "Progresso": ("app_pages/progress.py", ":material/insights:", "flow_progress"),
