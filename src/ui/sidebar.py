@@ -49,23 +49,24 @@ def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
             unsafe_allow_html=True,
         )
     st.sidebar.divider()
-    st.sidebar.markdown(
-        '<div class="plan-sidebar-section-label">Meta semanal</div>',
-        unsafe_allow_html=True,
-    )
-    goal_hours = st.sidebar.number_input(
-        "Horas por semana",
-        min_value=1.0,
-        max_value=80.0,
-        value=user.get("weekly_goal_minutes", 300) / 60,
-        step=0.5,
-        key="weekly_goal_hours",
-    )
-    if st.sidebar.button("Salvar meta", width="stretch"):
-        try:
-            services.users.update_weekly_goal(user["_id"], goal_hours)
-        except Exception as error:
-            show_action_error("atualizar sua meta", error)
-        else:
-            set_success_flash("Meta atualizada.")
-            st.rerun()
+    with st.sidebar.expander("Metas", expanded=True):
+        st.markdown(
+            '<div class="plan-sidebar-section-label">Meta semanal</div>',
+            unsafe_allow_html=True,
+        )
+        goal_hours = st.number_input(
+            "Horas por semana",
+            min_value=1.0,
+            max_value=80.0,
+            value=user.get("weekly_goal_minutes", 300) / 60,
+            step=0.5,
+            key="weekly_goal_hours",
+        )
+        if st.button("Salvar meta", width="stretch"):
+            try:
+                services.users.update_weekly_goal(user["_id"], goal_hours)
+            except Exception as error:
+                show_action_error("atualizar sua meta", error)
+            else:
+                set_success_flash("Meta atualizada.")
+                st.rerun()

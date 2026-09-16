@@ -273,6 +273,11 @@ def apply_styles() -> None:
         body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] .plan-sidebar-user { background: #1b302a; border-color: #426255; }
         body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] .plan-sidebar-user strong { color: #edf7f1; }
         body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] .plan-sidebar-user span { color: #b2c4bb; }
+        body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] [data-testid="stExpander"] summary { background: #182522; color: #edf7f1; }
+        body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] [data-testid="stExpander"] summary svg { color: #9ce3c5; }
+        body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] input,
+        body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] label,
+        body:has(.plan-dark-mode-marker) [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p { color: #edf7f1 !important; -webkit-text-fill-color: #edf7f1; }
         body:has(.plan-dark-mode-marker) [data-testid="stVerticalBlockBorderWrapper"],
         body:has(.plan-dark-mode-marker) [data-testid="stForm"],
         body:has(.plan-dark-mode-marker) [data-testid="stExpander"],
