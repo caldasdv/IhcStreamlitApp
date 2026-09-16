@@ -49,6 +49,15 @@ def apply_styles() -> None:
         button, input, textarea, select { min-height: 2.5rem; }
         .subject-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .35rem; vertical-align: .05rem; }
         .plan-subject-swatch { width: 1rem; height: 1rem; border-radius: 50%; margin-bottom: .7rem; }
+        .plan-timetable-scroll { overflow-x: auto; padding: .15rem .15rem .75rem; }
+        .plan-timetable { display: grid; grid-template-columns: repeat(7, minmax(155px, 1fr)); gap: .8rem; min-width: 1140px; }
+        .plan-timetable-day { background: var(--plan-input); border: 1px solid var(--plan-border); border-radius: 14px; min-height: 16rem; padding: 1rem; }
+        .plan-timetable-day h3 { border-bottom: 1px solid var(--plan-border); color: var(--plan-accent-dark); font-size: .95rem; letter-spacing: .06em; margin: 0 0 .9rem; padding-bottom: .7rem; text-transform: uppercase; }
+        .plan-meeting { background: var(--plan-surface); border-left: 5px solid var(--meeting-color); border-radius: 9px; box-shadow: 0 2px 8px rgba(30, 45, 49, .06); display: flex; flex-direction: column; gap: .3rem; margin-bottom: .7rem; padding: .8rem; }
+        .plan-meeting strong { color: var(--plan-text); font-size: .95rem; }
+        .plan-meeting span { color: var(--plan-text); font-size: .9rem; line-height: 1.3; }
+        .plan-meeting-location { color: var(--plan-muted) !important; font-size: .8rem !important; }
+        .plan-timetable-empty { color: var(--plan-muted); font-size: .85rem; margin: 3.8rem 0 0; text-align: center; }
         @media (max-width: 640px) {
             .block-container { padding-top: 2.75rem; padding-left: 1rem; padding-right: 1rem; }
             h1 { font-size: 2rem; }

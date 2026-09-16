@@ -55,6 +55,7 @@ precisam ser confirmados com uso real.
 | IHC-018 | Médio | A visão semanal não permitia consultar semanas anteriores ou futuras. | Corrigido tecnicamente; validar se a navegação preserva o contexto esperado. |
 | IHC-019 | Alto | Disciplinas eram exibidas como uma lista simples e não podiam ser editadas. | Corrigido tecnicamente; validar compreensão da edição e prevenção de duplicidade. |
 | IHC-020 | Alto | A grade de aulas empilhava horários por dia, com pouca visão de conjunto e muito deslocamento vertical. | Corrigido tecnicamente; validar localização de aulas e remoção no celular. |
+| IHC-021 | Alto | A primeira reorganização em abas ainda não oferecia uma leitura visual simultânea dos sete dias. | Corrigido tecnicamente; validar leitura da grade e rolagem horizontal em telas estreitas. |
 
 ## Plano de avaliação seguinte
 
