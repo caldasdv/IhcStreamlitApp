@@ -7,6 +7,7 @@ from html import escape
 import streamlit as st
 
 from src.services.container import ApplicationServices
+from src.config.runtime import is_local_mode
 from src.ui.feedback import show_action_error
 
 
@@ -21,8 +22,10 @@ def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
         f'<span>{escape(str(user["email"]))}</span></div>',
         unsafe_allow_html=True,
     )
-    if st.sidebar.button("Sair", width="stretch"):
+    if not is_local_mode() and st.sidebar.button("Sair", width="stretch"):
         st.logout()
+    if is_local_mode():
+        st.sidebar.caption("Ambiente local · dados temporários")
     st.sidebar.divider()
     dark_mode = bool(user.get("dark_mode", False))
     st.session_state["plan_dark_mode"] = dark_mode

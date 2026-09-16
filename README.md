@@ -92,6 +92,16 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt -r requirements-dev.txt
 ```
 
+### Rodar sem Google e sem MongoDB
+
+Para desenvolver telas e fluxos sem configurar credenciais, use a branch `local-demo` e ative o modo local:
+
+```bash
+PLANO_LOCAL_MODE=true mise exec -- python -m streamlit run app.py
+```
+
+Esse modo usa `mongomock` em memória e cria uma conta de demonstração com um período e disciplinas iniciais. Os dados são descartados quando o processo termina. Ele é exclusivo para desenvolvimento local; o modo normal continua exigindo Google OIDC e MongoDB Atlas.
+
 No Windows PowerShell, a ativação equivalente é:
 
 ```powershell

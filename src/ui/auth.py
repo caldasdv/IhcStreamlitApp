@@ -5,6 +5,8 @@ from __future__ import annotations
 import streamlit as st
 from streamlit.errors import StreamlitSecretNotFoundError
 
+from src.config.runtime import is_local_mode
+
 
 def _auth_is_configured() -> bool:
     """Verifica se o provedor OIDC local possui as credenciais necessárias."""
@@ -24,6 +26,8 @@ def _auth_is_configured() -> bool:
 
 def require_login() -> None:
     """Interrompe a execução até que o usuário conclua o login."""
+    if is_local_mode():
+        return
     if st.user.get("is_logged_in", False):
         return
 
@@ -78,6 +82,13 @@ def require_login() -> None:
 
 def get_current_identity() -> dict[str, str]:
     """Converte os claims necessários do OIDC em uma estrutura estável."""
+    if is_local_mode():
+        return {
+            "provider": "local-demo",
+            "subject": "local-demo-user",
+            "name": "Estudante local",
+            "email": "local@plano.test",
+        }
     subject = str(st.user.get("sub", "")).strip()
     if not subject:
         raise RuntimeError("A identidade do provedor não possui um identificador válido.")
