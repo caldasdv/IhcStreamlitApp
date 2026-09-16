@@ -10,6 +10,7 @@ from src.repositories.mongodb.repositories import (
     MongoClassMeetingRepository,
     MongoStudySessionRepository,
     MongoSubjectRepository,
+    MongoTopicRepository,
     MongoUserRepository,
 )
 from src.services.academic_period_service import AcademicPeriodService
@@ -17,6 +18,7 @@ from src.services.class_meeting_service import ClassMeetingService
 from src.services.session_service import SessionService
 from src.services.subject_service import SubjectService
 from src.services.user_service import UserService
+from src.services.topic_service import TopicService
 
 
 @dataclass(frozen=True)
@@ -26,12 +28,14 @@ class ApplicationServices:
     subjects: SubjectService
     class_meetings: ClassMeetingService
     sessions: SessionService
+    topics: TopicService
 
 
 def get_application_services() -> ApplicationServices:
     """Compõe services atuais; somente a conexão de banco permanece em cache."""
     database = get_database()
     subject_repository = MongoSubjectRepository(database)
+    topic_repository = MongoTopicRepository(database)
     academic_period_repository = MongoAcademicPeriodRepository(database)
     user_repository = MongoUserRepository(database)
     return ApplicationServices(
@@ -46,4 +50,5 @@ def get_application_services() -> ApplicationServices:
             academic_period_repository,
         ),
         sessions=SessionService(MongoStudySessionRepository(database), subject_repository),
+        topics=TopicService(topic_repository, subject_repository, academic_period_repository),
     )

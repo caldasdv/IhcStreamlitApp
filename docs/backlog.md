@@ -149,6 +149,16 @@ Como estudante quero editar o nome e a cor de uma disciplina para manter meu pla
 - Complexidade: M
 - Status: DONE (integrada à `main`).
 
+### US-021
+
+Como estudante quero organizar uma disciplina em tópicos e subtópicos para visualizar o conteúdo que preciso estudar.
+
+- Prioridade: P1
+- Critérios de aceitação: tópico e subtópico pertencem ao usuário, período e disciplina; pai pertence à mesma disciplina; título não vazio e sem duplicidade no mesmo nível; status e dificuldade válidos; árvore e estado vazio visíveis; testes de autorização passam.
+- Dependências: US-017 e página de disciplinas.
+- Complexidade: M
+- Status: DONE.
+
 ## Ciclo de entrega
 
 As histórias abaixo fazem parte de um único ciclo consolidado de evolução do produto. A divisão histórica

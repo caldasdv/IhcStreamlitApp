@@ -109,6 +109,18 @@ Invariantes:
 - conclusão, alteração e exclusão filtram por sessão e usuário;
 - prazo de tarefa futuro não deve ser confundido com horário da sessão.
 
+### Topic
+
+Representa uma unidade de conteúdo de uma disciplina; quando possui `parent_id`, é um subtópico.
+
+Invariantes atuais:
+
+- pertence ao mesmo usuário, período e disciplina;
+- o pai, quando informado, pertence ao mesmo usuário, período e disciplina;
+- título não vazio e único dentro da mesma disciplina e do mesmo pai após normalização;
+- status é `NOT_STARTED`, `IN_PROGRESS`, `REVIEWED` ou `MASTERED`;
+- dificuldade é `LOW`, `MEDIUM` ou `HIGH`.
+
 ## Entidades planejadas
 
 | Entidade | Finalidade | Prioridade indicativa | Dependências |

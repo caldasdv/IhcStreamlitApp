@@ -307,6 +307,28 @@ class MongoClassMeetingRepository:
             raise EntityNotFoundError("A aula não foi encontrada ou não está mais disponível.")
 
 
+class MongoTopicRepository:
+    def __init__(self, database) -> None:
+        self.collection = database.topics
+
+    def list_for_subject(self, user_id: Any, academic_period_id: Any, subject_id: Any) -> list[dict[str, Any]]:
+        return list(self.collection.find({"user_id": user_id, "academic_period_id": academic_period_id, "subject_id": subject_id}).sort("title", 1))
+
+    def belongs_to_subject(self, user_id: Any, academic_period_id: Any, subject_id: Any, topic_id: Any) -> bool:
+        return self.collection.find_one({"_id": topic_id, "user_id": user_id, "academic_period_id": academic_period_id, "subject_id": subject_id}, {"_id": 1}) is not None
+
+    def exists_by_title(self, user_id: Any, academic_period_id: Any, subject_id: Any, parent_id: Any | None, title_normalized: str) -> bool:
+        query = {"user_id": user_id, "academic_period_id": academic_period_id, "subject_id": subject_id, "title_normalized": title_normalized, "parent_id": parent_id}
+        return self.collection.find_one(query, {"_id": 1}) is not None
+
+    def create(self, user_id: Any, academic_period_id: Any, subject_id: Any, parent_id: Any | None, title: str, title_normalized: str, status: str, difficulty: str) -> Any:
+        from datetime import UTC, datetime
+        document = {"user_id": user_id, "academic_period_id": academic_period_id, "subject_id": subject_id, "title": title, "title_normalized": title_normalized, "status": status, "difficulty": difficulty, "created_at": datetime.now(UTC), "updated_at": datetime.now(UTC)}
+        if parent_id is not None:
+            document["parent_id"] = parent_id
+        return self.collection.insert_one(document).inserted_id
+
+
 class MongoStudySessionRepository:
     def __init__(self, database) -> None:
         self.collection = database.study_sessions

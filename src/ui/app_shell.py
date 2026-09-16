@@ -48,6 +48,11 @@ def run_app() -> None:
                     icon=":material/calendar_view_week:",
                 ),
                 st.Page(
+                    "app_pages/topics.py",
+                    title="Conteúdos",
+                    icon=":material/account_tree:",
+                ),
+                st.Page(
                     "app_pages/academic_periods.py",
                     title="Períodos acadêmicos",
                     icon=":material/date_range:",

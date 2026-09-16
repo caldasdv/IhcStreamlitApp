@@ -13,6 +13,7 @@ def test_application_services_are_rebuilt_while_database_remains_external(
         subjects=object(),
         class_meetings=object(),
         study_sessions=object(),
+        topics=object(),
     )
     monkeypatch.setattr(container, "get_database", lambda: database)
 

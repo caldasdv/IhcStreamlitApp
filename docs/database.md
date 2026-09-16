@@ -2,7 +2,7 @@
 
 ## Escopo atual
 
-O MVP utiliza `users`, `subjects` e `study_sessions`. O schema abaixo descreve a persistência vigente e as decisões de isolamento aplicadas pelos repositories.
+O MVP utiliza `users`, `subjects`, `study_sessions` e `topics`. O schema abaixo descreve a persistência vigente e as decisões de isolamento aplicadas pelos repositories.
 
 ## Collections
 
@@ -108,6 +108,26 @@ Relacionamentos por referência preservam os ciclos de vida de período e discip
 `{user_id: 1, academic_period_id: 1, weekday: 1, start_time: 1}` para montar a semana e verificar conflitos.
 Cada documento é pequeno; embedding na disciplina dificultaria autorização, ordenação global e conflito entre
 disciplinas.
+
+### `topics`
+
+Finalidade: organizar o conteúdo de uma disciplina em tópicos e subtópicos.
+
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| `_id` | ObjectId | sim |
+| `user_id` | ObjectId | sim |
+| `academic_period_id` | ObjectId | sim |
+| `subject_id` | ObjectId | sim |
+| `parent_id` | ObjectId | não; tópico raiz quando ausente |
+| `title` | string | sim |
+| `title_normalized` | string | sim |
+| `status` | enum `NOT_STARTED`/`IN_PROGRESS`/`REVIEWED`/`MASTERED` | sim |
+| `difficulty` | enum `LOW`/`MEDIUM`/`HIGH` | sim |
+| `created_at` | BSON datetime UTC | sim |
+| `updated_at` | BSON datetime UTC | sim |
+
+Cada tópico pertence ao usuário, período e disciplina; um subtópico referencia apenas um tópico da mesma disciplina. A árvore é consultada por `user_id + academic_period_id + subject_id` e ordenada por título. A unicidade de título é validada pelo service dentro do mesmo pai, disciplina e período.
 
 ## Consultas esperadas
 
