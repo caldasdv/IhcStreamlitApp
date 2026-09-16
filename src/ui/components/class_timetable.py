@@ -17,8 +17,8 @@ _TIMETABLE = st.components.v2.component(
     .timetable-hint { display: none; margin: 0 0 .5rem; color: var(--st-gray-text-color); font: .8rem var(--st-font); }
     .timetable-scroll { max-width: 100%; overflow-x: auto; padding: .15rem .15rem .75rem; scrollbar-color: var(--st-primary-color) var(--st-secondary-background-color); scrollbar-width: thin; }
     .timetable { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .8rem; min-width: 0; }
-    .day { min-height: 11rem; padding: .7rem; border: 1px solid var(--st-border-color); border-radius: var(--st-base-radius); background: var(--st-secondary-background-color); }
-    .day h3 { margin: 0 0 .6rem; padding-bottom: .5rem; border-bottom: 1px solid var(--st-border-color); color: var(--st-heading-color); font: 600 .78rem var(--st-heading-font); letter-spacing: .04em; text-transform: uppercase; }
+    .day { min-height: 14rem; padding: .85rem; border: 1px solid var(--st-border-color); border-radius: var(--st-base-radius); background: var(--st-secondary-background-color); }
+    .day h3 { margin: 0 0 .7rem; padding-bottom: .6rem; border-bottom: 1px solid var(--st-border-color); color: var(--st-heading-color); font: 600 .85rem var(--st-heading-font); letter-spacing: .04em; text-transform: uppercase; }
     .empty { margin-top: 2.6rem; color: var(--st-gray-text-color); font: .75rem var(--st-font); text-align: center; }
     .meeting { position: relative; margin: .3rem 0; padding: .55rem 3.5rem .55rem .55rem; border: 1px solid var(--st-widget-border-color); border-left: 3px solid var(--meeting-color, var(--st-primary-color)); border-radius: var(--st-button-radius); background: var(--st-background-color); color: var(--st-text-color); }
     .meeting strong, .meeting span { display: block; }
