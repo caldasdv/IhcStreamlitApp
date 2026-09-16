@@ -4,7 +4,10 @@ from datetime import time
 
 import streamlit as st
 
-from src.ui.components.class_timetable import render_class_timetable
+from src.ui.components.class_timetable import (
+    render_class_timetable,
+    render_class_timetable_fallback,
+)
 from src.ui.components.page_header import render_page_header
 from src.ui.context import load_current_period_subjects, load_page_context
 from src.ui.feedback import set_success_flash, show_action_error
@@ -66,9 +69,14 @@ deleted_meeting_id, edited_meeting_id = render_class_timetable(
     meetings, WEEKDAYS, key=f"class_timetable_{current_period_id}"
 )
 if deleted_meeting_id:
+    meeting_by_id = {str(meeting["_id"]): meeting for meeting in meetings}
+    deleted_meeting = meeting_by_id.get(str(deleted_meeting_id))
+    if deleted_meeting is None:
+        st.error("Esse horário não está mais disponível. Atualize a grade e tente novamente.")
+        st.stop()
     try:
         services.class_meetings.delete(
-            user["_id"], current_period_id, deleted_meeting_id
+            user["_id"], current_period_id, deleted_meeting["_id"]
         )
     except Exception as error:
         show_action_error("remover a aula", error)
@@ -133,8 +141,10 @@ if editing_meeting:
                 show_action_error("salvar o horário", error)
             else:
                 st.session_state.pop("editing_class_meeting_id", None)
-                set_success_flash("Horário atualizado na grade.")
-                st.rerun()
+        set_success_flash("Horário atualizado na grade.")
+        st.rerun()
+
+render_class_timetable_fallback(meetings, WEEKDAYS)
 
 st.divider()
 with st.expander("Adicionar aula recorrente", expanded=not meetings):

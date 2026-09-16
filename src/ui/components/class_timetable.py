@@ -152,3 +152,23 @@ def render_class_timetable(
         on_edited_change=lambda: None,
     )
     return getattr(result, "deleted", None), getattr(result, "edited", None)
+
+
+def render_class_timetable_fallback(
+    meetings: Iterable[dict[str, Any]], weekdays: Sequence[str]
+) -> None:
+    """Oferece uma leitura textual nativa quando o componente visual não é suportado."""
+    meetings = list(meetings)
+    with st.expander("Ver lista textual da grade", expanded=False):
+        for weekday, weekday_name in enumerate(weekdays):
+            day_meetings = [meeting for meeting in meetings if meeting["weekday"] == weekday]
+            st.markdown(f"**{weekday_name}**")
+            if not day_meetings:
+                st.caption("Livre")
+                continue
+            for meeting in day_meetings:
+                location = f" · {meeting['location']}" if meeting.get("location") else ""
+                st.caption(
+                    f"{meeting['start_time']}–{meeting['end_time']} · "
+                    f"{meeting['subject_name']}{location}"
+                )

@@ -25,6 +25,22 @@ def apply_styles() -> None:
         [data-testid="stHeader"] { background: transparent; }
         [data-testid="stSidebar"] { background: rgba(234, 240, 233, .92); border-right: 1px solid var(--plan-border); }
         [data-testid="stSidebar"] section { padding-top: 1.25rem; }
+        [data-testid="stSidebarNav"] { border-bottom: 1px solid var(--plan-border); padding: 0 .45rem 1rem; }
+        [data-testid="stSidebarNav"] ul { gap: .2rem; }
+        [data-testid="stSidebarNav"] li div a { border-radius: 10px; color: var(--plan-muted); font-weight: 650; padding: .55rem .7rem; }
+        [data-testid="stSidebarNav"] li div a:hover { background: rgba(252, 253, 249, .8); color: var(--plan-text); }
+        [data-testid="stSidebarNav"] li div a[aria-current="page"] { background: var(--plan-surface); box-shadow: 0 4px 14px rgba(23, 50, 45, .06); color: var(--plan-accent-dark); }
+        [data-testid="stSidebarNav"] li div a:focus-visible { outline: 3px solid var(--plan-attention); outline-offset: 2px; }
+        .plan-sidebar-brand { align-items: center; display: flex; gap: .7rem; padding: .25rem .4rem 1rem; }
+        .plan-sidebar-brand strong, .plan-sidebar-brand small { display: block; }
+        .plan-sidebar-brand strong { color: var(--plan-accent-dark); font-size: 1.15rem; letter-spacing: -.04em; }
+        .plan-sidebar-brand small { color: var(--plan-muted); font-size: .72rem; margin-top: .1rem; }
+        .plan-sidebar-mark { align-items: center; background: var(--plan-accent); border-radius: 10px; color: white; display: inline-flex; font-size: .9rem; font-weight: 800; height: 2rem; justify-content: center; width: 2rem; }
+        .plan-sidebar-user { background: rgba(252, 253, 249, .66); border: 1px solid var(--plan-border); border-radius: 12px; margin: .4rem 0 .65rem; padding: .7rem .75rem; }
+        .plan-sidebar-user strong, .plan-sidebar-user span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .plan-sidebar-user strong { color: var(--plan-text); font-size: .82rem; }
+        .plan-sidebar-user span { color: var(--plan-muted); font-size: .7rem; margin-top: .2rem; }
+        .plan-sidebar-section-label { color: var(--plan-accent-dark); font-size: .72rem; font-weight: 750; letter-spacing: .07em; margin: .25rem 0 .4rem; text-transform: uppercase; }
         .block-container { max-width: 1120px; padding-top: 4.5rem; padding-bottom: 5rem; }
         h1, h2, h3 { color: var(--plan-text); font-weight: 700; letter-spacing: -0.025em; overflow: visible; white-space: normal; overflow-wrap: break-word; }
         h1 { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.15; margin-bottom: .55rem; }

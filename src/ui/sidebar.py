@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from html import escape
+
 import streamlit as st
 
 from src.services.container import ApplicationServices
@@ -9,22 +11,29 @@ from src.ui.feedback import set_success_flash, show_action_error
 
 
 def render_account_sidebar(services: ApplicationServices, user: dict) -> None:
-    st.sidebar.markdown("## Plano")
-    st.sidebar.caption("Seu espaço de estudos")
-    st.sidebar.divider()
-    st.sidebar.write(user["name"])
-    st.sidebar.caption(user["email"])
+    st.sidebar.markdown(
+        '<div class="plan-sidebar-brand"><span class="plan-sidebar-mark">P</span>'
+        '<div><strong>Plano</strong><small>Seu espaço de estudos</small></div></div>',
+        unsafe_allow_html=True,
+    )
+    st.sidebar.markdown(
+        f'<div class="plan-sidebar-user"><strong>{escape(str(user["name"]))}</strong>'
+        f'<span>{escape(str(user["email"]))}</span></div>',
+        unsafe_allow_html=True,
+    )
     if st.sidebar.button("Sair", width="stretch"):
         st.logout()
     st.sidebar.divider()
-    st.sidebar.caption("Meta semanal")
+    st.sidebar.markdown(
+        '<div class="plan-sidebar-section-label">Meta semanal</div>',
+        unsafe_allow_html=True,
+    )
     goal_hours = st.sidebar.number_input(
-        "Horas",
+        "Horas por semana",
         min_value=1.0,
         max_value=80.0,
         value=user.get("weekly_goal_minutes", 300) / 60,
         step=0.5,
-        label_visibility="collapsed",
         key="weekly_goal_hours",
     )
     if st.sidebar.button("Salvar meta", width="stretch"):

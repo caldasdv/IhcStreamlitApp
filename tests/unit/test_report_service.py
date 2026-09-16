@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from src.services.report_service import build_subject_summary, build_week_summary
 
@@ -7,13 +7,14 @@ SUBJECTS = [{"_id": "ihc", "name": "IHC"}, {"_id": "bd", "name": "Banco de Dados
 
 
 def test_subject_summary_separates_planned_and_completed_minutes():
+    today = date(2026, 8, 30)
     sessions = [
         {"subject_id": "ihc", "study_date": "2026-08-30", "duration": 60, "status": "Concluída"},
         {"subject_id": "ihc", "study_date": "2026-08-31", "duration": 30, "status": "Pendente"},
         {"subject_id": "bd", "study_date": "2026-08-31", "duration": 45, "status": "Pendente"},
     ]
 
-    result = build_subject_summary(sessions, SUBJECTS)
+    result = build_subject_summary(sessions, SUBJECTS, today=today)
 
     assert result == [
         {"disciplina": "IHC", "planejados": 90, "concluídos": 60, "pendentes": 1, "atrasadas": 0},
@@ -43,7 +44,7 @@ def test_subject_summary_can_be_limited_to_the_selected_week():
 
     selected_week = [session for session in sessions if "2026-08-24" <= session["study_date"] <= "2026-08-30"]
 
-    result = build_subject_summary(selected_week, SUBJECTS)
+    result = build_subject_summary(selected_week, SUBJECTS, today=date(2026, 8, 30))
 
     assert result[0]["planejados"] == 60
     assert result[0]["atrasadas"] == 1

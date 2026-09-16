@@ -11,6 +11,7 @@
 - O dashboard usa Plotly quando há ganho de interação e oferece tabela equivalente.
 - O dashboard também usa cards HTML/CSS reutilizáveis para resumir progresso por disciplina com texto equivalente às barras.
 - A fundação visual usa tokens compartilhados, métricas consistentes, badges compactos e superfícies sem caixas brancas desconectadas.
+- A barra lateral usa marca, conta, navegação ativa, foco visível e meta semanal em blocos distintos.
 - A aplicação possui estados vazios, loading e feedback de ação, mas ainda não há avaliação com usuários.
 
 ### Inferências
@@ -110,6 +111,10 @@ percentuais e minutos concluídos, mantendo os dados preparados no service e sem
 O refinamento posterior alinhou métricas da tela Hoje, estados de sessão e fundo dos gráficos ao
 mesmo sistema visual. Hover e foco foram preservados; a validação de contraste e responsividade
 em navegador real continua pendente.
+
+A grade de aulas passou a ter ações de edição e remoção no card, confirmação local e lista textual
+nativa como fallback. IDs recebidos pelo componente são resolvidos contra os dados carregados antes
+da operação persistente.
 
 ### Sprint 11 — Responsividade e acessibilidade aplicada
 

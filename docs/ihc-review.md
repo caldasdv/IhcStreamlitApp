@@ -61,6 +61,8 @@ precisam ser confirmados com uso real.
 | IHC-024 | Alto | A remoção de uma aula acontecia em uma lista separada da localização visual na grade. | Corrigido tecnicamente; validar descoberta da lixeira, confirmação no card e cancelamento no celular. |
 | IHC-025 | Alto | A grade visual não oferecia edição contextual do horário, obrigando o usuário a procurar uma ação em outra seção. | Corrigido tecnicamente; validar descoberta do lápis, preenchimento do formulário e tratamento de conflitos. |
 | IHC-026 | Médio | Métricas, status e gráficos usavam superfícies e escalas diferentes, reduzindo a coerência visual entre telas. | Corrigido tecnicamente; validar contraste, leitura rápida e responsividade no navegador. |
+| IHC-027 | Alto | A grade visual dependia de ID textual do componente e não possuía leitura nativa equivalente em caso de falha. | Corrigido tecnicamente; validar exclusão real no Atlas e uso do fallback em navegador sem JavaScript. |
+| IHC-028 | Médio | O menu lateral misturava marca, conta, meta e navegação sem agrupamento visual suficiente. | Corrigido tecnicamente; validar localização da página atual, logout e edição da meta. |
 
 ## Plano de avaliação seguinte
 
