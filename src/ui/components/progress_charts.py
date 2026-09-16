@@ -36,6 +36,9 @@ def subject_progress_figure(summary: Sequence[dict[str, Any]]) -> go.Figure:
         legend={"orientation": "h", "y": 1.08, "x": 0},
         xaxis_title="Minutos",
         yaxis_title=None,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font={"color": "#687679"},
     )
     return figure
 
@@ -66,5 +69,8 @@ def weekly_progress_figure(summary: Sequence[dict[str, Any]]) -> go.Figure:
         legend={"orientation": "h", "y": 1.08, "x": 0},
         yaxis_title="Minutos",
         xaxis_title=None,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font={"color": "#687679"},
     )
     return figure

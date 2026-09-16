@@ -10,6 +10,7 @@
 - A grade semanal de aulas usa Custom Component v2 para manter as ações de edição e remoção junto ao cartão, com confirmação local e retorno de eventos ao service Python.
 - O dashboard usa Plotly quando há ganho de interação e oferece tabela equivalente.
 - O dashboard também usa cards HTML/CSS reutilizáveis para resumir progresso por disciplina com texto equivalente às barras.
+- A fundação visual usa tokens compartilhados, métricas consistentes, badges compactos e superfícies sem caixas brancas desconectadas.
 - A aplicação possui estados vazios, loading e feedback de ação, mas ainda não há avaliação com usuários.
 
 ### Inferências
@@ -105,6 +106,10 @@ alternativa. A dependência foi adicionada como `plotly>=5.0`.
 
 O detalhamento por disciplina passou a usar um componente visual leve com barras semânticas,
 percentuais e minutos concluídos, mantendo os dados preparados no service e sem dependência de React.
+
+O refinamento posterior alinhou métricas da tela Hoje, estados de sessão e fundo dos gráficos ao
+mesmo sistema visual. Hover e foco foram preservados; a validação de contraste e responsividade
+em navegador real continua pendente.
 
 ### Sprint 11 — Responsividade e acessibilidade aplicada
 

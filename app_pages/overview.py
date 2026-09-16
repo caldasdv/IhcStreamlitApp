@@ -69,12 +69,9 @@ completed = [s for s in week_sessions if effective_status(s) == "Concluída"]
 completed_minutes = sum(s["duration"] for s in week_sessions if effective_status(s) == "Concluída")
 goal_minutes = user.get("weekly_goal_minutes", 300)
 col1, col2, col3 = st.columns(3)
-col1.write("**Pendências**")
-col1.title(len(pending))
-col2.write("**Progresso da semana**")
-col2.title(f"{completed_minutes / 60:.1f} / {goal_minutes / 60:.1f}h")
-col3.write("**Sessões concluídas**")
-col3.title(len(completed))
+col1.metric("Pendências", len(pending), border=True)
+col2.metric("Progresso da semana", f"{completed_minutes / 60:.1f} / {goal_minutes / 60:.1f}h", border=True)
+col3.metric("Sessões concluídas", len(completed), border=True)
 st.progress(
     min(completed_minutes / goal_minutes, 1.0) if goal_minutes else 0.0,
     text=f"{completed_minutes / goal_minutes * 100:.0f}% da meta semanal" if goal_minutes else "Sem meta",
