@@ -42,6 +42,7 @@ def render_class_timetable(
             f'<h3>{escape(weekday_name[:3])}</h3>{"".join(meeting_markup)}</section>'
         )
     st.markdown(
+        '<p class="plan-timetable-hint">Deslize para ver a semana completa.</p>'
         '<div class="plan-timetable-scroll"><div class="plan-timetable" role="list">'
         + "".join(day_markup)
         + "</div></div>",

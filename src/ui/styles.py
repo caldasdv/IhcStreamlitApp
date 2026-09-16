@@ -49,8 +49,9 @@ def apply_styles() -> None:
         button, input, textarea, select { min-height: 2.5rem; }
         .subject-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .35rem; vertical-align: .05rem; }
         .plan-subject-swatch { width: 1rem; height: 1rem; border-radius: 50%; margin-bottom: .7rem; }
-        .plan-timetable-scroll { overflow-x: auto; padding: .15rem .15rem .75rem; }
-        .plan-timetable { display: grid; grid-template-columns: repeat(7, minmax(155px, 1fr)); gap: .8rem; min-width: 1140px; }
+        .plan-timetable-hint { color: var(--plan-muted); display: none; font-size: .8rem; margin: -.25rem 0 .5rem; }
+        .plan-timetable-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding: .15rem .15rem .75rem; scrollbar-color: var(--plan-accent) var(--plan-input); scrollbar-width: thin; }
+        .plan-timetable { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .8rem; min-width: 0; }
         .plan-timetable-day { background: var(--plan-input); border: 1px solid var(--plan-border); border-radius: 14px; min-height: 16rem; padding: 1rem; }
         .plan-timetable-day h3 { border-bottom: 1px solid var(--plan-border); color: var(--plan-accent-dark); font-size: .95rem; letter-spacing: .06em; margin: 0 0 .9rem; padding-bottom: .7rem; text-transform: uppercase; }
         .plan-meeting { background: var(--plan-surface); border-left: 5px solid var(--meeting-color); border-radius: 9px; box-shadow: 0 2px 8px rgba(30, 45, 49, .06); display: flex; flex-direction: column; gap: .3rem; margin-bottom: .7rem; padding: .8rem; }
@@ -62,6 +63,11 @@ def apply_styles() -> None:
             .block-container { padding-top: 2.75rem; padding-left: 1rem; padding-right: 1rem; }
             h1 { font-size: 2rem; }
             [data-testid="stHorizontalBlock"] { gap: .5rem; }
+        }
+        @media (max-width: 768px) {
+            .plan-timetable-hint { display: block; }
+            .plan-timetable-scroll { -webkit-overflow-scrolling: touch; }
+            .plan-timetable { grid-template-columns: repeat(7, minmax(155px, 1fr)); min-width: 1140px; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
