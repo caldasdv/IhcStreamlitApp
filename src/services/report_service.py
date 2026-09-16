@@ -65,3 +65,34 @@ def build_week_summary(
             }
         )
     return summary
+
+
+def build_topic_summary(
+    sessions: Iterable[dict[str, Any]], topics: Iterable[dict[str, Any]], today: date | None = None
+) -> list[dict[str, Any]]:
+    """Calcula o progresso real de cada conteúdo a partir das sessões vinculadas."""
+    sessions_by_topic: dict[Any, list[dict[str, Any]]] = {}
+    for session in sessions:
+        if session.get("topic_id") is not None:
+            sessions_by_topic.setdefault(session["topic_id"], []).append(session)
+
+    summary = []
+    for topic in topics:
+        rows = sessions_by_topic.get(topic["_id"], [])
+        planned = sum(int(row["duration"]) for row in rows)
+        completed = sum(
+            int(row["duration"])
+            for row in rows
+            if effective_status(row, today=today) == "Concluída"
+        )
+        summary.append(
+            {
+                "topic_id": topic["_id"],
+                "title": topic["title"],
+                "planned_minutes": planned,
+                "completed_minutes": completed,
+                "session_count": len(rows),
+                "progress": completed / planned if planned else 0.0,
+            }
+        )
+    return summary

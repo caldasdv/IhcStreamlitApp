@@ -9,9 +9,10 @@ from src.domain.session_rules import sessions_conflict, validate_new_session
 
 
 class SessionService:
-    def __init__(self, repository, subject_repository) -> None:
+    def __init__(self, repository, subject_repository, topic_repository=None) -> None:
         self.repository = repository
         self.subject_repository = subject_repository
+        self.topic_repository = topic_repository
 
     def list_for_user(
         self,
@@ -40,26 +41,29 @@ class SessionService:
         study_time: time,
         duration: int,
         priority: str,
+        topic_id: Any | None = None,
     ) -> Any:
         validate_new_session(topic=topic, study_date=study_date, duration=duration)
         self._validate_subject_ownership(user_id, subject_id, academic_period_id)
+        self._validate_topic_ownership(user_id, topic_id, subject_id, academic_period_id)
         existing = self.repository.list_pending_by_date(user_id, study_date)
         if sessions_conflict(study_time, duration, existing):
             raise ValueError("Esse horário conflita com outra sessão pendente.")
-        return self.repository.create(
-            {
-                "user_id": user_id,
-                "academic_period_id": academic_period_id,
-                "subject_id": subject_id,
-                "topic": topic.strip(),
-                "study_date": study_date.isoformat(),
-                "study_time": study_time.strftime("%H:%M"),
-                "duration": duration,
-                "priority": priority,
-                "status": "Pendente",
-                "goal": goal.strip(),
-            }
-        )
+        data = {
+            "user_id": user_id,
+            "academic_period_id": academic_period_id,
+            "subject_id": subject_id,
+            "topic": topic.strip(),
+            "study_date": study_date.isoformat(),
+            "study_time": study_time.strftime("%H:%M"),
+            "duration": duration,
+            "priority": priority,
+            "status": "Pendente",
+            "goal": goal.strip(),
+        }
+        if topic_id is not None:
+            data["topic_id"] = topic_id
+        return self.repository.create(data)
 
     def complete(self, session_id: Any, user_id: Any) -> None:
         self.repository.mark_completed(session_id, user_id)
@@ -77,10 +81,12 @@ class SessionService:
         study_time: time,
         duration: int,
         priority: str,
+        topic_id: Any | None = None,
     ) -> None:
         """Edita uma sessão e revalida conflito, ignorando a própria sessão."""
         validate_new_session(topic=topic, study_date=study_date, duration=duration)
         self._validate_subject_ownership(user_id, subject_id, academic_period_id)
+        self._validate_topic_ownership(user_id, topic_id, subject_id, academic_period_id)
         existing = [
             item
             for item in self.repository.list_pending_by_date(user_id, study_date)
@@ -100,6 +106,7 @@ class SessionService:
                 "duration": duration,
                 "priority": priority,
                 "goal": goal.strip(),
+                "topic_id": topic_id,
             },
         )
 
@@ -113,3 +120,13 @@ class SessionService:
             user_id, subject_id, academic_period_id
         ):
             raise ValueError("Selecione uma disciplina válida do período acadêmico atual.")
+
+    def _validate_topic_ownership(
+        self, user_id: Any, topic_id: Any | None, subject_id: Any, academic_period_id: Any
+    ) -> None:
+        if topic_id is None:
+            return
+        if self.topic_repository is None or not self.topic_repository.belongs_to_subject(
+            user_id, academic_period_id, subject_id, topic_id
+        ):
+            raise ValueError("Selecione um conteúdo válido da disciplina.")

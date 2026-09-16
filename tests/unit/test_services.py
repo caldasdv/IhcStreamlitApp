@@ -130,6 +130,14 @@ class FakeAcademicPeriodRepository:
         return user_id == "user-id" and academic_period_id == "period-id"
 
 
+class FakeTopicRepository:
+    def __init__(self, valid_topic_ids=None):
+        self.valid_topic_ids = set(valid_topic_ids or [])
+
+    def belongs_to_subject(self, user_id, academic_period_id, subject_id, topic_id):
+        return topic_id in self.valid_topic_ids
+
+
 def build_subject_service(repository=None):
     return SubjectService(
         repository or FakeSubjectRepository(), FakeAcademicPeriodRepository()
@@ -157,6 +165,48 @@ def test_session_service_creates_normalized_session():
     assert repository.created[0]["goal"] == "Revisar"
     assert repository.created[0]["status"] == "Pendente"
     assert repository.created[0]["academic_period_id"] == "period-id"
+
+
+def test_session_service_links_owned_topic():
+    repository = FakeSessionRepository()
+    service = SessionService(
+        repository, FakeSubjectRepository(), FakeTopicRepository(["topic-id"])
+    )
+
+    service.create(
+        user_id="user-id",
+        academic_period_id="period-id",
+        subject_id="subject-id",
+        topic="Revisão",
+        goal="",
+        study_date=date.today(),
+        study_time=time(14, 0),
+        duration=60,
+        priority="Média",
+        topic_id="topic-id",
+    )
+
+    assert repository.created[0]["topic_id"] == "topic-id"
+
+
+def test_session_service_rejects_topic_from_other_subject():
+    service = SessionService(
+        FakeSessionRepository(), FakeSubjectRepository(), FakeTopicRepository()
+    )
+
+    with pytest.raises(ValueError, match="conteúdo válido"):
+        service.create(
+            user_id="user-id",
+            academic_period_id="period-id",
+            subject_id="subject-id",
+            topic="Revisão",
+            goal="",
+            study_date=date.today(),
+            study_time=time(14, 0),
+            duration=60,
+            priority="Média",
+            topic_id="other-topic",
+        )
 
 
 def test_session_service_rejects_conflicting_session():

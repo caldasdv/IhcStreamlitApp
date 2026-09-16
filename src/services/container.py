@@ -49,6 +49,8 @@ def get_application_services() -> ApplicationServices:
             subject_repository,
             academic_period_repository,
         ),
-        sessions=SessionService(MongoStudySessionRepository(database), subject_repository),
+        sessions=SessionService(
+            MongoStudySessionRepository(database), subject_repository, topic_repository
+        ),
         topics=TopicService(topic_repository, subject_repository, academic_period_repository),
     )

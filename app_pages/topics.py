@@ -6,6 +6,7 @@ from src.ui.components.page_header import render_page_header
 from src.ui.context import load_current_period_subjects, load_page_context
 from src.ui.feedback import set_success_flash, show_action_error
 from src.ui.sidebar import render_account_sidebar
+from src.services.report_service import build_topic_summary
 
 
 STATUS_LABELS = {"NOT_STARTED": "Não iniciado", "IN_PROGRESS": "Em andamento", "REVIEWED": "Revisado", "MASTERED": "Dominado"}
@@ -13,6 +14,11 @@ DIFFICULTY_LABELS = {"LOW": "Baixa", "MEDIUM": "Média", "HIGH": "Alta"}
 
 services, user, _subjects = load_page_context()
 render_account_sidebar(services, user)
+topics_service = getattr(services, "topics", None)
+if topics_service is None:
+    st.error("A versão atual do app ainda não carregou o módulo de conteúdos.")
+    st.caption("Reinicie o Streamlit ou aguarde o novo deploy para atualizar os services.")
+    st.stop()
 subjects = load_current_period_subjects(services, user, retry_key="retry_topics_subjects")
 render_page_header("ORGANIZAÇÃO", "Conteúdos", "Quebre cada disciplina em tópicos claros e acompanhe o que já foi revisado.")
 
@@ -25,7 +31,8 @@ if not subjects:
 subjects_by_id = {subject["_id"]: subject for subject in subjects}
 selected_subject_id = st.selectbox("Disciplina", list(subjects_by_id), format_func=lambda value: subjects_by_id[value]["name"], key="topics_subject")
 try:
-    topics = services.topics.list_for_subject(user["_id"], user.get("current_academic_period_id"), selected_subject_id)
+    topics = topics_service.list_for_subject(user["_id"], user.get("current_academic_period_id"), selected_subject_id)
+    all_sessions = services.sessions.list_for_user(user["_id"], subjects)
 except Exception as error:
     show_action_error("carregar os conteúdos", error)
     st.stop()
@@ -37,6 +44,10 @@ for topic in topics:
         children[topic["parent_id"]].append(topic)
 
 st.subheader(subjects_by_id[selected_subject_id]["name"])
+topic_summary = build_topic_summary(
+    [session for session in all_sessions if session.get("subject_id") == selected_subject_id],
+    topics,
+)
 if not topics:
     st.info("Esta disciplina ainda não tem tópicos. Crie o primeiro conteúdo abaixo.")
 else:
@@ -44,8 +55,14 @@ else:
         with st.container(border=True):
             st.markdown(f"### {root['title']}")
             st.caption(f"{STATUS_LABELS.get(root['status'], root['status'])} · Dificuldade {DIFFICULTY_LABELS.get(root['difficulty'], root['difficulty'])}")
+            root_progress = next((item for item in topic_summary if item["topic_id"] == root["_id"]), None)
+            if root_progress and root_progress["planned_minutes"]:
+                st.progress(root_progress["progress"], text=f"{root_progress['completed_minutes']} de {root_progress['planned_minutes']} min em sessões")
             for child in children[root["_id"]]:
                 st.markdown(f"↳ **{child['title']}** · {STATUS_LABELS.get(child['status'], child['status'])} · {DIFFICULTY_LABELS.get(child['difficulty'], child['difficulty'])}")
+                child_progress = next((item for item in topic_summary if item["topic_id"] == child["_id"]), None)
+                if child_progress and child_progress["planned_minutes"]:
+                    st.progress(child_progress["progress"], text=f"{child_progress['completed_minutes']} de {child_progress['planned_minutes']} min")
 
 with st.expander("Adicionar tópico ou subtópico", expanded=not topics):
     with st.form("new_topic"):
@@ -57,7 +74,7 @@ with st.expander("Adicionar tópico ou subtópico", expanded=not topics):
         submitted = st.form_submit_button("Adicionar conteúdo", type="primary", width="stretch")
     if submitted:
         try:
-            services.topics.create(user_id=user["_id"], academic_period_id=user.get("current_academic_period_id"), subject_id=selected_subject_id, parent_id=parent_id, title=title, status=status, difficulty=difficulty)
+            topics_service.create(user_id=user["_id"], academic_period_id=user.get("current_academic_period_id"), subject_id=selected_subject_id, parent_id=parent_id, title=title, status=status, difficulty=difficulty)
         except ValueError as error:
             st.error(str(error))
         except Exception as error:

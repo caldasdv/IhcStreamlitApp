@@ -77,6 +77,7 @@ Finalidade: planejamento e acompanhamento de sessões.
 | `user_id` | ObjectId | sim |
 | `academic_period_id` | ObjectId | sim para novas sessões |
 | `subject_id` | ObjectId | sim |
+| `topic_id` | ObjectId | não, para associar a sessão a um conteúdo |
 | `topic` | string | sim |
 | `study_date` | string ISO `YYYY-MM-DD` (atual) | sim |
 | `study_time` | string `HH:MM` (atual) | sim |
@@ -85,7 +86,7 @@ Finalidade: planejamento e acompanhamento de sessões.
 | `status` | enum string | sim |
 | `goal` | string | não |
 
-Relaciona-se por referência a `users`, `academic_periods` e `subjects`. Não embutir sessões em usuário ou disciplina: o array cresce e sessões são consultadas/atualizadas individualmente. Índice atual `{user_id: 1, study_date: 1, study_time: 1}` apoia agenda e checagem de conflito. Sessões legadas continuam legíveis por `subject_id`; novas sessões registram também o período atual.
+Relaciona-se por referência a `users`, `academic_periods`, `subjects` e opcionalmente `topics`. Não embutir sessões em usuário ou disciplina: o array cresce e sessões são consultadas/atualizadas individualmente. Índice atual `{user_id: 1, study_date: 1, study_time: 1}` apoia agenda e checagem de conflito. Sessões legadas continuam legíveis por `subject_id`; novas sessões registram também o período atual. O vínculo com `topic_id` é validado contra a mesma disciplina e período antes da escrita.
 
 ### `class_meetings`
 

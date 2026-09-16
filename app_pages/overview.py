@@ -173,6 +173,25 @@ if day_sessions:
                     index=subject_ids.index(current_subject_id),
                     format_func=lambda value: subjects_by_id[value]["name"],
                 )
+                topics_service = getattr(services, "topics", None)
+                edit_topics = (
+                    topics_service.list_for_subject(
+                        user["_id"], current_period_id, edit_subject_id
+                    )
+                    if topics_service is not None
+                    else []
+                )
+                edit_topics_by_id = {topic["_id"]: topic for topic in edit_topics}
+                topic_options = [None, *edit_topics_by_id]
+                current_topic_id = chosen.get("topic_id")
+                if current_topic_id not in topic_options:
+                    current_topic_id = None
+                edit_topic_id = st.selectbox(
+                    "Conteúdo relacionado (opcional)",
+                    topic_options,
+                    index=topic_options.index(current_topic_id),
+                    format_func=lambda value: "Sem conteúdo específico" if value is None else edit_topics_by_id[value]["title"],
+                )
                 edit_topic = st.text_input("Assunto", value=chosen["topic"])
                 edit_goal = st.text_area("Objetivo", value=chosen.get("goal", ""))
                 edit_col1, edit_col2, edit_col3 = st.columns(3)
@@ -216,6 +235,7 @@ if day_sessions:
                         study_time=edit_time,
                         duration=edit_duration,
                         priority=edit_priority,
+                        topic_id=edit_topic_id,
                     )
                 except ValueError as error:
                     st.error(str(error))

@@ -30,12 +30,25 @@ if not current_subjects:
     st.stop()
 
 render_page_header("PLANEJAMENTO", "Nova sessão", "Defina uma sessão pequena e objetiva para facilitar o início do estudo.")
+subjects_by_id = {subject["_id"]: subject for subject in current_subjects}
+subject_id = st.selectbox(
+    "Disciplina",
+    list(subjects_by_id),
+    format_func=lambda value: subjects_by_id[value]["name"],
+)
+topics_service = getattr(services, "topics", None)
+available_topics = (
+    topics_service.list_for_subject(user["_id"], current_period_id, subject_id)
+    if topics_service is not None
+    else []
+)
+topics_by_id = {topic["_id"]: topic for topic in available_topics}
 with st.form("new_session"):
-    subjects_by_id = {subject["_id"]: subject for subject in current_subjects}
-    subject_id = st.selectbox(
-        "Disciplina",
-        list(subjects_by_id),
-        format_func=lambda value: subjects_by_id[value]["name"],
+    topic_id = st.selectbox(
+        "Conteúdo relacionado (opcional)",
+        [None, *topics_by_id],
+        format_func=lambda value: "Sem conteúdo específico" if value is None else topics_by_id[value]["title"],
+        help="Vincule a sessão a um tópico para acompanhar o progresso por conteúdo.",
     )
     topic = st.text_input("O que você vai estudar?", placeholder="Ex.: Heurísticas de Nielsen")
     goal = st.text_area("Objetivo da sessão", placeholder="Ex.: revisar as heurísticas e anotar exemplos")
@@ -52,6 +65,7 @@ if submitted:
             user_id=user["_id"], subject_id=subject_id, topic=topic, goal=goal,
             academic_period_id=current_period_id,
             study_date=study_date, study_time=study_time, duration=duration, priority=priority,
+            topic_id=topic_id,
         )
     except ValueError as error:
         st.error(str(error))
